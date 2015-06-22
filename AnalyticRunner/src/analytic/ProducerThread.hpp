@@ -8,16 +8,17 @@
 #include "util/ImageUtil.hpp"
 #include "../opencctv/util/log/Loggers.hpp"
 #include "../opencctv/util/serialization/Serializable.hpp"
+#include "ImageQueue.hpp"
 
 namespace analytic {
 
 class ProducerThread {
 private:
-	ConcurrentQueue<api::Image_t>* _pImageInputQueue;
+	ImageQueue<api::Image_t>* _pImageInputQueue;
 	opencctv::mq::Receiver* _pReceiver;
 	opencctv::util::serialization::Serializable* _pSerializer;
 public:
-	ProducerThread(ConcurrentQueue<api::Image_t>* pImageInputQueue, opencctv::mq::Receiver* pReceiver, opencctv::util::serialization::Serializable* pSerializer);
+	ProducerThread(ImageQueue<api::Image_t>* pImageInputQueue, opencctv::mq::Receiver* pReceiver, opencctv::util::serialization::Serializable* pSerializer);
 	void operator()();
 };
 

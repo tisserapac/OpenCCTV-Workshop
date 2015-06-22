@@ -3,7 +3,7 @@
 
 namespace analytic {
 
-ConsumerThread::ConsumerThread(ConcurrentQueue<api::Image_t>* pResultsOutputQueue, opencctv::mq::Sender* pSender, opencctv::util::serialization::Serializable* pSerializer) {
+ConsumerThread::ConsumerThread(ImageQueue<api::Image_t>* pResultsOutputQueue, opencctv::mq::Sender* pSender, opencctv::util::serialization::Serializable* pSerializer) {
 	_pResultsOutputQueue = pResultsOutputQueue;
 	_pSender = pSender;
 	_pSerializer = pSerializer;

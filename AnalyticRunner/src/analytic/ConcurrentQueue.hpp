@@ -7,6 +7,7 @@
 #include <semaphore.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 
 namespace analytic {
 
