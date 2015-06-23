@@ -42,9 +42,7 @@ int main()
 	}
 	catch(opencctv::Exception &e)
 	{
-		std::string sErrMsg = "Failed to create StreamGateway -  ";
-		sErrMsg.append(e.what());
-		opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+		opencctv::util::log::Loggers::getDefaultLogger()->error(e.what());
 		return -1;
 	}
 
@@ -56,9 +54,7 @@ int main()
 	}
 	catch(opencctv::Exception &e)
 	{
-		std::string sErrMsg = "Failed to create AnalyticInstanceStreamGateway -  ";
-		sErrMsg.append(e.what());
-		opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+		opencctv::util::log::Loggers::getDefaultLogger()->error(e.what());
 		return -1;
 	}
 
@@ -217,9 +213,6 @@ int main()
 					stream.getCompressionRate() };
 			bool bVmsConnInitDone = false;
 			try {
-				//=======For Test Gateways====================================
-				//bVmsConnInitDone = pVmsConnector->init(connInfo, stream.getVmsConnectorDirLocation());
-				//============================================================
 				bVmsConnInitDone = pVmsConnector->init(connInfo, sVmsPluginDirPath);
 			} catch (std::exception &e) {
 				std::string sErrMsg =

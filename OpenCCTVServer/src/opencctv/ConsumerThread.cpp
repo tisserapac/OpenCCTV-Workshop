@@ -1,4 +1,3 @@
-
 #include "ConsumerThread.hpp"
 
 namespace opencctv {
