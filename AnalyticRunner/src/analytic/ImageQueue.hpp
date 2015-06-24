@@ -29,7 +29,6 @@ public:
 
 	void push(T const& data)
 	{
-		std::cerr << "Analytic Runner ImageQueue : push" << std::endl;
 		boost::mutex::scoped_lock lock(_mutex);
 
 		while(_queue.size() >= size)
@@ -70,7 +69,6 @@ public:
 
 	T pop()
 	{
-		std::cerr << "Analytic Runner ImageQueue : pop" << std::endl;
 		boost::mutex::scoped_lock lock(_mutex);
 
 		while(_queue.empty())

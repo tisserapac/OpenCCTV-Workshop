@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	fflush (stdout);
 	// Saving input arguments
 	std::string sAnalyticInstanceId = argv[1];
-	std::string sAnalyticPluginDirLocation = argv[2];
+	std::string sAnalyticPluginDir = argv[2];
 	std::string sAnalyticPluginFilename = argv[3];
 	std::string sInputAnalyticQueueAddress = argv[4];
 	std::string sOutputAnalyticQueueAddress = argv[5];
@@ -66,16 +66,17 @@ int main(int argc, char* argv[])
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Creating Results output queue done.");
 
 	// Creating internal input, output queue
-	analytic::ConcurrentQueue<analytic::api::Image_t>* pInputImageQueue = new analytic::ConcurrentQueue<analytic::api::Image_t>(5);
-	analytic::ConcurrentQueue<analytic::api::Image_t>* pOutputResultQueue = new analytic::ConcurrentQueue<analytic::api::Image_t>(5);
-	/*analytic::ImageQueue<analytic::api::Image_t>* pInputImageQueue = new analytic::ImageQueue<analytic::api::Image_t>(5);
-	analytic::ImageQueue<analytic::api::Image_t>* pOutputResultQueue = new analytic::ImageQueue<analytic::api::Image_t>(5);*/
+	/*analytic::ConcurrentQueue<analytic::api::Image_t>* pInputImageQueue = new analytic::ConcurrentQueue<analytic::api::Image_t>(5);
+	analytic::ConcurrentQueue<analytic::api::Image_t>* pOutputResultQueue = new analytic::ConcurrentQueue<analytic::api::Image_t>(5);*/
+	analytic::ImageQueue<analytic::api::Image_t>* pInputImageQueue = new analytic::ImageQueue<analytic::api::Image_t>(5);
+	analytic::ImageQueue<analytic::api::Image_t>* pOutputResultQueue = new analytic::ImageQueue<analytic::api::Image_t>(5);
 
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Creating internal input, output queue done.");
 
 	// Loading Analytic plugin
 	opencctv::PluginLoader<analytic::api::Analytic> analyticLoader;
 	analytic::api::Analytic* pAnalytic = NULL;
+	std::string sAnalyticPluginDirLocation;
 	try {
 		//std::string sAnalyticPluginPath = sAnalyticPluginDirLocation;
 		//sAnalyticPluginPath.append("/").append(sAnalyticPluginFilename);
@@ -84,10 +85,12 @@ int main(int argc, char* argv[])
 		{
 			sAnalyticPluginDirLocation.append("/");
 		}
-		sAnalyticPluginDirLocation.append(sAnalyticPluginFilename);
+		sAnalyticPluginDirLocation.append(sAnalyticPluginDir);
+		//sAnalyticPluginDirLocation.append(sAnalyticPluginFilename);
 		std::string sAnalyticPluginPath;
 		opencctv::util::Util::findSharedLibOfPlugin(sAnalyticPluginDirLocation, sAnalyticPluginPath);
-		//std::cerr << "Analytic plugin path = " << sAnalyticPluginDirLocation << std::endl;
+		/*std::cerr << "sAnalyticPluginDirLocation = " << sAnalyticPluginDirLocation << std::endl;
+		std::cerr << "sAnalyticPluginPath = " << sAnalyticPluginPath << std::endl;*/
 		analyticLoader.loadPlugin(sAnalyticPluginPath);
 		pAnalytic = analyticLoader.createPluginInstance();
 	} catch (opencctv::Exception &e) {
