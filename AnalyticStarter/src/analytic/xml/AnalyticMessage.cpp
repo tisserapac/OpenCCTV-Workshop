@@ -89,6 +89,40 @@ std::string AnalyticMessage::getAnalyticStartReply(const std::string& sAnalyticQ
 	return message;
 }
 
+std::string AnalyticMessage::getAnalyticStopRequest(unsigned int iAnalyticInstanceId)
+{
+	boost::property_tree::ptree pt;
+	pt.put("analyticrequest.operation", OPERATION_STOP_ANALYTIC);
+	pt.put("analyticrequest.analyticinstanceid", iAnalyticInstanceId);
+	std::ostringstream oss;
+	try {
+		write_xml(oss, pt);
+	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
+		std::string sErrMsg = "AnalyticMessage : Failed to generate Analytic Instance Stop Request. ";
+		sErrMsg.append(e.what());
+		throw opencctv::Exception(sErrMsg);
+	}
+	std::string message = oss.str();
+	return message;
+}
+
+std::string AnalyticMessage::getAnalyticStopReply(bool bDone)
+{
+	boost::property_tree::ptree pt;
+	pt.put("analyticreply.operation", OPERATION_STOP_ANALYTIC);
+	pt.put("analyticreply.done", bDone);
+	std::ostringstream oss;
+	try {
+		write_xml(oss, pt);
+	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
+		std::string sErrMsg = "AnalyticMessage: Failed to generate Analytic Instance Stop Reply. ";
+		sErrMsg.append(e.what());
+		throw opencctv::Exception(sErrMsg);
+	}
+	std::string message = oss.str();
+	return message;
+}
+
 std::string AnalyticMessage::getPidMessage(pid_t pid)
 {
 	boost::property_tree::ptree pt;
@@ -151,6 +185,20 @@ void AnalyticMessage::parseKillAllAnalyticProcessesReply(const std::string& sRep
 		sDone = pt.get<bool>("analyticreply.done");
 	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
 		std::string sErrMsg = "Failed to parse Kill All Analytic Processes Reply. ";
+		sErrMsg.append(e.what());
+		throw opencctv::Exception(sErrMsg);
+	}
+}
+
+void AnalyticMessage::parseStopAnalyticProcessesReply(const std::string& sReply, bool& sDone)
+{
+	boost::property_tree::ptree pt;
+	std::istringstream iss(sReply);
+	try {
+		read_xml(iss, pt);
+		sDone = pt.get<bool>("analyticreply.done");
+	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
+		std::string sErrMsg = "AnalyticMessage : Failed to Parse Stop Analytic Processes Reply. ";
 		sErrMsg.append(e.what());
 		throw opencctv::Exception(sErrMsg);
 	}
