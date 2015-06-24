@@ -34,11 +34,12 @@ int main()
 	signal(SIGINT, terminateHandler); // for Ctrl + C keyboard interrupt
 
 	// Initializing variables
-	//test::gateway::TestStreamGateway streamGateway;
-	opencctv::db::StreamGateway* pStreamGateway = NULL;
+	test::gateway::TestStreamGateway* pStreamGateway;
+	//opencctv::db::StreamGateway* pStreamGateway = NULL;
 	try
 	{
-		pStreamGateway = new opencctv::db::StreamGateway();
+		//pStreamGateway = new opencctv::db::StreamGateway();
+		pStreamGateway = new test::gateway::TestStreamGateway();
 	}
 	catch(opencctv::Exception &e)
 	{
@@ -46,11 +47,12 @@ int main()
 		return -1;
 	}
 
-	//test::gateway::TestAnalyticInstanceStreamGateway analyticInstanceGateway;
-	opencctv::db::AnalyticInstanceStreamGateway* pAnalyticInstanceGateway = NULL;
+	test::gateway::TestAnalyticInstanceStreamGateway* pAnalyticInstanceGateway;
+	//opencctv::db::AnalyticInstanceStreamGateway* pAnalyticInstanceGateway = NULL;
 	try
 	{
-		pAnalyticInstanceGateway = new opencctv::db::AnalyticInstanceStreamGateway();
+		//pAnalyticInstanceGateway = new opencctv::db::AnalyticInstanceStreamGateway();
+		pAnalyticInstanceGateway = new test::gateway::TestAnalyticInstanceStreamGateway();
 	}
 	catch(opencctv::Exception &e)
 	{
@@ -165,7 +167,7 @@ int main()
 			{
 				sVmsPluginDirPath.append("/");
 			}
-			sVmsPluginDirPath.append(stream.getVmsConnectorFilename());
+			sVmsPluginDirPath.append(stream.getVmsConnectorDirLocation());
 
 			// Loading VMS Connector Plugin
 			opencctv::api::VmsConnector* pVmsConnector = NULL;
@@ -181,6 +183,7 @@ int main()
 
 					std::string sVmsPluginPath;
 					opencctv::util::Util::findSharedLibOfPlugin(sVmsPluginDirPath, sVmsPluginPath);
+					//std::cout << "sVmsPluginPath : " << sVmsPluginPath << std::endl;
 					pVmsPluginLoader->loadPlugin(sVmsPluginPath);
 					pModel->getVmsPluginLoaders()[stream.getVmsTypeId()] = pVmsPluginLoader;
 				} catch (opencctv::Exception &e) {

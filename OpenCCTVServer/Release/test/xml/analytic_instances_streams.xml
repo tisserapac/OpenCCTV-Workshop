@@ -7,7 +7,7 @@
 		<streamid> 1 </streamid>
 		<inputname> default </inputname>
 		<analyticdir>
-			/usr/local/opencctv/analytics/MockAnalytic
+			MockAnalytic
 		</analyticdir>
 		<analyticfile> libMockAnalyticPlugin.so </analyticfile>
 	</analyticinstancestream>
@@ -18,7 +18,7 @@
 		<streamid> 1 </streamid>
 		<inputname> default </inputname>
 		<analyticdir>
-			/usr/local/opencctv/analytics/MockAnalytic
+			MockAnalytic
 		</analyticdir>
 		<analyticfile> libMockAnalyticPlugin.so </analyticfile>
 	</analyticinstancestream>

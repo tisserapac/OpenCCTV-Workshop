@@ -14,6 +14,7 @@ private:
 public:
 	AnalyticInstanceManager(const std::string& sAnalyticServerIp, const std::string& sAnalyticServerPort);
 	bool startAnalyticInstance(unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, const std::string& sAnalyticPluginFilename, std::string& sAnalyticQueueInAddress, std::string& sAnalyticQueueOutAddress);
+	bool stopAnalyticInstance(unsigned int iAnalyticInstanceId);
 	bool killAllAnalyticInstances();
 	virtual ~AnalyticInstanceManager();
 };
