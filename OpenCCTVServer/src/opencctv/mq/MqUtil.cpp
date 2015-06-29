@@ -20,7 +20,8 @@ zmq::socket_t* MqUtil::createNewMq(const std::string& serverPortStr, int zmqServ
 	} catch (error_t &e) {
 		std::string sErrMsg = "Failed to create new MQ at port: ";
 		sErrMsg.append(serverPortStr);
-		throw std::runtime_error(sErrMsg);
+		//throw std::runtime_error(sErrMsg);
+		throw opencctv::Exception(sErrMsg);
 	}
 	return pSocket;
 }
@@ -45,7 +46,8 @@ zmq::socket_t* MqUtil::connectToMq(const std::string& serverName, const std::str
 		sErrMsg.append(serverName);
 		sErrMsg.append(":");
 		sErrMsg.append(serverPortStr);
-		throw std::runtime_error(sErrMsg);
+		//throw std::runtime_error(sErrMsg);
+		throw opencctv::Exception(sErrMsg);
 	}
 	return pSocket;
 }
@@ -67,7 +69,8 @@ bool MqUtil::writeToSocket(zmq::socket_t* pSocket, const std::string* pSMessage)
 			sent = pSocket->send(*pMessageToServer);
 		} catch (error_t &e) {
 			if (pMessageToServer) delete pMessageToServer;
-			throw std::runtime_error("Unable to send to the Socket");
+			//throw std::runtime_error("Unable to send to the Socket");
+			throw opencctv::Exception("Unable to send to the Socket");
 		}
 		if (pMessageToServer) delete pMessageToServer;
 	}
@@ -84,7 +87,8 @@ bool MqUtil::writeToSocket(zmq::socket_t* pSocket, const std::string& sMessage) 
 					sMessage.size());
 			sent = pSocket->send(messageToServer);
 		} catch (error_t &e) {
-			throw std::runtime_error("Unable to send to the Socket");
+			//throw std::runtime_error("Unable to send to the Socket");
+			throw opencctv::Exception("Unable to send to the Socket");
 		}
 	}
 	return sent;
@@ -105,11 +109,13 @@ std::string* MqUtil::readFromSocket(zmq::socket_t* pSocket) {
 			received = pSocket->recv(pMessageFromServer);
 		} catch (error_t &e) {
 			if (pMessageFromServer) delete pMessageFromServer;
-			throw std::runtime_error("Unable to receive from the Socket");
+			//throw std::runtime_error("Unable to receive from the Socket");
+			throw opencctv::Exception("Unable to receive from the Socket");
 		}
 		if (!received) {
 			if (pMessageFromServer) delete pMessageFromServer;
-			throw std::runtime_error("Unable to receive from the Socket");
+			//throw std::runtime_error("Unable to receive from the Socket");
+			throw opencctv::Exception("Unable to receive from the Socket");
 		}
 		pSMessage = new std::string(static_cast<char*>(pMessageFromServer->data()),
 				pMessageFromServer->size());
@@ -118,18 +124,22 @@ std::string* MqUtil::readFromSocket(zmq::socket_t* pSocket) {
 	return pSMessage;
 }
 
-void MqUtil::readFromSocket(zmq::socket_t* pSocket, std::string& sMessage) {
+bool MqUtil::readFromSocket(zmq::socket_t* pSocket, std::string& sMessage) {
 	zmq::message_t messageFromServer;
 	bool received = false;
 	try {
 		received = pSocket->recv(&messageFromServer);
 	} catch (error_t &e) {
-		throw std::runtime_error("Unable to receive from the Socket");
+		//throw std::runtime_error("Unable to receive from the Socket");
+		throw opencctv::Exception("Unable to receive from the Socket");
 	}
 	if (!received) {
-		throw std::runtime_error("Unable to receive from the Socket");
+		//throw std::runtime_error("Unable to receive from the Socket");
+		throw opencctv::Exception("Unable to receive from the Socket");
 	}
 	sMessage = std::string(static_cast<char*>(messageFromServer.data()), messageFromServer.size());
+
+	return received;
 }
 
 std::string MqUtil::getZmqTcpServerBindUrl(const std::string& serverPortStr) {
