@@ -2,10 +2,11 @@
 #ifndef OPENCCTV_CONSUMERTHREAD_HPP_
 #define OPENCCTV_CONSUMERTHREAD_HPP_
 
+#include <vector>
 #include "ApplicationModel.hpp"
 #include "mq/TcpMqSender.hpp"
 #include "ImageMulticaster.hpp"
-#include <vector>
+
 
 namespace opencctv {
 
