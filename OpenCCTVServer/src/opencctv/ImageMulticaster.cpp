@@ -71,6 +71,7 @@ void ImageMulticaster::start() {
 			break;
 		}
 	}
+	ssMsg.clear();
 	ssMsg <<  "Image Multicaster of Consumer thread : " << _iStreamId << " Stopped";
 	opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 }

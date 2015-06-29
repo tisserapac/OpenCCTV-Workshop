@@ -94,6 +94,7 @@ void ResultRouterThread::operator()()
 			}
 		}
 	}
+	ssMsg.clear();
 	ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " Stopped";
 	opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 }
