@@ -10,6 +10,7 @@
 /* boost library links (/usr/local/lib/) -lboost_system */
 #include <boost/lexical_cast.hpp> // to cast types
 #include <exception> // to throw runtime exceptions
+#include "../Exception.hpp"
 
 namespace opencctv {
 namespace mq {
@@ -25,7 +26,7 @@ public:
 	static bool writeToSocket(zmq::socket_t* pSocket, const std::string* pSMessage);
 	static std::string* readFromSocket(zmq::socket_t* pSocket);
 	static bool writeToSocket(zmq::socket_t* pSocket, const std::string& sMessage);
-	static void readFromSocket(zmq::socket_t* pSocket, std::string& sMessage);
+	static bool readFromSocket(zmq::socket_t* pSocket, std::string& sMessage);
 };
 
 } /* namespace mq */
