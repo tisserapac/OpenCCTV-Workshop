@@ -18,6 +18,8 @@ void ResultRouterThread::operator()()
 {
 	util::Config* pConfig = util::Config::getInstance();
 	ApplicationModel* pModel = ApplicationModel::getInstance();
+	std::stringstream ssMsg;
+
 	if(pModel->containsResultsOutputQueueAddress(_iAnalyticInstanceId))
 	{
 		//Initialize the ZMQ connection to the analytic instance's output queue
@@ -77,9 +79,23 @@ void ResultRouterThread::operator()()
 
 			_pFlowController->received();
 			if(pSSerializedResult) delete pSSerializedResult;
+
+			//Define the interrupt point of the results router threads
+			try
+			{
+				boost::this_thread::interruption_point();
+			}
+			catch(const boost::thread_interrupted&)
+			{
+				// Thread interruption request received, break the loop
+				ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
+				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				break;
+			}
 		}
 	}
-	opencctv::util::log::Loggers::getDefaultLogger()->info("Results Router Thread stopped.");
+	ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " Stopped";
+	opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 }
 
 } /* namespace opencctv */

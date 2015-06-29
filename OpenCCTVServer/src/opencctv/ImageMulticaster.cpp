@@ -12,6 +12,8 @@ ImageMulticaster::ImageMulticaster(unsigned int iStreamId) {
 void ImageMulticaster::start() {
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	ConcurrentQueue<Image>* pQueue;
+	std::stringstream ssMsg;
+
 	if(pModel->containsInternalQueue(_iStreamId))
 	{
 		pQueue = pModel->getInternalQueues()[_iStreamId];
@@ -19,11 +21,11 @@ void ImageMulticaster::start() {
 	if(pQueue && _pSerializer)
 	{
 		_bEnable = true;
-		std::stringstream ssMsg;
 		ssMsg << "Image Multicaster " << _iStreamId << " started.";
 		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 	}
-	while (_bEnable) {
+	while (_bEnable)
+	{
 		Image* pImage = NULL;
 		unsigned long long lProducedTime = pQueue->waitAndGetFrontElement(pImage);
 		if(pImage) {
@@ -54,7 +56,23 @@ void ImageMulticaster::start() {
 			}
 		}
 		pQueue->tryRemoveFrontElement();
+
+		//Define the interrupt point of the consumer threads
+		try
+		{
+			boost::this_thread::interruption_point();
+		}
+		catch(const boost::thread_interrupted&)
+		{
+			// Thread interruption request received, break the loop
+			ssMsg.clear();
+			ssMsg <<  "Image Multicaster of Consumer thread : " << _iStreamId << "interrupted";
+			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+			break;
+		}
 	}
+	ssMsg <<  "Image Multicaster of Consumer thread : " << _iStreamId << " Stopped";
+	opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 }
 
 bool ImageMulticaster::send(mq::Sender* pMqSender, Image* pImage) {
