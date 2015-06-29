@@ -28,6 +28,8 @@
 /Release/src/test/gateway/*.o
 /Release/src/opencctv/db/*.d
 /Release/src/opencctv/db/*.o
+/Release/src/event/*.d
+/Release/src/event/*.o
 /Release/src/opencctv/.gitignore
 
 
