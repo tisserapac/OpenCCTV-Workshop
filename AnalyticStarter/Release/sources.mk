@@ -29,6 +29,7 @@ src/opencctv/util \
 src/opencctv/mq \
 src/opencctv \
 src \
+src/analyticserver \
 src/analytic/xml \
 src/analytic/util \
 src/analytic \

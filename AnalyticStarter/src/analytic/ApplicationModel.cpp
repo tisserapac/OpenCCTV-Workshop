@@ -26,6 +26,11 @@ std::map<unsigned int, analytic::AnalyticProcess*>& ApplicationModel::getAnalyti
 	return _mAnalyticProcesses;
 }
 
+std::vector<unsigned int>& ApplicationModel::getAnalyticPorts()
+{
+	return _vPorts;
+}
+
 ApplicationModel::~ApplicationModel() {
 }
 

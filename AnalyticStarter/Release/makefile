@@ -13,6 +13,7 @@ RM := rm -rf
 -include src/opencctv/util/subdir.mk
 -include src/opencctv/mq/subdir.mk
 -include src/opencctv/subdir.mk
+-include src/analyticserver/subdir.mk
 -include src/analytic/xml/subdir.mk
 -include src/analytic/util/subdir.mk
 -include src/analytic/subdir.mk
