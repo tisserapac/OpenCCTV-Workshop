@@ -2,6 +2,8 @@
 #ifndef OPENCCTV_RESULTROUTERTHREAD_HPP_
 #define OPENCCTV_RESULTROUTERTHREAD_HPP_
 
+#include <sstream>
+#include <boost/thread/thread.hpp>
 #include "ApplicationModel.hpp"
 #include "mq/TcpMqReceiver.hpp"
 #include "util/Config.hpp"
@@ -9,7 +11,7 @@
 #include "util/log/Loggers.hpp"
 #include "util/serialization/Serializers.hpp"
 #include "db/AnalyticResultGateway.hpp"
-#include <sstream>
+
 
 namespace opencctv {
 

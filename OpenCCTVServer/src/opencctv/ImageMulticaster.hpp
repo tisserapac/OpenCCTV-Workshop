@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <sstream>
+#include <boost/thread/thread.hpp>
 #include "mq/TcpMqSender.hpp"
 #include "util/Config.hpp"
 #include "Exception.hpp"

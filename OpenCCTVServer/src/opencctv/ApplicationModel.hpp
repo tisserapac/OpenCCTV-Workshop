@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include <boost/thread/thread.hpp>
 #include "mq/Mq.hpp"
 #include "PluginLoader.hpp"
 #include "api/VmsConnector.hpp"
@@ -27,6 +28,8 @@ private:
 	std::map<unsigned int, boost::thread*> _mConsumerThreads; // Stream ID as key
 	std::map<unsigned int, boost::thread*> _mResultsRouterThreads; // Analytic ID as key
 
+	//std::map<unsigned int, ImageMulticaster*> _mImageMulticasters; // Stream ID as key
+
 	std::map<unsigned int, std::string> _mImageInputQueueAddresses; // Analytic Instance ID as key
 	std::map<unsigned int, std::string> _mResultsOutputQueueAddresses; // Analytic Instance ID as key
 	std::map<unsigned int, util::flow::FlowController*> _mFlowControllers; // Analytic Instance ID as key
@@ -48,6 +51,8 @@ public:
 	bool containsConsumerThread(unsigned int iStreamId);
 	bool containsResultsRouterThread(unsigned int iAnalyticInstanceId);
 
+	//bool containsImageMulticaster(unsigned int iStreamId);
+
 	bool containsImageInputQueueAddress(unsigned int iAnalyticInstanceId);
 	bool containsResultsOutputQueueAddress(unsigned int iAnalyticInstanceId);
 	bool containsFlowController(unsigned int iAnalyticInstanceId);
@@ -59,6 +64,8 @@ public:
 	std::map<unsigned int, boost::thread*>& getConsumerThreads();
 	std::map<unsigned int, boost::thread*>& getProducerThreads();
 	std::map<unsigned int, boost::thread*>& getResultsRouterThreads();
+
+	//std::map<unsigned int, ImageMulticaster*> getImageMulticaster();
 
 	std::map<unsigned int, std::string>& getImageInputQueueAddresses();
 	std::map<unsigned int, std::string>& getResultsOutputQueueAddresses();

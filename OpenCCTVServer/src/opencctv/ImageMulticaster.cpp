@@ -3,13 +3,15 @@
 
 namespace opencctv {
 
-ImageMulticaster::ImageMulticaster(unsigned int iStreamId) {
+ImageMulticaster::ImageMulticaster(unsigned int iStreamId)
+{
 	_bEnable = false;
 	_iStreamId = iStreamId;
 	_pSerializer = util::serialization::Serializers::getInstanceOfDefaultSerializer();
 }
 
-void ImageMulticaster::start() {
+void ImageMulticaster::start()
+{
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	ConcurrentQueue<Image>* pQueue;
 	std::stringstream ssMsg;
