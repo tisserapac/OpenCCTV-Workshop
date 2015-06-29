@@ -4,14 +4,88 @@ namespace opencctv {
 
 ApplicationModel* ApplicationModel::_pModel = NULL;
 
-ApplicationModel* ApplicationModel::getInstance() {
+ApplicationModel* ApplicationModel::getInstance()
+{
 	if (!_pModel) {
 		_pModel = new ApplicationModel();
 	}
 	return _pModel;
 }
 
-ApplicationModel::ApplicationModel() {
+ApplicationModel::ApplicationModel()
+{
+	_pProducerThreadGroup = NULL;
+	_pConsumerThreadGroup =NULL;
+	_pResultsRouterThreadGroup = NULL;
+}
+
+boost::thread_group*& ApplicationModel::getConsumerThreadGroup()
+{
+	return _pConsumerThreadGroup;
+}
+
+void ApplicationModel::setConsumerThreadGroup(boost::thread_group*& consumerThreadGroup)
+{
+	_pConsumerThreadGroup = consumerThreadGroup;
+}
+
+boost::thread_group*& ApplicationModel::getProducerThreadGroup()
+{
+	return _pProducerThreadGroup;
+}
+
+void ApplicationModel::setProducerThreadGroup(boost::thread_group*& producerThreadGroup)
+{
+	_pProducerThreadGroup = producerThreadGroup;
+}
+
+boost::thread_group*& ApplicationModel::getResultsRouterThreadGroup()
+{
+	return _pResultsRouterThreadGroup;
+}
+
+void ApplicationModel::setResultsRouterThreadGroup(boost::thread_group*& resultsRouterThreadGroup)
+{
+	_pResultsRouterThreadGroup = resultsRouterThreadGroup;
+}
+
+bool ApplicationModel::containsProducerThread(unsigned int iStreamId)
+{
+	std::map<unsigned int, boost::thread*>::iterator it = _mProducerThreads.find(iStreamId);
+	if (it != _mProducerThreads.end()) {
+		return true;
+	}
+	return false;
+}
+
+bool ApplicationModel::containsConsumerThread(unsigned int iStreamId)
+{
+	std::map<unsigned int, boost::thread*>::iterator it = _mConsumerThreads.find(iStreamId);
+	if (it != _mConsumerThreads.end()) {
+		return true;
+	}
+	return false;
+}
+
+bool ApplicationModel::containsResultsRouterThread(unsigned int iAnalyticInstanceId)
+{
+	std::map<unsigned int, boost::thread*>::iterator it = _mResultsRouterThreads.find(iAnalyticInstanceId);
+	if (it != _mResultsRouterThreads.end()) {
+		return true;
+	}
+	return false;
+}
+
+std::map<unsigned int, boost::thread*>& ApplicationModel::getConsumerThreads(){
+	return _mConsumerThreads;
+}
+
+std::map<unsigned int, boost::thread*>& ApplicationModel::getProducerThreads(){
+	return _mProducerThreads;
+}
+
+std::map<unsigned int, boost::thread*>& ApplicationModel::getResultsRouterThreads(){
+	return _mResultsRouterThreads;
 }
 
 bool ApplicationModel::containsImageInputQueueAddress(unsigned int iAnalyticInstanceId)

@@ -18,6 +18,15 @@ class ApplicationModel {
 private:
 	static ApplicationModel* _pModel;
 	ApplicationModel();
+
+	boost::thread_group* _pProducerThreadGroup;
+	boost::thread_group* _pConsumerThreadGroup;
+	boost::thread_group* _pResultsRouterThreadGroup;
+
+	std::map<unsigned int, boost::thread*> _mProducerThreads; // Stream ID as key
+	std::map<unsigned int, boost::thread*> _mConsumerThreads; // Stream ID as key
+	std::map<unsigned int, boost::thread*> _mResultsRouterThreads; // Analytic ID as key
+
 	std::map<unsigned int, std::string> _mImageInputQueueAddresses; // Analytic Instance ID as key
 	std::map<unsigned int, std::string> _mResultsOutputQueueAddresses; // Analytic Instance ID as key
 	std::map<unsigned int, util::flow::FlowController*> _mFlowControllers; // Analytic Instance ID as key
@@ -27,6 +36,18 @@ private:
 	std::map<unsigned int, analytic::AnalyticInstanceManager*> _mAnalyticInstanceManagers; // Analytic Server ID as key
 public:
 	static ApplicationModel* getInstance();
+
+	boost::thread_group*& getConsumerThreadGroup();
+	void setConsumerThreadGroup(boost::thread_group*& consumerThreadGroup);
+	boost::thread_group*& getProducerThreadGroup();
+	void setProducerThreadGroup(boost::thread_group*& producerThreadGroup);
+	boost::thread_group*& getResultsRouterThreadGroup();
+	void setResultsRouterThreadGroup(boost::thread_group*& resultsRouterThreadGroup);
+
+	bool containsProducerThread(unsigned int iStreamId);
+	bool containsConsumerThread(unsigned int iStreamId);
+	bool containsResultsRouterThread(unsigned int iAnalyticInstanceId);
+
 	bool containsImageInputQueueAddress(unsigned int iAnalyticInstanceId);
 	bool containsResultsOutputQueueAddress(unsigned int iAnalyticInstanceId);
 	bool containsFlowController(unsigned int iAnalyticInstanceId);
@@ -34,6 +55,11 @@ public:
 	bool containsVmsPluginLoader(unsigned int iVmsTypeId);
 	bool containsInternalQueue(unsigned int iStreamId);
 	bool containsAnalyticInstanceManager(unsigned int iAnalyticServerId);
+
+	std::map<unsigned int, boost::thread*>& getConsumerThreads();
+	std::map<unsigned int, boost::thread*>& getProducerThreads();
+	std::map<unsigned int, boost::thread*>& getResultsRouterThreads();
+
 	std::map<unsigned int, std::string>& getImageInputQueueAddresses();
 	std::map<unsigned int, std::string>& getResultsOutputQueueAddresses();
 	std::map<unsigned int, util::flow::FlowController*>& getFlowControllers();
@@ -42,6 +68,8 @@ public:
 	std::map<unsigned int, ConcurrentQueue<Image>*>& getInternalQueues();
 	std::map<unsigned int, analytic::AnalyticInstanceManager*>& getAnalyticInstanceManagers();
 	virtual ~ApplicationModel();
+
+
 };
 
 } /* namespace opencctv */
