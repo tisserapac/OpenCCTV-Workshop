@@ -22,142 +22,129 @@ bool AnalyticInstanceManager::startAnalyticInstance(unsigned int iAnalyticInstan
 	if(_pSocket)
 	{
 		std::string sRequest, sReply;
-		try {
-			sRequest = xml::AnalyticMessage::getAnalyticStartRequest(
-					iAnalyticInstanceId, sAnalyticPluginDirLocation,
-					sAnalyticPluginFilename);
+		try
+		{
+			sRequest = xml::AnalyticMessage::getAnalyticStartRequest(iAnalyticInstanceId, sAnalyticPluginDirLocation, sAnalyticPluginFilename);
+
+			if (!opencctv::mq::MqUtil::writeToSocket(_pSocket, sRequest))
+			{
+				throw opencctv::Exception("Failed to send Analytic Start request.");
+			}
+
+			if(!opencctv::mq::MqUtil::readFromSocket(_pSocket, sReply))
+			{
+				throw opencctv::Exception("Failed to read Analytic Start reply.");
+			}
+
+			if (!sReply.empty() && sReply.compare("Error") != 0)
+			{
+				std::string sMessage;
+				analytic::xml::AnalyticMessage::extractAnalyticStartReplyData(sReply, bRet, sMessage, sAnalyticQueueInAddress,sAnalyticQueueOutAddress);
+			} else
+			{
+				throw opencctv::Exception("Error in extracting Analytic Start reply data.");
+			}
 		} catch (opencctv::Exception &e) {
-			std::string sErrMsg = "Failed to generate Analytic Start request. ";
+			std::string sErrMsg = "AnalyticInstanceManager::startAnalyticInstance - ";
 			sErrMsg.append(e.what());
 			throw opencctv::Exception(sErrMsg);
 		}
-		bool bRequestSent = false;
-		try {
-			bRequestSent = opencctv::mq::MqUtil::writeToSocket(_pSocket, sRequest);
-		} catch (std::runtime_error &e) {
-			std::string sErrMsg = "Failed to send Analytic Start request. ";
-			sErrMsg.append(e.what());
-			throw opencctv::Exception(sErrMsg);
-		}
-		if (bRequestSent) {
-			try {
-				opencctv::mq::MqUtil::readFromSocket(_pSocket, sReply);
-			} catch (std::runtime_error &e) {
-				std::string sErrMsg = "Failed to read Analytic Start reply. ";
-				sErrMsg.append(e.what());
-				throw opencctv::Exception(sErrMsg);
-			}
-			if (!sReply.empty() && sReply.compare("Error") != 0) {
-				try {
-					analytic::xml::AnalyticMessage::extractAnalyticStartReplyData(
-							sReply, sAnalyticQueueInAddress,
-							sAnalyticQueueOutAddress);
-					bRet = true;
-				} catch (opencctv::Exception &e) {
-					std::string sErrMsg =
-							"Failed to extract data from Analytic Start reply. ";
-					sErrMsg.append(e.what());
-					throw opencctv::Exception(sErrMsg);
-				}
-			} else {
-				throw opencctv::Exception("Error in Analytic Start reply.");
-			}
-		}
+	}else
+	{
+		throw opencctv::Exception("AnalyticInstanceManager::startAnalyticInstance - Unable to communicate with analytic server.");
 	}
 	return bRet;
 }
 
-bool AnalyticInstanceManager::stopAnalyticInstance(unsigned int iAnalyticInstanceId)
+bool AnalyticInstanceManager::stopAnalyticInstance(const unsigned int iAnalyticInstanceId, std::string& sMessage)
 {
 	bool bDone = false;
+
 	if(_pSocket)
 	{
 		std::string sRequest, sReply;
-		try {
+		try
+		{
 			sRequest = xml::AnalyticMessage::getAnalyticStopRequest(iAnalyticInstanceId);
+			if(!opencctv::mq::MqUtil::writeToSocket(_pSocket, sRequest))
+			{
+				throw opencctv::Exception("Failed to send Analytic Stop request.");
+			}
+
+			if(!opencctv::mq::MqUtil::readFromSocket(_pSocket, sReply))
+			{
+				throw opencctv::Exception("Failed to read Analytic Stop reply.");
+			}
+
+			if (!sReply.empty() && sReply.compare("Error") != 0)
+			{
+				std::string sMessage;
+				analytic::xml::AnalyticMessage::extractStopAnalyticProcessesReplyData(sReply, bDone, sMessage);
+			} else
+			{
+				throw opencctv::Exception("Error in extracting Analytic Stop reply data.");
+			}
+
 		} catch (opencctv::Exception &e) {
-			std::string sErrMsg = "AnalyticInstanceManager : Failed to generate Analytic Stop request. ";
+			std::string sErrMsg = "AnalyticInstanceManager::stopAnalyticInstance - ";
 			sErrMsg.append(e.what());
 			throw opencctv::Exception(sErrMsg);
-		}
-		bool bRequestSent = false;
-		try {
-			bRequestSent = opencctv::mq::MqUtil::writeToSocket(_pSocket, sRequest);
-		} catch (std::runtime_error &e) {
-			std::string sErrMsg = "AnalyticInstanceManager : Failed to send Analytic Stop request. ";
-			sErrMsg.append(e.what());
-			throw opencctv::Exception(sErrMsg);
-		}
-		if (bRequestSent) {
-			try {
-				opencctv::mq::MqUtil::readFromSocket(_pSocket, sReply);
-			} catch (std::runtime_error &e) {
-				std::string sErrMsg = "AnalyticInstanceManager : Failed to read Analytic Stop reply. ";
-				sErrMsg.append(e.what());
-				throw opencctv::Exception(sErrMsg);
-			}
-			if (!sReply.empty() && sReply.compare("Error") != 0) {
-				try {
-					analytic::xml::AnalyticMessage::parseStopAnalyticProcessesReply(sReply, bDone);
-				} catch (opencctv::Exception &e) {
-					std::string sErrMsg = "AnalyticInstanceManager : Failed to extract data from Analytic Stop reply. ";
-					sErrMsg.append(e.what());
-					throw opencctv::Exception(sErrMsg);
-				}
-			} else {
-				throw opencctv::Exception("AnalyticInstanceManager : Error in Analytic Stop reply.");
-			}
 		}
 
 	}else
 	{
-		throw opencctv::Exception("AnalyticInstanceManager : Unable to communicate with analytic server.");
+		throw opencctv::Exception("AnalyticInstanceManager::stopAnalyticInstance : Unable to communicate with analytic server.");
 	}
 
 	return bDone;
 }
 
-bool AnalyticInstanceManager::killAllAnalyticInstances()
+bool AnalyticInstanceManager::killAllAnalyticInstances(std::string& sMessage)
 {
 	bool bDone = false;
+
 	if(_pSocket)
 	{
-		std::string sMsg, sReply;
-		try {
-			sMsg = xml::AnalyticMessage::getKillAllAnalyticProcessesRequest();
-		} catch (opencctv::Exception &e) {
-			std::string sErrMsg = "Failed to generate xml message. ";
-			sErrMsg.append(e.what());
-			throw opencctv::Exception(sErrMsg);
-		}
-		bool bMsgSent = false;
-		try {
-			bMsgSent = opencctv::mq::MqUtil::writeToSocket(_pSocket, sMsg);
-		} catch (std::runtime_error &e) {
-			std::string sErrMsg = "Failed to send Kill All Analytic Instances Message. ";
-			sErrMsg.append(e.what());
-			throw opencctv::Exception(sErrMsg);
-		}
-		if (bMsgSent) {
-			try {
-				opencctv::mq::MqUtil::readFromSocket(_pSocket, sReply);
-			} catch (std::runtime_error &e) {
-				std::string sErrMsg = "Failed to read Kill all analytic processes reply. ";
-				sErrMsg.append(e.what());
-				throw opencctv::Exception(sErrMsg);
+		std::string sRequest, sReply;
+		try
+		{
+			sRequest = xml::AnalyticMessage::getKillAllAnalyticProcessesRequest();
+
+			if(!opencctv::mq::MqUtil::writeToSocket(_pSocket, sRequest))
+			{
+				throw opencctv::Exception("Failed to send Kill All Analytics request.");
 			}
-			xml::AnalyticMessage::parseKillAllAnalyticProcessesReply(sReply, bDone);
+
+			if(!opencctv::mq::MqUtil::readFromSocket(_pSocket, sReply))
+			{
+				throw opencctv::Exception("Failed to receive Kill All Analytics reply.");
+			}
+
+			if (!sReply.empty() && sReply.compare("Error") != 0)
+			{
+				std::string sMessage;
+				xml::AnalyticMessage::extractKillAllAnalyticProcessesReplyData(sReply, bDone, sMessage);
+			} else
+			{
+				throw opencctv::Exception("Error in extracting Kill All Analytics reply data.");
+			}
+		} catch (opencctv::Exception &e) {
+			std::string sErrMsg = "AnalyticInstanceManager::killAllAnalyticInstances - ";
+			sErrMsg.append(e.what());
+			throw opencctv::Exception(sErrMsg);
 		}
+
+	}else
+	{
+		throw opencctv::Exception("AnalyticInstanceManager::killAllAnalyticInstances : Unable to communicate with analytic server.");
 	}
+
 	return bDone;
 }
 
 AnalyticInstanceManager::~AnalyticInstanceManager() {
-	if(_pSocket)
-	{
-		_pSocket->close();
-		delete _pSocket;
-	}
+	_pSocket->close();
+	delete _pSocket; _pSocket = NULL;
 }
 
 } /* namespace analytic */
