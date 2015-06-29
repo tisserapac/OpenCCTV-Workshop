@@ -18,6 +18,8 @@ namespace pod = boost::program_options::detail;
 namespace opencctv {
 namespace util {
 
+const std::string PROPERTY_OPENCCTV_SERVER_PORT = "opencctv_server_port";
+
 const std::string PROPERTY_ANALYTIC_SERVER_IP = "analytic_server_ip";
 const std::string PROPERTY_ANALYTIC_SERVER_PORT = "analytic_server_port";
 const std::string PROPERTY_INTERNAL_QUEUE_SIZE = "internal_queue_size";
