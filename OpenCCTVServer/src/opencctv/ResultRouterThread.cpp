@@ -21,6 +21,7 @@ void ResultRouterThread::operator()()
 	util::Config* pConfig = util::Config::getInstance();
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	std::stringstream ssMsg;
+	opencctv::db::AnalyticResultGateway* _pAnalyticResultGateway = NULL;
 
 	if(pModel->containsResultsOutputQueueAddress(_iAnalyticInstanceId))
 	{
@@ -40,7 +41,6 @@ void ResultRouterThread::operator()()
 		}
 
 		//Create the AnalyticResultGateway to the DB
-		opencctv::db::AnalyticResultGateway* _pAnalyticResultGateway = NULL;
 		try
 		{
 			_pAnalyticResultGateway = new opencctv::db::AnalyticResultGateway();
@@ -120,6 +120,7 @@ void ResultRouterThread::operator()()
 		}
 	}
 	delete _pSerializer; _pSerializer = NULL;
+	delete _pAnalyticResultGateway; _pAnalyticResultGateway = NULL;
 	ssMsg.clear();
 	ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " Stopped";
 	opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
