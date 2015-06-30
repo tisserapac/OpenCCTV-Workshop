@@ -37,6 +37,9 @@ void ProducerThread::operator ()()
 			opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
 		}
 	}
+
+	_pPluginLoader->deletePluginInstance(_pVmsConn);
+	delete _pVmsConn; _pVmsConn = NULL;
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Producer Thread stopped.");
 }
 
