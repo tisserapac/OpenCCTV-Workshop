@@ -10,8 +10,9 @@ TcpMqReceiver::TcpMqReceiver() {
 bool TcpMqReceiver::createMq(const std::string& serverPortStr) {
 	try {
 		_pSocket = MqUtil::createNewMq(serverPortStr, ZMQ_PULL);
-	} catch (std::runtime_error &e) {
-		throw Exception(std::string(e.what()));
+	} catch(opencctv::Exception &e)
+	{
+		throw e;
 	}
 	if (_pSocket) {
 		return true;
@@ -23,8 +24,9 @@ bool TcpMqReceiver::connectToMq(const std::string& serverName,
 		const std::string& serverPortStr) {
 	try {
 		_pSocket = MqUtil::connectToMq(serverName, serverPortStr, ZMQ_PULL);
-	} catch (std::runtime_error &e) {
-		throw Exception(e.what());
+	} catch(opencctv::Exception &e)
+	{
+		throw e;
 	}
 	if (_pSocket) {
 		return true;
@@ -43,9 +45,9 @@ std::string* TcpMqReceiver::receive() {
 	{
 		pSMessage = MqUtil::readFromSocket(_pSocket);
 	}
-	catch(std::exception &e)
+	catch(opencctv::Exception &e)
 	{
-		throw Exception(e.what());
+		throw e;
 	}
 	return pSMessage;
 }

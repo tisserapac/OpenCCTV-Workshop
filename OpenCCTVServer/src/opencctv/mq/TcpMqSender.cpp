@@ -13,9 +13,9 @@ bool TcpMqSender::createMq(const std::string& serverPortStr) {
 	{
 		_pSocket = MqUtil::createNewMq(serverPortStr, ZMQ_PUSH);
 	}
-	catch(std::runtime_error &e)
-	{
-		throw Exception(std::string(e.what()));
+	catch(opencctv::Exception &e)
+		{
+			throw e;
 	}
 	if (_pSocket) {
 		return true;
@@ -29,9 +29,9 @@ bool TcpMqSender::connectToMq(const std::string& serverName,
 	{
 		_pSocket = MqUtil::connectToMq(serverName, serverPortStr, ZMQ_PUSH);
 	}
-	catch(std::runtime_error &e)
+	catch(opencctv::Exception &e)
 	{
-		throw Exception(e.what());
+		throw e;
 	}
 	if (_pSocket) {
 		return true;
@@ -50,9 +50,9 @@ int TcpMqSender::send(const std::string* pSMessage) {
 	{
 		sent = MqUtil::writeToSocket(_pSocket, pSMessage);
 	}
-	catch(std::runtime_error &e)
+	catch(opencctv::Exception &e)
 	{
-		throw Exception(e.what());
+		throw e;
 	}
 	return sent;
 }
