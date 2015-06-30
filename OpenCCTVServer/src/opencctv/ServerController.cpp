@@ -64,7 +64,76 @@ ServerController::ServerController()
 
 void ServerController::executeOperation()
 {
+	std::string sRequest;
+	std::string sReply;
+	std::string sOperation;
+	std::string sMessage;
 
+	//Read the request
+	try
+	{
+		opencctv::mq::MqUtil::readFromSocket(_pSocket, sRequest);
+		sOperation = opencctv::event::EventMessage::extractEventRequestOperation(sRequest);
+	}
+	catch(opencctv::Exception &e)
+	{
+		sOperation = opencctv::event::EVENT_UNKNOWN;
+		sMessage = e.what();
+	}
+
+	std::cout << "sOperation : " << sOperation << std::endl;
+
+	//Execute the operation according to the operation type
+	if(sOperation.compare(opencctv::event::SERVER_EVENT_START) == 0)
+	{
+		bool bResult = opencctv::event::ServerEvent::serverStart();
+
+		if(bResult)
+		{
+			sReply = opencctv::event::EventMessage::getStartMessageReply();
+		}else
+		{
+			sReply = "Error";
+		}
+		sendReply(sReply);
+	}
+	else if(sOperation.compare(opencctv::event::SERVER_EVENT_STOP) == 0)
+	{
+		bool bResult = opencctv::event::ServerEvent::serverStop();
+
+		if(bResult)
+		{
+			sReply = opencctv::event::EventMessage::getStopMessageReply();
+		}else
+		{
+			sReply = "Error";
+		}
+		sendReply(sReply);
+	}
+	else
+	{
+		std::string sErrMsg = "Request with an unknown Operation.\nRequest: ";
+		sErrMsg.append(sRequest);
+		opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+		//sReply = analytic::xml::AnalyticMessage::getErrorReply(analytic::xml::OPERATION_UNKNOWN, false, sMessage);
+		sReply = "Error";
+		sendReply(sReply);
+	}
+}
+
+void ServerController::sendReply(const std::string& sMessage)
+{
+	if(_pSocket)
+	{
+		try {
+			opencctv::mq::MqUtil::writeToSocket(_pSocket, sMessage);
+		} catch (opencctv::Exception &e) {
+			opencctv::util::log::Loggers::getDefaultLogger()->error(e.what());
+		}
+	}else
+	{
+		opencctv::util::log::Loggers::getDefaultLogger()->error("OpenCCTV Server Request-Reply Queue is not Initialized");
+	}
 }
 
 ServerController::~ServerController()

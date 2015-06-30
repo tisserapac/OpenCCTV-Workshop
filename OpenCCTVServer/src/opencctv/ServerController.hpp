@@ -14,6 +14,9 @@
 #include "util/Config.hpp"
 #include "ApplicationModel.hpp"
 //#include "../analytic/xml/AnalyticMessage.hpp"
+#include "event/EventMessage.hpp"
+#include "event/ServerEvent.hpp"
+#include "event/EventType.hpp"
 
 namespace opencctv {
 
@@ -25,6 +28,8 @@ private:
 	ServerController();
 	ServerController(ServerController const& source);
 	ServerController& operator=(ServerController const&);
+
+	void sendReply(const std::string& sMessage);
 
 public:
 	static ServerController* getInstance();
