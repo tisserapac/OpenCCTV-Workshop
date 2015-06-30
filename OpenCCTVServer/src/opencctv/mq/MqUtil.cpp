@@ -34,12 +34,11 @@ zmq::socket_t* MqUtil::connectToMq(const std::string& serverName, const std::str
 	zmq::socket_t* pSocket = NULL;
 	try {
 		pSocket = new zmq::socket_t(*pContext, zmqClientSocketType);
-		/*int timeout = 100;
-		pSocket->setsockopt(ZMQ_SNDTIMEO, &timeout, sizeof(timeout));*/
+		int timeout = 100;
+		pSocket->setsockopt(ZMQ_RCVTIMEO, &timeout, sizeof(timeout));
 
 		if (pSocket) {
-			pSocket->connect(
-					getZmqServerConnectUrl(serverName, serverPortStr).data());
+			pSocket->connect(getZmqServerConnectUrl(serverName, serverPortStr).data());
 		}
 	} catch (error_t &e) {
 		std::string sErrMsg = "Failed to connect to MQ at: ";
