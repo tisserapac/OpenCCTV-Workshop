@@ -345,13 +345,15 @@ void AnalyticServerController::sendReply(const std::string& sMessage)
 
 void AnalyticServerController::fillIOPorts()
 {
+	analytic::ApplicationModel::getInstance()->getAnalyticPorts().clear();
+
 	unsigned int iPort = STARTING_PORT;
 	for(unsigned int i = 0; i < NO_ANALYTICS; i++)
 	{
 		analytic::ApplicationModel::getInstance()->getAnalyticPorts().push_back(++iPort);//for input queue address
 		analytic::ApplicationModel::getInstance()->getAnalyticPorts().push_back(++iPort);//for output queue address
 	}
-	std::cout << "Size Analytic ports = " << analytic::ApplicationModel::getInstance()->getAnalyticPorts().size();
+	//std::cout << "Size Analytic ports = " << analytic::ApplicationModel::getInstance()->getAnalyticPorts().size();
 }
 
 AnalyticServerController::~AnalyticServerController()
