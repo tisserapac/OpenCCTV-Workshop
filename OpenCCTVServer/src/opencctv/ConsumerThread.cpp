@@ -18,6 +18,8 @@ void ConsumerThread::operator ()()
 	{
 		opencctv::util::log::Loggers::getDefaultLogger()->info("Consumer Thread started.");
 		_pImageMulticaster->start();
+
+		delete _pImageMulticaster; _pImageMulticaster = NULL;
 	}
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Consumer Thread stopped.");
 }
