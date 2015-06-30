@@ -19,9 +19,14 @@
 #include <signal.h> // to handle terminate signal
 #include "opencctv/db/StreamGateway.hpp"
 #include "opencctv/db/AnalyticInstanceStreamGateway.hpp"
+#include "opencctv/ServerController.hpp"
+
 
 
 void terminateHandler(int signum); // Terminate signal handler
+bool init(); //Initialize the OpenCCTV server at startup
+
+bool bEnabled = false;
 
 int main()
 {
@@ -33,6 +38,42 @@ int main()
 	signal(SIGTERM, terminateHandler); // for Terminate signal
 	signal(SIGINT, terminateHandler); // for Ctrl + C keyboard interrupt
 
+	//Initialize the OpenCCTV server
+	/*bool bResult = init();
+	if(!bResult)
+	{
+		return -1;
+	}*/
+
+	//Listen to the events and respond
+	opencctv::ServerController* pServerController = NULL;
+	//bool bEnabled = false;
+	try
+	{
+		pServerController = opencctv::ServerController::getInstance();
+		if(pServerController)
+		{
+			bEnabled = true;
+		}
+	}catch(opencctv::Exception &e)
+	{
+		std::string sErrMsg = "Failed to initialize the OpenCCTV Server : ";
+		sErrMsg.append(e.what());
+		opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+		return -1;
+	}
+
+	while(bEnabled)
+	{
+		opencctv::util::log::Loggers::getDefaultLogger()->info("Listening to the events....");
+		pServerController->executeOperation();
+	}
+
+	return 0;
+}
+
+bool init()
+{
 	// Initializing variables
 	test::gateway::TestStreamGateway* pStreamGateway;
 	//opencctv::db::StreamGateway* pStreamGateway = NULL;
@@ -44,7 +85,7 @@ int main()
 	catch(opencctv::Exception &e)
 	{
 		opencctv::util::log::Loggers::getDefaultLogger()->error(e.what());
-		return -1;
+		return false;
 	}
 
 	test::gateway::TestAnalyticInstanceStreamGateway* pAnalyticInstanceGateway;
@@ -57,14 +98,22 @@ int main()
 	catch(opencctv::Exception &e)
 	{
 		opencctv::util::log::Loggers::getDefaultLogger()->error(e.what());
-		return -1;
+		return false;
 	}
 
 	opencctv::util::Config* pConfig = opencctv::util::Config::getInstance();
 	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
-	boost::thread_group _producerThreadGroup;
-	boost::thread_group _consumerThreadGroup;
-	boost::thread_group _resultsRouterThreadGroup;
+
+	pModel->setServerStatus(opencctv::event::SERVER_STATUS_STOPPED);
+
+	//Create and add the thread groups to the ApplicationModel
+	boost::thread_group* _pPproducerThreadGroup = new boost::thread_group();
+	boost::thread_group* _pConsumerThreadGroup = new boost::thread_group();
+	boost::thread_group* _pResultsRouterThreadGroup = new boost::thread_group();
+	pModel->setProducerThreadGroup(_pPproducerThreadGroup);
+	pModel->setConsumerThreadGroup(_pConsumerThreadGroup);
+	pModel->setResultsRouterThreadGroup(_pResultsRouterThreadGroup);
+
 	size_t internalQueueSize = boost::lexical_cast<size_t>(pConfig->get(opencctv::util::PROPERTY_INTERNAL_QUEUE_SIZE));
 	size_t remoteQueueSize = boost::lexical_cast<size_t>(pConfig->get(opencctv::util::PROPERTY_REMOTE_QUEUE_SIZE));
 	analytic::AnalyticInstanceManager* pAnalyticInstanceManager = new analytic::AnalyticInstanceManager(pConfig->get(opencctv::util::PROPERTY_ANALYTIC_SERVER_IP), pConfig->get(opencctv::util::PROPERTY_ANALYTIC_SERVER_PORT));
@@ -82,7 +131,7 @@ int main()
 		std::string sErrMsg = "Failed to find all Streams. ";
 		sErrMsg.append(e.what());
 		opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
-		return -1;
+		return false;
 	}
 	for(size_t i = 0; i < vStreams.size(); ++i)
 	{
@@ -99,7 +148,7 @@ int main()
 			std::string sErrMsg = "Failed to find all AnalyticInstanceStream. ";
 			sErrMsg.append(e.what());
 			opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
-			return -1;
+			return false;
 		}
 		// Starting Analytic Instances
 		for(size_t j = 0; j < vAnalyticInstances.size(); ++j) {
@@ -240,36 +289,39 @@ int main()
 				{
 					opencctv::ResultRouterThread* pResultsRouter = new opencctv::ResultRouterThread(analyticInstance.getAnalyticInstanceId());
 					boost::thread* pResultsRouterThread = new boost::thread(*pResultsRouter);
+					pModel->getResultsRouterThreads()[analyticInstance.getAnalyticInstanceId()] = pResultsRouterThread;
 					if(pResultsRouterThread->joinable())
 					{
-						_resultsRouterThreadGroup.add_thread(pResultsRouterThread);
+						_pResultsRouterThreadGroup->add_thread(pResultsRouterThread);
 					}
 				}
 			}
 			// Start Consumer and Producer threads
 			boost::thread* pConsumerThread = new boost::thread(*pConsumer);
+			pModel->getConsumerThreads()[stream.getId()] = pConsumerThread;
 			if (pConsumerThread->joinable()) {
 				boost::thread* pProducerThread = new boost::thread(*pProducer);
+				pModel->getProducerThreads()[stream.getId()] = pProducerThread;
 				if (pProducerThread->joinable()) {
-					_consumerThreadGroup.add_thread(pConsumerThread);
-					_producerThreadGroup.add_thread(pProducerThread);
+					_pConsumerThreadGroup->add_thread(pConsumerThread);
+					_pPproducerThreadGroup->add_thread(pProducerThread);
 				}
 			}
 		}
 	}
-	_resultsRouterThreadGroup.join_all();
-	// _consumerThreadGroup.join_all();
-	// _producerThreadGroup.join_all();
-	return 0;
+	pModel->setServerStatus(opencctv::event::SERVER_STATUS_STARTED);
+	return true;
 }
 
 // Signal handler for SIGTERM (Terminate signal)
 void terminateHandler(int signum) {
 	std::map<unsigned int, analytic::AnalyticInstanceManager*> mAnalyticInstanceManagers = opencctv::ApplicationModel::getInstance()->getAnalyticInstanceManagers();
 	std::map<unsigned int, analytic::AnalyticInstanceManager*>::iterator it;
-	for(it = mAnalyticInstanceManagers.begin(); it != mAnalyticInstanceManagers.end(); /*it increment below*/) {
+	for(it = mAnalyticInstanceManagers.begin(); it != mAnalyticInstanceManagers.end(); /*it increment below*/)
+	{
 		analytic::AnalyticInstanceManager* pAnalyticInstanceManager = it->second;
-		if(pAnalyticInstanceManager->killAllAnalyticInstances())
+		std::string sMessage;
+		if(pAnalyticInstanceManager->killAllAnalyticInstances(sMessage))
 		{
 			if(pAnalyticInstanceManager)
 			{
@@ -280,6 +332,7 @@ void terminateHandler(int signum) {
 		}
 		else
 		{
+			opencctv::util::log::Loggers::getDefaultLogger()->error(sMessage);
 			++it;
 		}
 	}
@@ -291,5 +344,6 @@ void terminateHandler(int signum) {
 	{
 		opencctv::util::log::Loggers::getDefaultLogger()->info("Reset all the Analytic Servers.");
 	}
+	bEnabled = false;
 	exit(signum);
 }
