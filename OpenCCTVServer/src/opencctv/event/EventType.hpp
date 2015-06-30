@@ -17,6 +17,9 @@ const std::string SERVER_STATUS_STOPPED = "Stopped";
 const std::string SERVER_EVENT_START = "StartServer";
 const std::string SERVER_EVENT_STOP = "StopServer";
 
+const std::string ANALYTIC_EVENT_STOP = "StopAnalyticInstance";
+const std::string ANALYTIC_EVENT_START = "StartAnalyticInstance";
+
 const std::string EVENT_UNKNOWN = "UnknownEvent";
 
 
