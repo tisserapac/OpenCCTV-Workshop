@@ -11,6 +11,9 @@
 namespace opencctv {
 namespace event {
 
+const std::string SERVER_STATUS_STARTED = "Started";
+const std::string SERVER_STATUS_STOPPED = "Stopped";
+
 const std::string SERVER_EVENT_START = "StartServer";
 const std::string SERVER_EVENT_STOP = "StopServer";
 
