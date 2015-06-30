@@ -12,6 +12,7 @@
 #include "ConcurrentQueue.hpp"
 #include "Image.hpp"
 #include "../analytic/AnalyticInstanceManager.hpp"
+#include "util/log/Loggers.hpp"
 
 namespace opencctv {
 
@@ -20,6 +21,8 @@ private:
 	static ApplicationModel* _pModel;
 	ApplicationModel();
 
+	std::string sServerStatus;
+
 	boost::thread_group* _pProducerThreadGroup;
 	boost::thread_group* _pConsumerThreadGroup;
 	boost::thread_group* _pResultsRouterThreadGroup;
@@ -27,8 +30,6 @@ private:
 	std::map<unsigned int, boost::thread*> _mProducerThreads; // Stream ID as key
 	std::map<unsigned int, boost::thread*> _mConsumerThreads; // Stream ID as key
 	std::map<unsigned int, boost::thread*> _mResultsRouterThreads; // Analytic ID as key
-
-	//std::map<unsigned int, ImageMulticaster*> _mImageMulticasters; // Stream ID as key
 
 	std::map<unsigned int, std::string> _mImageInputQueueAddresses; // Analytic Instance ID as key
 	std::map<unsigned int, std::string> _mResultsOutputQueueAddresses; // Analytic Instance ID as key
@@ -51,8 +52,6 @@ public:
 	bool containsConsumerThread(unsigned int iStreamId);
 	bool containsResultsRouterThread(unsigned int iAnalyticInstanceId);
 
-	//bool containsImageMulticaster(unsigned int iStreamId);
-
 	bool containsImageInputQueueAddress(unsigned int iAnalyticInstanceId);
 	bool containsResultsOutputQueueAddress(unsigned int iAnalyticInstanceId);
 	bool containsFlowController(unsigned int iAnalyticInstanceId);
@@ -65,8 +64,6 @@ public:
 	std::map<unsigned int, boost::thread*>& getProducerThreads();
 	std::map<unsigned int, boost::thread*>& getResultsRouterThreads();
 
-	//std::map<unsigned int, ImageMulticaster*> getImageMulticaster();
-
 	std::map<unsigned int, std::string>& getImageInputQueueAddresses();
 	std::map<unsigned int, std::string>& getResultsOutputQueueAddresses();
 	std::map<unsigned int, util::flow::FlowController*>& getFlowControllers();
@@ -76,7 +73,11 @@ public:
 	std::map<unsigned int, analytic::AnalyticInstanceManager*>& getAnalyticInstanceManagers();
 	virtual ~ApplicationModel();
 
+	const std::string& getServerStatus() const;
 
+	void setServerStatus(const std::string& serverStatus);
+
+	void clear();
 };
 
 } /* namespace opencctv */
