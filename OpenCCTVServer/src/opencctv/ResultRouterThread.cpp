@@ -16,6 +16,8 @@ ResultRouterThread::ResultRouterThread(unsigned int iAnalyticInstanceId) {
 
 void ResultRouterThread::operator()()
 {
+	util::log::Loggers::getDefaultLogger()->info("Results Router started....");
+
 	util::Config* pConfig = util::Config::getInstance();
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	std::stringstream ssMsg;
@@ -51,7 +53,30 @@ void ResultRouterThread::operator()()
 		//Start inserting the analytic instance's results to the results DB
 		while(bConnected && _pFlowController && _pAnalyticResultGateway)
 		{
-			std::string* pSSerializedResult = receiver.receive();
+
+			//Define the interrupt point of the results router threads
+			try
+			{
+				boost::this_thread::interruption_point();
+			}
+			catch(const boost::thread_interrupted&)
+			{
+				// Thread interruption request received, break the loop
+				ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
+				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				break;
+			}
+
+
+			std::string* pSSerializedResult;
+			try
+			{
+				pSSerializedResult = receiver.receive();
+			}catch(opencctv::Exception &e)
+			{
+				continue;
+			}
+
 			analytic::AnalyticResult result = _pSerializer->deserializeAnalyticResult(*pSSerializedResult);
 			std::string sMsg = "\t\tReceived Result of ";
 			sMsg.append(result.getTimestamp());
@@ -94,6 +119,7 @@ void ResultRouterThread::operator()()
 			}
 		}
 	}
+	delete _pSerializer; _pSerializer = NULL;
 	ssMsg.clear();
 	ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " Stopped";
 	opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
