@@ -15,6 +15,7 @@
 #include <boost/lexical_cast.hpp>
 #include <sys/types.h>
 #include "../../opencctv/Exception.hpp"
+#include "../../opencctv/ApplicationModel.hpp"
 
 namespace opencctv {
 namespace event {
@@ -23,6 +24,8 @@ class EventMessage {
 public:
 	EventMessage();
 	static std::string extractEventRequestOperation(const std::string& sEventRequest);
+	static std::string getStartMessageReply();
+	static std::string getStopMessageReply();
 	virtual ~EventMessage();
 };
 
