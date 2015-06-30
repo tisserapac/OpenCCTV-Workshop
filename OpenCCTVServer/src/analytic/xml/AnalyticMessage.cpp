@@ -79,13 +79,14 @@ std::string AnalyticMessage::getAnalyticStartReply(const bool bDone, const std::
 	return message;
 }
 
-void AnalyticMessage::extractAnalyticStartReplyData(const std::string& sAnalyticStartReply, bool bDone, std::string& sMessage, std::string& sAnalyticQueueInAddress, std::string& sAnalyticQueueOutAddress)
+void AnalyticMessage::extractAnalyticStartReplyData(const std::string& sAnalyticStartReply, bool& bDone, std::string& sMessage, std::string& sAnalyticQueueInAddress, std::string& sAnalyticQueueOutAddress)
 {
 	boost::property_tree::ptree pt;
 	std::istringstream iss(sAnalyticStartReply);
 	try {
 		read_xml(iss, pt);
 		bDone = pt.get<bool>("analyticreply.done");
+
 		sMessage = pt.get<std::string>("analyticreply.message");
 		sAnalyticQueueInAddress = pt.get<std::string>("analyticreply.analyticqueueinaddress");
 		sAnalyticQueueOutAddress = pt.get<std::string>("analyticreply.analyticqueueoutaddress");
@@ -235,7 +236,7 @@ std::string AnalyticMessage::getErrorReply(const std::string& sOperation, const 
 	return sReplyMessage;
 }
 
-void AnalyticMessage::extractErrorReplyData(const std::string& sReply, std::string& sOperation, bool bDone, std::string& sMessage)
+void AnalyticMessage::extractErrorReplyData(const std::string& sReply, std::string& sOperation, bool& bDone, std::string& sMessage)
 {
 	boost::property_tree::ptree pt;
 	std::istringstream iss(sReply);

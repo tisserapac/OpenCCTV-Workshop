@@ -9,6 +9,7 @@
 #include <boost/lexical_cast.hpp>
 #include <sys/types.h>
 #include "../../opencctv/Exception.hpp"
+#include <iostream>
 
 namespace analytic {
 namespace xml {
@@ -26,10 +27,10 @@ public:
 	static void extractAnalyticStopRequestData(const std::string& sAnalyticStartRequest, unsigned int& iAnalyticInstanceId);
 
 	//Reply Extract
-	static void extractAnalyticStartReplyData(const std::string& sAnalyticStartReply, bool bDone, std::string& sMessage, std::string& sAnalyticQueueInAddress, std::string& sAnalyticQueueOutAddress);
+	static void extractAnalyticStartReplyData(const std::string& sAnalyticStartReply, bool& bDone, std::string& sMessage, std::string& sAnalyticQueueInAddress, std::string& sAnalyticQueueOutAddress);
 	static void extractKillAllAnalyticProcessesReplyData(const std::string& sReply, bool& sDone, std::string& sMessage);
 	static void extractStopAnalyticProcessesReplyData(const std::string& sReply, bool& bDone, std::string& sMessage);
-	void extractErrorReplyData(const std::string& sReply, std::string& sOperation, bool bDone, std::string& sMessage);
+	void extractErrorReplyData(const std::string& sReply, std::string& sOperation, bool& bDone, std::string& sMessage);
 
 	//Request XML Messages
 	static std::string getAnalyticStartRequest(const unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, const std::string& sAnalyticPluginFilename);
