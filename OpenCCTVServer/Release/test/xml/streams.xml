@@ -8,7 +8,26 @@
 		<keepaspectratio> true </keepaspectratio>
 		<allowupsizing> false </allowupsizing>
 		<compressionrate> 100 </compressionrate>
-		<cameraid> Custom_Cam_ID </cameraid>
+		<cameraid> Custom_Cam_ID1 </cameraid>
+		<vmstypeid> 1 </vmstypeid>
+		<serverip> localhost </serverip>
+		<serverport> 8080 </serverport>
+		<username> opencctv </username>
+		<password> opencctvpassword </password>
+		<vmsconnectordir>
+			FakeVmsConnector
+		</vmsconnectordir>
+		<vmsconnectorfile> libFakeVmsConnectorPlugin.so </vmsconnectorfile>
+	</stream>
+	
+	<stream>
+		<id> 2 </id>
+		<width> 320 </width>
+		<height> 240 </height>
+		<keepaspectratio> true </keepaspectratio>
+		<allowupsizing> false </allowupsizing>
+		<compressionrate> 100 </compressionrate>
+		<cameraid> Custom_Cam_ID2 </cameraid>
 		<vmstypeid> 1 </vmstypeid>
 		<serverip> localhost </serverip>
 		<serverport> 8080 </serverport>

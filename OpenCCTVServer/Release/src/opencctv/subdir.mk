@@ -11,7 +11,8 @@ CPP_SRCS += \
 ../src/opencctv/ImageMulticaster.cpp \
 ../src/opencctv/Process.cpp \
 ../src/opencctv/ProducerThread.cpp \
-../src/opencctv/ResultRouterThread.cpp 
+../src/opencctv/ResultRouterThread.cpp \
+../src/opencctv/ServerController.cpp 
 
 OBJS += \
 ./src/opencctv/ApplicationModel.o \
@@ -21,7 +22,8 @@ OBJS += \
 ./src/opencctv/ImageMulticaster.o \
 ./src/opencctv/Process.o \
 ./src/opencctv/ProducerThread.o \
-./src/opencctv/ResultRouterThread.o 
+./src/opencctv/ResultRouterThread.o \
+./src/opencctv/ServerController.o 
 
 CPP_DEPS += \
 ./src/opencctv/ApplicationModel.d \
@@ -31,7 +33,8 @@ CPP_DEPS += \
 ./src/opencctv/ImageMulticaster.d \
 ./src/opencctv/Process.d \
 ./src/opencctv/ProducerThread.d \
-./src/opencctv/ResultRouterThread.d 
+./src/opencctv/ResultRouterThread.d \
+./src/opencctv/ServerController.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -31,6 +31,7 @@ src/opencctv/util/log \
 src/opencctv/util/flow \
 src/opencctv/util \
 src/opencctv/mq \
+src/opencctv/event \
 src/opencctv/dto \
 src/opencctv/db \
 src/opencctv \

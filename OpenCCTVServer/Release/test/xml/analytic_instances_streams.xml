@@ -11,11 +11,22 @@
 		</analyticdir>
 		<analyticfile> libMockAnalyticPlugin.so </analyticfile>
 	</analyticinstancestream>
-
+	
 	<analyticinstancestream>
 		<id> 2 </id>
 		<analyticinstanceid> 2 </analyticinstanceid>
 		<streamid> 1 </streamid>
+		<inputname> default </inputname>
+		<analyticdir>
+			MockAnalytic
+		</analyticdir>
+		<analyticfile> libMockAnalyticPlugin.so </analyticfile>
+	</analyticinstancestream>
+	
+	<analyticinstancestream>
+		<id> 3 </id>
+		<analyticinstanceid> 3 </analyticinstanceid>
+		<streamid> 2 </streamid>
 		<inputname> default </inputname>
 		<analyticdir>
 			MockAnalytic
