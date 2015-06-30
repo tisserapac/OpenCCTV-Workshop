@@ -224,8 +224,11 @@ bool ServerEvent::serverStart()
 				pProducer = new opencctv::ProducerThread(stream.getId(), pVmsConnector);
 			}
 		}
-		if (pQueue && pConsumer && pProducer) {
+		if (pQueue && pConsumer && pProducer)
+		{
 			// Create and start Results Router threads
+
+			std::cout << "No Results router threads = " << vAnalyticInstances.size() << std::endl;
 			for(size_t j = 0; j < vAnalyticInstances.size(); ++j) {
 				opencctv::dto::AnalyticInstanceStream analyticInstance = vAnalyticInstances[j];
 				if(pModel->containsResultsOutputQueueAddress(analyticInstance.getAnalyticInstanceId()))
@@ -254,21 +257,22 @@ bool ServerEvent::serverStart()
 			}
 		}
 
-		delete pMulticaster;
 		delete pConsumer;
 		delete pProducer;
 	}
 
 	delete pStreamGateway;
 	delete pAnalyticInstanceGateway;
-	delete pAnalyticInstanceManager;
 
+	pModel->setServerStatus(opencctv::event::SERVER_STATUS_STARTED);
 	return true;
-
 }
 
 bool ServerEvent::serverStop()
 {
+	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
+	pModel->clear();
+	pModel->setServerStatus(opencctv::event::SERVER_STATUS_STOPPED);
 	return true;
 }
 

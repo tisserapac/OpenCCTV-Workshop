@@ -25,6 +25,7 @@
 #include "../ResultRouterThread.hpp"
 #include "../db/StreamGateway.hpp"
 #include "../db/AnalyticInstanceStreamGateway.hpp"
+#include "EventType.hpp"
 
 namespace opencctv {
 namespace event {
