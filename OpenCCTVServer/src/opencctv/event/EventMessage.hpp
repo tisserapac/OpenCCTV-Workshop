@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include "../../opencctv/Exception.hpp"
 #include "../../opencctv/ApplicationModel.hpp"
+#include <boost/foreach.hpp>
 
 namespace opencctv {
 namespace event {
@@ -24,6 +25,12 @@ class EventMessage {
 public:
 	EventMessage();
 	static std::string extractEventRequestOperation(const std::string& sEventRequest);
+
+	//Analytic stop
+	static std::string extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticId, std::vector<unsigned int>& vStreamIds);
+	static std::string getAnalyticStopReply(const unsigned int& iAnalyticId);
+
+	//Server start/stop
 	static std::string getStartMessageReply();
 	static std::string getStopMessageReply();
 	virtual ~EventMessage();
