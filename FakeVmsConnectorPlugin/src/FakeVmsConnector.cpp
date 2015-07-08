@@ -50,34 +50,33 @@ void FakeVmsConnector::produceImageObjects(opencctv::ConcurrentQueue<opencctv::I
 	while(_bEnable)
 	//while(_lCount < iCount)
 	{
-		opencctv::Image* pImage = new opencctv::Image();
-		std::stringstream ssTimestamp;
-		ssTimestamp << "Custom Timestamp ";
-		ssTimestamp << _lCount;
-		pImage->setTimestamp(ssTimestamp.str());
-		pImage->setWidth(boost::lexical_cast<unsigned int>(_pConfig->get(util::PROPERTY_IMAGE_WIDTH)));
-		pImage->setHeight(boost::lexical_cast<unsigned int>(_pConfig->get(util::PROPERTY_IMAGE_HEIGHT)));
-		pImage->setImageData(*_pVImageData);
-		pQueue->push(pImage);
-		_lCount++;
-		boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+		try{
+			opencctv::Image* pImage = new opencctv::Image();
+			std::stringstream ssTimestamp;
+			ssTimestamp << "Custom Timestamp ";
+			ssTimestamp << _lCount;
+			pImage->setTimestamp(ssTimestamp.str());
+			pImage->setWidth(boost::lexical_cast<unsigned int>(_pConfig->get(util::PROPERTY_IMAGE_WIDTH)));
+			pImage->setHeight(boost::lexical_cast<unsigned int>(_pConfig->get(util::PROPERTY_IMAGE_HEIGHT)));
+			pImage->setImageData(*_pVImageData);
+			pQueue->push(pImage);
+			_lCount++;
+			boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
 
-		//Define the interrupt point of the producer threads
-		try
-		{
 			boost::this_thread::interruption_point();
-		}
-		catch(const boost::thread_interrupted&)
+
+		}catch(const boost::thread_interrupted& e)
 		{
 			// Thread interruption request received, break the loop
-			ssMsg <<  "Producer thread interrupted";
+			//ssMsg <<  "Producer thread interrupted";
 			std::cout << ssMsg.str() << std::endl;
 			break;
 		}
 	}
-	if(_pVImageData) delete _pVImageData;
+
+	if(_pVImageData) delete _pVImageData; _pVImageData = NULL;
 	ssMsg.clear();
-	ssMsg <<  "Producer thread stopped";
+	//ssMsg <<  "Producer thread stopped";
 	std::cout << ssMsg.str() << std::endl;
 }
 
@@ -87,6 +86,6 @@ bool FakeVmsConnector::isStillProducingImages()
 }
 
 FakeVmsConnector::~FakeVmsConnector() {
-	if(_pVImageData) delete _pVImageData;
+	if(_pVImageData) delete _pVImageData; _pVImageData = NULL;
 }
 

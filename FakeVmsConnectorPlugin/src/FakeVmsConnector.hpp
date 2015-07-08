@@ -25,12 +25,15 @@ public:
 };
 
 // the class factories
-extern "C" FakeVmsConnector* create() {
+extern "C" FakeVmsConnector* create()
+{
 	return new FakeVmsConnector;
 }
 
-extern "C" void destroy(FakeVmsConnector* p) {
-	if (p) {
+extern "C" void destroy(FakeVmsConnector* p)
+{
+	if (p)
+	{
 		delete p;
 	}
 }
