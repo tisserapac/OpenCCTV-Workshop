@@ -34,7 +34,7 @@ zmq::socket_t* MqUtil::connectToMq(const std::string& serverName, const std::str
 	zmq::socket_t* pSocket = NULL;
 	try {
 		pSocket = new zmq::socket_t(*pContext, zmqClientSocketType);
-		int timeout = 100;
+		int timeout = 2000;
 		pSocket->setsockopt(ZMQ_RCVTIMEO, &timeout, sizeof(timeout));
 
 		if (pSocket) {
