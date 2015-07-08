@@ -9,6 +9,7 @@
 #include <boost/lexical_cast.hpp>
 #include <sys/types.h>
 #include "../../opencctv/Exception.hpp"
+#include "../../opencctv/util/Util.hpp"
 #include <iostream>
 
 namespace analytic {

@@ -11,7 +11,7 @@ std::string AnalyticMessage::extractAnalyticRequestOperation(const std::string& 
 	std::istringstream iss(sAnalyticRequest);
 	try {
 		read_xml(iss, pt);
-		sRet = pt.get<std::string>("analyticrequest.operation");
+		sRet = opencctv::util::Util::trim(pt.get<std::string>("analyticrequest.operation"));
 	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
 		std::string sErrMsg = "Failed to parse Analytic Start Reply. ";
 		sErrMsg.append(e.what());
@@ -157,7 +157,7 @@ void AnalyticMessage::extractStopAnalyticProcessesReplyData(const std::string& s
 	try {
 		read_xml(iss, pt);
 		bDone = pt.get<bool>("analyticreply.done");
-		sMessage = pt.get<std::string>("analyticreply.message");
+		sMessage = opencctv::util::Util::trim(pt.get<std::string>("analyticreply.message"));
 	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
 		std::string sErrMsg = "AnalyticMessage : Failed to Parse Stop Analytic Processes Reply. ";
 		sErrMsg.append(e.what());
@@ -209,6 +209,7 @@ void AnalyticMessage::extractKillAllAnalyticProcessesReplyData(const std::string
 		read_xml(iss, pt);
 		sDone = pt.get<bool>("analyticreply.done");
 		sMessage = pt.get<std::string>("analyticreply.message");
+		boost::algorithm::trim (sMessage);
 	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
 		std::string sErrMsg = "Failed to parse Kill All Analytic Processes Reply. ";
 		sErrMsg.append(e.what());
@@ -243,8 +244,10 @@ void AnalyticMessage::extractErrorReplyData(const std::string& sReply, std::stri
 	try {
 		read_xml(iss, pt);
 		sOperation = pt.get<std::string>("analyticreply.operation");
+		boost::algorithm::trim (sOperation);
 		bDone = pt.get<bool>("analyticreply.done");
 		sMessage = pt.get<std::string>("analyticreply.message");
+		boost::algorithm::trim (sMessage);
 	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
 		std::string sErrMsg = "Failed to parse Kill All Analytic Processes Reply. ";
 		sErrMsg.append(e.what());
