@@ -69,7 +69,7 @@ void FakeVmsConnector::produceImageObjects(opencctv::ConcurrentQueue<opencctv::I
 		{
 			// Thread interruption request received, break the loop
 			//ssMsg <<  "Producer thread interrupted";
-			std::cout << ssMsg.str() << std::endl;
+			//std::cout << ssMsg.str() << std::endl;
 			break;
 		}
 	}
@@ -77,7 +77,7 @@ void FakeVmsConnector::produceImageObjects(opencctv::ConcurrentQueue<opencctv::I
 	if(_pVImageData) delete _pVImageData; _pVImageData = NULL;
 	ssMsg.clear();
 	//ssMsg <<  "Producer thread stopped";
-	std::cout << ssMsg.str() << std::endl;
+	//std::cout << ssMsg.str() << std::endl;
 }
 
 bool FakeVmsConnector::isStillProducingImages()
