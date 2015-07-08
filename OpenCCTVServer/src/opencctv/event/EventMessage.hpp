@@ -27,12 +27,16 @@ public:
 	static std::string extractEventRequestOperation(const std::string& sEventRequest);
 
 	//Analytic stop
-	static std::string extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticId, std::vector<unsigned int>& vStreamIds);
+	static void extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticId, std::vector<unsigned int>& vStreamIds);
 	static std::string getAnalyticStopReply(const unsigned int& iAnalyticId);
 
 	//Server start/stop
 	static std::string getStartMessageReply();
 	static std::string getStopMessageReply();
+
+	//Error reply
+	static std::string getInvalidMessageReply(const std::string& sContent);
+
 	virtual ~EventMessage();
 };
 
