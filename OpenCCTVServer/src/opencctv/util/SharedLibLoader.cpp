@@ -16,6 +16,22 @@ void SharedLibLoader::loadLib(const std::string& sShLibPath)
 	}
 }
 
+void SharedLibLoader::closeLib()
+{
+	if(_pShLib)
+	{
+		dlclose(_pShLib);
+	}
+}
+
+/*void SharedLibLoader::loadLib(const std::string& sShLibPath)
+{
+	_pShLib = dlopen(sShLibPath.c_str(), RTLD_LAZY);
+	if (!_pShLib) {
+		throw std::runtime_error(dlerror());
+	}
+}*/
+
 void* SharedLibLoader::getFunctionExecutor(const std::string& sFunctionName) {
 	void* ret = NULL;
 	if (_pShLib) {

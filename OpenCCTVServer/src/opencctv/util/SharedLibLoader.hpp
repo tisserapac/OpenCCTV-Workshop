@@ -15,6 +15,7 @@ private:
 public:
 	SharedLibLoader();
 	void loadLib(const std::string& sShLibPath);
+	void closeLib();
 	void* getFunctionExecutor(const std::string& sFunctionName);
 	virtual ~SharedLibLoader();
 };
