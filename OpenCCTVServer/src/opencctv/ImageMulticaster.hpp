@@ -15,23 +15,26 @@
 #include "util/flow/FlowController.hpp"
 #include "util/serialization/Serializers.hpp"
 #include "util/Util.hpp"
+#include "MulticastDestination.hpp"
 
 namespace opencctv {
 
 class ImageMulticaster {
 private:
-	typedef struct {
+	/*typedef struct {
 		unsigned int iAnalyticInstanceId;
 		std::string sInputName;
-	} Element;
+	} Element;*/
 	unsigned int _iStreamId;
-	std::map<unsigned int, Element> _mAISInfo; // Analytic Instance Stream ID as key
+	//std::map<unsigned int, Element> _mAISInfo; // Analytic Instance Stream ID as key
+	std::map<unsigned int, AnalyticDestination> _mAISInfo; // Analytic Instance ID as key
 	bool _bEnable;
 	util::serialization::Serializable* _pSerializer;
+	MulticastDestination* _pMulticastDestination;
 	bool send(mq::Sender* pMqSender, Image* pImage);
 public:
 	ImageMulticaster(unsigned int iStreamId);
-	void addDestination(const dto::AnalyticInstanceStream& analyticInstance);
+	//void addDestination(const dto::AnalyticInstanceStream& analyticInstance);
 	size_t getNumberOfDestinations();
 	void start();
 	void stop();

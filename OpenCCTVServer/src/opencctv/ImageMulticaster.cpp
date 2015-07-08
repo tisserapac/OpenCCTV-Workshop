@@ -8,6 +8,7 @@ ImageMulticaster::ImageMulticaster(unsigned int iStreamId)
 	_bEnable = false;
 	_iStreamId = iStreamId;
 	_pSerializer = util::serialization::Serializers::getInstanceOfDefaultSerializer();
+	_pMulticastDestination = NULL;
 }
 
 void ImageMulticaster::start()
@@ -20,35 +21,54 @@ void ImageMulticaster::start()
 	{
 		pQueue = pModel->getInternalQueues()[_iStreamId];
 	}
-	if(pQueue && _pSerializer)
+	if(pModel->containsMulticastDestination(_iStreamId))
 	{
+		_pMulticastDestination = pModel->getMulticastDestinations()[_iStreamId];
+	}
+	if(pQueue && _pSerializer && _pMulticastDestination)
+	{
+		//_mAISInfo = _pMulticastDestination->getAllDestinations();
 		_bEnable = true;
 		ssMsg << "Image Multicaster " << _iStreamId << " started.";
 		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 	}
+
+	std::map<unsigned int, AnalyticDestination>::iterator it;
+	unsigned int iAnalyticInstanceId;
+	mq::Sender* pSender = NULL;
+	//std::string sInputName;
+	util::flow::FlowController* pFlowController = NULL;
+
 	while (_bEnable)
 	{
 		Image* pImage = NULL;
-		unsigned long long lProducedTime = pQueue->waitAndGetFrontElement(pImage);
-		if(pImage) {
-			std::map<unsigned int, Element>::iterator it;
-			// for each Analytic Input queue/Analytic Instance Stream
-			for (it = _mAISInfo.begin(); it != _mAISInfo.end(); ++it) {
-				unsigned int iAnalyticInstanceId = it->second.iAnalyticInstanceId;
-				// if Flow Controller available
-				if (pModel->containsFlowController(iAnalyticInstanceId)) {
-					util::flow::FlowController* pFlowController = pModel->getFlowControllers()[iAnalyticInstanceId];
-					// if Flow Controller allows to send
-					if (pFlowController->canSendImageGeneratedAt(lProducedTime)) {
-						unsigned int iId = it->first; // AnalyticInstanceStream ID
-						// check if MQ Sender available
-						if (pModel->containsMulticastDestination(iId)) {
-							mq::Sender* pSender = pModel->getMulticastDestinations()[iId];
-							if (pSender) {
+		try
+		{
+			unsigned long long lProducedTime = pQueue->waitAndGetFrontElement(pImage);
+			if(pImage)
+			{
+				// for each Analytic Input queue/Analytic Instance Stream
+				_mAISInfo = _pMulticastDestination->getAllDestinations();
+				for (it = _mAISInfo.begin(); it != _mAISInfo.end(); ++it)
+				//if(_pMulticastDestination->getNextDestination(iAnalyticInstanceId, sInputName, pSender))
+				{
+					iAnalyticInstanceId = it->second.iAnalyticInstanceId;
+					// if Flow Controller available
+					if (pModel->containsFlowController(iAnalyticInstanceId))
+					{
+						pFlowController = pModel->getFlowControllers()[iAnalyticInstanceId];
+						// if Flow Controller allows to send
+						if (pFlowController->canSendImageGeneratedAt(lProducedTime))
+						{
+							pSender = it->second.pMqSender;
+							if (pSender)
+							{
 								pImage->setStreamId(_iStreamId);
 								pImage->setInputName(it->second.sInputName);
+
 								// send to Analytic Input queue
-								if (send(pSender, pImage)) {
+								if (send(pSender, pImage))
+								{
 									pFlowController->sent(pImage, lProducedTime);
 								}
 							}
@@ -56,23 +76,22 @@ void ImageMulticaster::start()
 					}
 				}
 			}
-		}
-		pQueue->tryRemoveFrontElement();
+			pQueue->tryRemoveFrontElement();
 
-		//Define the interrupt point of the consumer threads
-		try
-		{
+			//Define the interrupt point of the consumer threads
 			boost::this_thread::interruption_point();
-		}
-		catch(const boost::thread_interrupted&)
+
+		}catch(const boost::thread_interrupted&)
 		{
 			// Thread interruption request received, break the loop
+			_bEnable = false;
 			ssMsg.clear();
-			ssMsg <<  "Image Multicaster of Consumer thread : " << _iStreamId << "interrupted";
+			//ssMsg <<  "Image Multicaster of Consumer thread : " << _iStreamId << "interrupted";
 			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 			break;
 		}
 	}
+
 	ssMsg.clear();
 	ssMsg <<  "Image Multicaster of Consumer thread : " << _iStreamId << " Stopped";
 	opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
@@ -84,7 +103,7 @@ bool ImageMulticaster::send(mq::Sender* pMqSender, Image* pImage) {
 	{
 		std::string* pSSerializedImage = _pSerializer->serialize(pImage);
 		try {
-			if(pMqSender->send(pSSerializedImage))
+			if(pMqSender && pMqSender->send(pSSerializedImage))
 			{
 				bSent = true;
 				std::stringstream ssMsg;
@@ -110,7 +129,7 @@ bool ImageMulticaster::send(mq::Sender* pMqSender, Image* pImage) {
 	return bSent;
 }
 
-void ImageMulticaster::addDestination(const dto::AnalyticInstanceStream& analyticInstance)
+/*void ImageMulticaster::addDestination(const dto::AnalyticInstanceStream& analyticInstance)
 {
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	if(pModel->containsImageInputQueueAddress(analyticInstance.getAnalyticInstanceId()))
@@ -146,7 +165,7 @@ void ImageMulticaster::addDestination(const dto::AnalyticInstanceStream& analyti
 			util::log::Loggers::getDefaultLogger()->error(ssErrMsg.str());
 		}
 	}
-}
+}*/
 
 size_t ImageMulticaster::getNumberOfDestinations()
 {
