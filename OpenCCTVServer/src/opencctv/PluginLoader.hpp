@@ -13,9 +13,12 @@ private:
 	util::SharedLibLoader sll;
 	typedef T* create_t();
 	typedef void destroy_t(T*);
+
 public:
-	PluginLoader() {
+	PluginLoader()
+	{
 	}
+
 	void loadPlugin(const std::string& sPluginPath)
 	{
 		try
@@ -27,6 +30,12 @@ public:
 			throw Exception(std::string(e.what()));
 		}
 	}
+
+	void closePlugin()
+	{
+		sll.closeLib();
+	}
+
 	T* createPluginInstance() {
 		create_t* createInstance = NULL;
 		try
@@ -40,6 +49,7 @@ public:
 		}
 		return NULL;
 	}
+
 	void deletePluginInstance(T* pPluginInst)
 	{
 		destroy_t* deleteInstance = NULL;
