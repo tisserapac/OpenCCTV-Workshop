@@ -62,7 +62,7 @@ void ResultRouterThread::operator()()
 			catch(const boost::thread_interrupted&)
 			{
 				// Thread interruption request received, break the loop
-				ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
+				//ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
 				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 				break;
 			}
@@ -113,7 +113,7 @@ void ResultRouterThread::operator()()
 			catch(const boost::thread_interrupted&)
 			{
 				// Thread interruption request received, break the loop
-				ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
+				//ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
 				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 				break;
 			}
