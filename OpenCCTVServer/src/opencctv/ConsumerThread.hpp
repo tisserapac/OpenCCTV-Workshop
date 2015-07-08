@@ -16,6 +16,7 @@ private:
 	ConcurrentQueue<Image>* _pQueue;
 public:
 	ConsumerThread(unsigned int iStreamId, ImageMulticaster* pImageMulticaster);
+	ConsumerThread(unsigned int iStreamId);
 	void operator()();
 };
 

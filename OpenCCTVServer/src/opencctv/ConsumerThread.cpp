@@ -12,6 +12,17 @@ ConsumerThread::ConsumerThread(unsigned int iStreamId, ImageMulticaster* pImageM
 	_pImageMulticaster = pImageMulticaster;
 }
 
+ConsumerThread::ConsumerThread(unsigned int iStreamId)
+{
+	ApplicationModel* pModel = ApplicationModel::getInstance();
+	_pQueue = NULL;
+	if(pModel->containsInternalQueue(iStreamId))
+	{
+		_pQueue = pModel->getInternalQueues()[iStreamId];
+	}
+	_pImageMulticaster = new ImageMulticaster(iStreamId);
+}
+
 void ConsumerThread::operator ()()
 {
 	if(_pImageMulticaster)
