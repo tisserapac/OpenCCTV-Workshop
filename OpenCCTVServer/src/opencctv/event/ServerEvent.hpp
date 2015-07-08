@@ -23,9 +23,11 @@
 #include "../ConsumerThread.hpp"
 #include "../ProducerThread.hpp"
 #include "../ResultRouterThread.hpp"
+#include "../MulticastDestination.hpp"
 #include "../db/StreamGateway.hpp"
 #include "../db/AnalyticInstanceStreamGateway.hpp"
 #include "EventType.hpp"
+
 
 namespace opencctv {
 namespace event {
@@ -33,8 +35,8 @@ namespace event {
 class ServerEvent {
 public:
 	ServerEvent();
-	static bool serverStart();
-	static bool serverStop();
+	static bool startServer();
+	static bool stopServer();
 	virtual ~ServerEvent();
 };
 

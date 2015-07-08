@@ -14,15 +14,24 @@ ServerEvent::ServerEvent()
 {
 }
 
-bool ServerEvent::serverStart()
+bool ServerEvent::startServer()
 {
+	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
+
+	//If the server is already running just return TRUE
+	std::string sServerStatus = pModel->getServerStatus();
+	if(sServerStatus.compare(opencctv::event::SERVER_STATUS_STARTED) == 0)
+	{
+		return true;
+	}
+
 	// Initializing variables
-	test::gateway::TestStreamGateway* pStreamGateway;
-	//opencctv::db::StreamGateway* pStreamGateway = NULL;
+	//test::gateway::TestStreamGateway* pStreamGateway;
+	opencctv::db::StreamGateway* pStreamGateway = NULL;
 	try
 	{
-		//pStreamGateway = new opencctv::db::StreamGateway();
-		pStreamGateway = new test::gateway::TestStreamGateway();
+		pStreamGateway = new opencctv::db::StreamGateway();
+		//pStreamGateway = new test::gateway::TestStreamGateway();
 	}
 	catch(opencctv::Exception &e)
 	{
@@ -30,12 +39,12 @@ bool ServerEvent::serverStart()
 		return false;
 	}
 
-	test::gateway::TestAnalyticInstanceStreamGateway* pAnalyticInstanceGateway;
-	//opencctv::db::AnalyticInstanceStreamGateway* pAnalyticInstanceGateway = NULL;
+	//test::gateway::TestAnalyticInstanceStreamGateway* pAnalyticInstanceGateway;
+	opencctv::db::AnalyticInstanceStreamGateway* pAnalyticInstanceGateway = NULL;
 	try
 	{
-		//pAnalyticInstanceGateway = new opencctv::db::AnalyticInstanceStreamGateway();
-		pAnalyticInstanceGateway = new test::gateway::TestAnalyticInstanceStreamGateway();
+		pAnalyticInstanceGateway = new opencctv::db::AnalyticInstanceStreamGateway();
+		//pAnalyticInstanceGateway = new test::gateway::TestAnalyticInstanceStreamGateway();
 	}
 	catch(opencctv::Exception &e)
 	{
@@ -44,7 +53,6 @@ bool ServerEvent::serverStart()
 	}
 
 	opencctv::util::Config* pConfig = opencctv::util::Config::getInstance();
-	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
 
 	//Create and add the thread groups to the ApplicationModel
 	boost::thread_group* _pPproducerThreadGroup = new boost::thread_group();
@@ -77,7 +85,9 @@ bool ServerEvent::serverStart()
 	for(size_t i = 0; i < vStreams.size(); ++i)
 	{
 		opencctv::dto::Stream stream = vStreams[i];
-		opencctv::ImageMulticaster* pMulticaster = new opencctv::ImageMulticaster(stream.getId());
+		opencctv::MulticastDestination* pMulticastDestination = new opencctv::MulticastDestination();
+		pModel->getMulticastDestinations()[stream.getId()] = pMulticastDestination;
+		//opencctv::ImageMulticaster* pMulticaster = new opencctv::ImageMulticaster(stream.getId());
 		std::vector<opencctv::dto::AnalyticInstanceStream> vAnalyticInstances;
 		try
 		{
@@ -92,13 +102,14 @@ bool ServerEvent::serverStart()
 			return false;
 		}
 		// Starting Analytic Instances
+		std::string sAnalyticQueueInAddress, sAnalyticQueueOutAddress;
 		for(size_t j = 0; j < vAnalyticInstances.size(); ++j)
 		{
 			opencctv::dto::AnalyticInstanceStream analyticInstance = vAnalyticInstances[j];
 			// if the Analytic Instance has not been started yet
-			if(!pModel->containsImageInputQueueAddress(analyticInstance.getAnalyticInstanceId())) {
+			if(!pModel->containsImageInputQueueAddress(analyticInstance.getAnalyticInstanceId()))
+			{
 				bool bAIStarted = false;
-				std::string sAnalyticQueueInAddress, sAnalyticQueueOutAddress;
 				try {
 					// start Analytic Instance, store Analytic Input, Output queue addresses into the Application Model.
 					bAIStarted = pAnalyticInstanceManager->startAnalyticInstance(
@@ -134,7 +145,12 @@ bool ServerEvent::serverStart()
 			}
 			// Adding Input Image Queue destinations to Image Multicaster
 			try {
-				pMulticaster->addDestination(analyticInstance);
+				if(pModel->containsImageInputQueueAddress(analyticInstance.getAnalyticInstanceId()))
+				{
+					sAnalyticQueueInAddress = pModel->getImageInputQueueAddresses()[analyticInstance.getAnalyticInstanceId()];
+					pMulticastDestination->addDestination(analyticInstance.getAnalyticInstanceId(), analyticInstance.getInputName(),sAnalyticQueueInAddress);
+					//pMulticaster->addDestination(analyticInstance);
+				}
 			} catch (opencctv::Exception &e) {
 				std::string sErrMsg = "Failed to add destination to Image Multicaster. ";
 				sErrMsg.append(e.what());
@@ -148,11 +164,12 @@ bool ServerEvent::serverStart()
 		opencctv::ConcurrentQueue<opencctv::Image>* pQueue = NULL;
 		opencctv::ConsumerThread* pConsumer = NULL;
 		opencctv::ProducerThread* pProducer = NULL;
-		if(pMulticaster->getNumberOfDestinations() > 0)
+		if(pMulticastDestination->getNumberOfDestinations() > 0)
 		{
 			pQueue = new opencctv::ConcurrentQueue<opencctv::Image>(internalQueueSize);
 			pModel->getInternalQueues()[stream.getId()] = pQueue;
-			pConsumer = new opencctv::ConsumerThread(stream.getId(), pMulticaster);
+			//pConsumer = new opencctv::ConsumerThread(stream.getId(), pMulticaster);
+			pConsumer = new opencctv::ConsumerThread(stream.getId());
 
 			std::string sVmsPluginDirPath = pConfig->get(opencctv::util::PROPERTY_VMS_CONNECTOR_DIR);
 			if(*sVmsPluginDirPath.rbegin() != '/') // check last char
@@ -206,42 +223,57 @@ bool ServerEvent::serverStart()
 					stream.getWidth(), stream.getHeight(),
 					stream.getKeepAspectRatio(), stream.getAllowUpSizing(),
 					stream.getCompressionRate() };
+
 			bool bVmsConnInitDone = false;
-			try {
-				bVmsConnInitDone = pVmsConnector->init(connInfo, sVmsPluginDirPath);
-			} catch (std::exception &e) {
-				std::string sErrMsg =
-						"Failed to initialize VMS Connector plugin. ";
-				sErrMsg.append(e.what());
-				opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+			if(pVmsConnector)
+			{
+				try {
+					bVmsConnInitDone = pVmsConnector->init(connInfo, sVmsPluginDirPath);
+				} catch (std::exception &e) {
+					std::string sErrMsg = "Failed to initialize VMS Connector plugin. ";
+					sErrMsg.append(e.what());
+					opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+				}
 			}
-			if(pVmsConnector && bVmsConnInitDone)
+
+			if(bVmsConnInitDone)
 			{
 				std::stringstream ssMsg;
 				ssMsg << "VMS Connector plugin " << stream.getId();
 				ssMsg << " init done.";
 				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-				pProducer = new opencctv::ProducerThread(stream.getId(), pVmsConnector);
+
+				//Add the VMS connector to the ApplicationModel
+				std::pair <unsigned int,opencctv::api::VmsConnector*> vmsConn (stream.getVmsTypeId(),pVmsConnector);
+				pModel->getVmsConnectors()[stream.getId()] = vmsConn;
+
+				//pProducer = new opencctv::ProducerThread(stream.getId(), stream.getVmsTypeId(), pVmsConnector);
+				pProducer = new opencctv::ProducerThread(stream.getId());
 			}
 		}
 		if (pQueue && pConsumer && pProducer)
 		{
 			// Create and start Results Router threads
-
-			std::cout << "No Results router threads = " << vAnalyticInstances.size() << std::endl;
-			for(size_t j = 0; j < vAnalyticInstances.size(); ++j) {
+			//std::cout << "No Results router threads = " << vAnalyticInstances.size() << std::endl;
+			for(size_t j = 0; j < vAnalyticInstances.size(); ++j)
+			{
 				opencctv::dto::AnalyticInstanceStream analyticInstance = vAnalyticInstances[j];
-				if(pModel->containsResultsOutputQueueAddress(analyticInstance.getAnalyticInstanceId()))
+
+				if(!pModel->containsResultsRouterThread(analyticInstance.getAnalyticInstanceId()))
 				{
-					opencctv::ResultRouterThread* pResultsRouter = new opencctv::ResultRouterThread(analyticInstance.getAnalyticInstanceId());
-					boost::thread* pResultsRouterThread = new boost::thread(*pResultsRouter);
-					pModel->getResultsRouterThreads()[analyticInstance.getAnalyticInstanceId()] = pResultsRouterThread;
-					if(pResultsRouterThread->joinable())
+					if(pModel->containsResultsOutputQueueAddress(analyticInstance.getAnalyticInstanceId()))
 					{
-						_pResultsRouterThreadGroup->add_thread(pResultsRouterThread);
+						opencctv::ResultRouterThread* pResultsRouter = new opencctv::ResultRouterThread(analyticInstance.getAnalyticInstanceId());
+						boost::thread* pResultsRouterThread = new boost::thread(*pResultsRouter);
+						pModel->getResultsRouterThreads()[analyticInstance.getAnalyticInstanceId()] = pResultsRouterThread;
+						if(pResultsRouterThread->joinable())
+						{
+							_pResultsRouterThreadGroup->add_thread(pResultsRouterThread);
+						}
+
+						delete pResultsRouter;
 					}
 
-					delete pResultsRouter;
 				}
 			}
 			// Start Consumer and Producer threads
@@ -268,7 +300,7 @@ bool ServerEvent::serverStart()
 	return true;
 }
 
-bool ServerEvent::serverStop()
+bool ServerEvent::stopServer()
 {
 	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
 	pModel->clear();
