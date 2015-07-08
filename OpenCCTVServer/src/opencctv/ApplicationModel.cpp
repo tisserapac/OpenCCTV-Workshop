@@ -75,7 +75,7 @@ bool ApplicationModel::containsFlowController(unsigned int iAnalyticInstanceId)
 
 bool ApplicationModel::containsMulticastDestination(unsigned int iId)
 {
-	std::map<unsigned int, mq::Sender*>::iterator it = _mMulticastDestinations.find(iId);
+	std::map<unsigned int, MulticastDestination*>::iterator it = _mMulticastDestinations.find(iId);
 	if(it != _mMulticastDestinations.end())
 	{
 		return true;
@@ -107,6 +107,15 @@ bool ApplicationModel::containsAnalyticInstanceManager(unsigned int iAnalyticSer
 {
 	std::map<unsigned int, analytic::AnalyticInstanceManager*>::iterator it = _mAnalyticInstanceManagers.find(iAnalyticServerId);
 	if (it != _mAnalyticInstanceManagers.end()) {
+		return true;
+	}
+	return false;
+}
+
+bool ApplicationModel::containsVmsConnector(unsigned int iStreamId)
+{
+	std::map<unsigned int, std::pair <unsigned int,opencctv::api::VmsConnector*> >::iterator it = _mVmsConnectors.find(iStreamId);
+	if (it != _mVmsConnectors.end()) {
 		return true;
 	}
 	return false;
@@ -169,7 +178,7 @@ std::map<unsigned int, util::flow::FlowController*>& ApplicationModel::getFlowCo
 	return _mFlowControllers;
 }
 
-std::map<unsigned int, mq::Sender*>& ApplicationModel::getMulticastDestinations()
+std::map<unsigned int, MulticastDestination*>& ApplicationModel::getMulticastDestinations()
 {
 	return _mMulticastDestinations;
 }
@@ -187,6 +196,11 @@ std::map<unsigned int, ConcurrentQueue<Image>*>& ApplicationModel::getInternalQu
 std::map<unsigned int, analytic::AnalyticInstanceManager*>& ApplicationModel::getAnalyticInstanceManagers()
 {
 	return _mAnalyticInstanceManagers;
+}
+
+std::map<unsigned int, std::pair <unsigned int,opencctv::api::VmsConnector*> >& ApplicationModel::getVmsConnectors()
+{
+	return _mVmsConnectors;
 }
 
 const std::string& ApplicationModel::getServerStatus() const {
@@ -210,13 +224,9 @@ void ApplicationModel::clear()
 
 		while (pThread->timed_join(boost::posix_time::seconds(1))==false)
 		{
-			// Interupt the thread
-			//std::cout<<"Producer Thread not stopped, interrupt it now."<<std::endl;
 			pThread->interrupt();
-			//std::cout<<"Producer Thread interrupt request sent. ";
-			//std::cout<<"Wait to finish for 1 seconds again."<<std::endl;
 		}
-		//std::cout<<"Producer Thread stopped"<<std::endl;
+
 		_pProducerThreadGroup->remove_thread(pThread);
 		delete pThread; pThread = NULL;
 		_mProducerThreads.erase(itThread++);
@@ -316,24 +326,49 @@ void ApplicationModel::clear()
 
 	//Remove all multicast destinations
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Removing all multicast destinations");
-	mq::Sender* pSender = NULL;
-	std::map<unsigned int, mq::Sender*>::iterator itSender;
-	for(itSender = _mMulticastDestinations.begin(); itSender != _mMulticastDestinations.end(); /*it increment below*/)
+
+	MulticastDestination* pMulticastDestination = NULL;
+	std::map<unsigned int, MulticastDestination*>::iterator itMulticastDestination;
+	for(itMulticastDestination = _mMulticastDestinations.begin(); itMulticastDestination != _mMulticastDestinations.end(); /*it increment below*/)
 	{
-		pSender = itSender->second;
-		delete pSender; pSender = NULL;
-		_mMulticastDestinations.erase(itSender++);
+		pMulticastDestination = itMulticastDestination->second;
+		pMulticastDestination->removeAllDestinations();
+		delete pMulticastDestination; pMulticastDestination = NULL;
+		_mMulticastDestinations.erase(itMulticastDestination++);
+	}
+
+	//Remove all VmsConnectors
+	opencctv::util::log::Loggers::getDefaultLogger()->info("Removing all VmsConnectors");
+	opencctv::api::VmsConnector* pVmsConnector = NULL;
+	unsigned int iVmsTypeId;
+	PluginLoader<api::VmsConnector>* pPluginLoader = NULL;
+	std::map<unsigned int, std::pair <unsigned int,opencctv::api::VmsConnector*> >::iterator itVmsConnector;
+	for(itVmsConnector = _mVmsConnectors.begin(); itVmsConnector != _mVmsConnectors.end(); /*it increment below*/)
+	{
+		iVmsTypeId = itVmsConnector->second.first;
+		pVmsConnector = itVmsConnector->second.second;
+		pPluginLoader = _mVmsPluginLoaders[iVmsTypeId];
+
+		if(pPluginLoader)
+		{
+			pPluginLoader->deletePluginInstance(pVmsConnector);
+		}
+
+		_mVmsConnectors.erase(itVmsConnector++);
+
 	}
 
 	//Remove all VmsPluginLoaders
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Removing all VmsPluginLoaders");
-	PluginLoader<api::VmsConnector>* pVmsConnector = NULL;
-	std::map<unsigned int, PluginLoader<api::VmsConnector>*>::iterator itVmsConnector;
-	for(itVmsConnector = _mVmsPluginLoaders.begin(); itVmsConnector != _mVmsPluginLoaders.end(); /*it increment below*/)
+	//PluginLoader<api::VmsConnector>* pPluginLoader = NULL;
+	pPluginLoader = NULL;
+	std::map<unsigned int, PluginLoader<api::VmsConnector>*>::iterator itPluginLoader;
+	for(itPluginLoader = _mVmsPluginLoaders.begin(); itPluginLoader != _mVmsPluginLoaders.end(); /*it increment below*/)
 	{
-		pVmsConnector = itVmsConnector->second;
-		delete pVmsConnector; pVmsConnector = NULL;
-		_mVmsPluginLoaders.erase(itVmsConnector++);
+		pPluginLoader = itPluginLoader->second;
+		pPluginLoader->closePlugin();
+		delete pPluginLoader; pPluginLoader = NULL;
+		_mVmsPluginLoaders.erase(itPluginLoader++);
 	}
 }
 
