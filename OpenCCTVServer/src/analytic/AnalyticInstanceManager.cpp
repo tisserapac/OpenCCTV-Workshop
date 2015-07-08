@@ -68,17 +68,17 @@ bool AnalyticInstanceManager::stopAnalyticInstance(const unsigned int iAnalyticI
 			sRequest = xml::AnalyticMessage::getAnalyticStopRequest(iAnalyticInstanceId);
 			if(!opencctv::mq::MqUtil::writeToSocket(_pSocket, sRequest))
 			{
-				throw opencctv::Exception("Failed to send Analytic Stop request.");
+				throw opencctv::Exception("Failed to send Analytic Instance Stop request to the Analytic Server.");
 			}
 
 			if(!opencctv::mq::MqUtil::readFromSocket(_pSocket, sReply))
 			{
-				throw opencctv::Exception("Failed to read Analytic Stop reply.");
+				throw opencctv::Exception("Failed to read Analytic Instance Stop reply from the Analytic Server.");
 			}
 
 			if (!sReply.empty() && sReply.compare("Error") != 0)
 			{
-				std::string sMessage;
+				//std::string sMessage;
 				analytic::xml::AnalyticMessage::extractStopAnalyticProcessesReplyData(sReply, bDone, sMessage);
 			} else
 			{
