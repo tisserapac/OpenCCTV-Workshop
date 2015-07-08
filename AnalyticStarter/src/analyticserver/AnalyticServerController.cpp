@@ -256,10 +256,10 @@ std::string AnalyticServerController::stopAnalytic(const std::string& sRequest)
 
 				if(bDone)
 				{
-					msg << " Successfully stopped ";
+					msg << "Successfully stopped ";
 				}else
 				{
-					msg << " Analytic server failed to stop ";
+					msg << "Analytic server failed to stop ";
 				}
 
 				msg << "the analytic instance : " << iAnalyticInstanceId;
