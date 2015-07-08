@@ -3,19 +3,39 @@
 
 namespace opencctv {
 
-ProducerThread::ProducerThread(unsigned int iStreamId, opencctv::api::VmsConnector* pVmsConn) {
+ProducerThread::ProducerThread(unsigned int iStreamId, opencctv::api::VmsConnector* pVmsConn)
+{
+	_iStreamId = iStreamId;
+	_iVMSTypeId = 0;
+	_pVmsConn = pVmsConn;
+
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	_pQueue = NULL;
 	if(pModel->containsInternalQueue(iStreamId))
 	{
 		_pQueue = pModel->getInternalQueues()[iStreamId];
 	}
-	_pPluginLoader = NULL;
-	if(pModel->containsVmsPluginLoader(iStreamId))
+	_bActive = false;
+}
+
+ProducerThread::ProducerThread(unsigned int iStreamId)
+{
+	_iStreamId = iStreamId;
+	_iVMSTypeId = 0;
+
+	ApplicationModel* pModel = ApplicationModel::getInstance();
+	_pQueue = NULL;
+	if(pModel->containsInternalQueue(iStreamId))
 	{
-		_pPluginLoader = pModel->getVmsPluginLoaders()[iStreamId];
+		_pQueue = pModel->getInternalQueues()[iStreamId];
 	}
-	_pVmsConn = pVmsConn;
+
+	_pVmsConn = NULL;
+	if(pModel->containsVmsConnector(iStreamId))
+	{
+		_pVmsConn = pModel->getVmsConnectors()[iStreamId].second;
+	}
+
 	_bActive = false;
 }
 
@@ -38,8 +58,6 @@ void ProducerThread::operator ()()
 		}
 	}
 
-	_pPluginLoader->deletePluginInstance(_pVmsConn);
-	delete _pVmsConn; _pVmsConn = NULL;
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Producer Thread stopped.");
 }
 

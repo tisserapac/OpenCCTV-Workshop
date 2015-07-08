@@ -11,12 +11,14 @@ namespace opencctv {
 
 class ProducerThread {
 private:
+	unsigned int _iStreamId;
+	unsigned int _iVMSTypeId;
 	opencctv::api::VmsConnector* _pVmsConn;
 	opencctv::ConcurrentQueue<opencctv::Image>* _pQueue;
-	PluginLoader<api::VmsConnector>* _pPluginLoader;
 	bool _bActive;
 public:
 	ProducerThread(unsigned int iStreamId, opencctv::api::VmsConnector* pVmsConn);
+	ProducerThread(unsigned int iStreamId);
 	void operator()();
 	bool isStillRunning();
 };
