@@ -24,7 +24,7 @@
 
 int main(int argc, char* argv[])
 {
-	if(argc < 6)
+	if(argc < 5)
 	{
 		opencctv::util::log::Loggers::getDefaultLogger()->error("Invalid number of arguments.");
 		return -1;
@@ -89,8 +89,8 @@ int main(int argc, char* argv[])
 		//sAnalyticPluginDirLocation.append(sAnalyticPluginFilename);
 		std::string sAnalyticPluginPath;
 		opencctv::util::Util::findSharedLibOfPlugin(sAnalyticPluginDirLocation, sAnalyticPluginPath);
-		std::cerr << "sAnalyticPluginDirLocation = " << sAnalyticPluginDirLocation << std::endl;
-		std::cerr << "sAnalyticPluginPath = " << sAnalyticPluginPath << std::endl;
+		/*std::cerr << "sAnalyticPluginDirLocation = " << sAnalyticPluginDirLocation << std::endl;
+		std::cerr << "sAnalyticPluginPath = " << sAnalyticPluginPath << std::endl;*/
 		analyticLoader.loadPlugin(sAnalyticPluginPath);
 		pAnalytic = analyticLoader.createPluginInstance();
 	} catch (opencctv::Exception &e) {
