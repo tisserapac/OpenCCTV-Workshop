@@ -66,6 +66,7 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 	unsigned int iAnalyticId = 0;
 	std::vector<unsigned int> vStreamIds;
 	std::string sErrorMessages;
+	std::stringstream ssMsg;
 
 	try
 	{
@@ -80,9 +81,9 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 
 			for(unsigned int i=0; i<vStreamIds.size(); ++i)
 			{
-				std::cout<< "i = " << i << std::endl;
 				iStreamId = vStreamIds.at(i);
-				std::cout<< "iStreamId = " << iStreamId << std::endl;
+				/*std::cout<< "i = " << i << std::endl;
+				std::cout<< "iStreamId = " << iStreamId << std::endl;*/
 
 				if(pModel->containsMulticastDestination(iStreamId))
 				{
@@ -105,11 +106,15 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 						delete pThread; pThread = NULL;
 						pModel->getConsumerThreads().erase(iStreamId);
 					}
-					std::cout << "Paused the consumer thread " << iStreamId << std::endl;
+					ssMsg << "Paused the consumer thread " << iStreamId;
+					opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+					ssMsg.str("");
 
 					//Remove this analytic from the multicast destinations of the stream
 					destinations->removeDestination(iAnalyticId);
-					std::cout << "Removed analytic instance " << iAnalyticId << " from the destinations of stream " << iStreamId << std::endl;
+					ssMsg << "Removed analytic instance " << iAnalyticId << " from the destinations of stream " << iStreamId;
+					opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+					ssMsg.str("");
 
 					//If no of Consumer’s multicast destinations = 0
 					if(destinations->getNumberOfDestinations() == 0)
@@ -118,7 +123,7 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 						delete destinations; destinations = NULL;
 						pModel->getMulticastDestinations().erase(iStreamId);
 
-						//Remove the producer thread - unload the vms connector plugin
+						//Remove the producer thread
 						if(pModel->containsProducerThread(iStreamId))
 						{
 							pThread = pModel->getProducerThreads()[iStreamId];
@@ -135,7 +140,37 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 							delete pThread; pThread = NULL;
 							pModel->getProducerThreads().erase(iStreamId);
 						}
-						std::cout << "Removed the producer thread " << iStreamId << std::endl;
+						ssMsg << "Removed the producer thread " << iStreamId;
+						opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+						ssMsg.str("");
+
+						//Remove the VMS connector instance used by the producer thread
+						opencctv::api::VmsConnector* pVmsConnector = NULL;
+						unsigned int iVmsTypeId;
+						PluginLoader<api::VmsConnector>* pPluginLoader = NULL;
+						if(pModel->containsVmsConnector(iStreamId))
+						{
+							iVmsTypeId = pModel->getVmsConnectors()[iStreamId].first;
+							pVmsConnector = pModel->getVmsConnectors()[iStreamId].second;
+
+							if(pModel->containsVmsPluginLoader(iVmsTypeId))
+							{
+								pPluginLoader = pModel->getVmsPluginLoaders()[iVmsTypeId];
+								try
+								{
+									pPluginLoader->deletePluginInstance(pVmsConnector);
+									iVmsTypeId = pModel->getVmsConnectors().erase(iStreamId);
+								}catch(opencctv::Exception& e)
+								{
+									std::string sErrorMsg = "ApplicationModel::clear - Error in deleting the VMS connector plugin - ";
+									sErrorMsg.append(e.what());
+									opencctv::util::log::Loggers::getDefaultLogger()->error(sErrorMsg);
+								}
+							}
+						}
+						ssMsg << "Removed VMS plugin used by the producer thread " << iStreamId;
+						opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+						ssMsg.str("");
 
 						//Remove the concurrent queue
 						if(pModel->containsInternalQueue(iStreamId))
@@ -144,7 +179,9 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 							delete pConcurrentQueue; pConcurrentQueue = NULL;
 							pModel->getInternalQueues().erase(iStreamId);
 						}
-						std::cout << "Removed the concurrent queue " << iStreamId << std::endl;
+						ssMsg << "Removed the concurrent queue " << iStreamId;
+						opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+						ssMsg.str("");
 					}else
 					{
 						//Restart the consumer thread
@@ -155,7 +192,9 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 
 						delete pConsumer;
 
-						std::cout << "Resumed the consumer thread" << iStreamId << std::endl;
+						ssMsg << "Resumed the consumer thread " << iStreamId;
+						opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+						ssMsg.str("");
 					}
 				}
 			}
@@ -177,27 +216,35 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 				delete pThread; pThread = NULL;
 				pModel->getResultsRouterThreads().erase(iAnalyticId);
 			}
-			std::cout << "Removed the results router thread " << iAnalyticId << std::endl;
+			ssMsg << "Removed the results router thread " << iAnalyticId;
+			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+			ssMsg.str("");
 
 			//Stop the analytic instance on the analytic server
 			analytic::AnalyticInstanceManager* pAnalyticInstanceManager = pModel->getAnalyticInstanceManagers()[1];
 			pAnalyticInstanceManager->stopAnalyticInstance(iAnalyticId, sErrorMessages);
 
-			std::cout << "Results of stopping the analytic on the analytic server : " << sErrorMessages << std::endl;
+			ssMsg << "Results of stopping the analytic on the analytic server : " << sErrorMessages ;
+			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+			ssMsg.str("");
 
 			//Remove reference to Remote Input Queue
 			if(pModel->containsImageInputQueueAddress(iAnalyticId))
 			{
 				pModel->getImageInputQueueAddresses().erase(iAnalyticId);
 			}
-			std::cout << "Removed reference to Remote Input Queue " << iAnalyticId << std::endl;
+			ssMsg << "Removed reference to Remote Input Queue " << iAnalyticId;
+			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+			ssMsg.str("");
 
 			//Remove reference to Remote Output Queue
 			if(pModel->containsResultsOutputQueueAddress(iAnalyticId))
 			{
 				pModel->getResultsOutputQueueAddresses().erase(iAnalyticId);
 			}
-			std::cout << "Removed reference to Remote Output Queue " << iAnalyticId << std::endl;
+			ssMsg << "Removed reference to Remote Output Queue " << iAnalyticId;
+			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+			ssMsg.str("");
 
 			//Remove the flow controller of the analytic instance
 			if(pModel->containsFlowController(iAnalyticId))
@@ -206,7 +253,9 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 				delete pFlowController; pFlowController = NULL;
 				pModel->getFlowControllers().erase(iAnalyticId);
 			}
-			std::cout << "Removed the flow controller of the analytic instance " << iAnalyticId << std::endl;
+			ssMsg << "Removed the flow controller of the analytic instance " << iAnalyticId;
+			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+			ssMsg.str("");
 
 			if(sErrorMessages.empty())
 			{
