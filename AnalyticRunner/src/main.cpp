@@ -35,9 +35,9 @@ int main(int argc, char* argv[])
 	// Saving input arguments
 	std::string sAnalyticInstanceId = argv[1];
 	std::string sAnalyticPluginDir = argv[2];
-	std::string sAnalyticPluginFilename = argv[3];
-	std::string sInputAnalyticQueueAddress = argv[4];
-	std::string sOutputAnalyticQueueAddress = argv[5];
+	//std::string sAnalyticPluginFilename = argv[3];
+	std::string sInputAnalyticQueueAddress = argv[3];
+	std::string sOutputAnalyticQueueAddress = argv[4];
 
 	// Creating Image input queue
 	opencctv::mq::TcpMqReceiver* pReceiver = NULL;
