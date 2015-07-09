@@ -11,12 +11,12 @@ private:
 	std::string _sPathToAnalyticRunnerExecutable;
 	unsigned int _iAnalyticInstanceId;
 	std::string _sAnalyticPluginDirLocation;
-	std::string _sAnalyticPluginFilename;
+	//std::string _sAnalyticPluginFilename;
 	std::string _sInputAnalyticQueueAddress;
 	std::string _sOutputAnalyticQueueAddress;
 
 public:
-	AnalyticProcess(const std::string sPathToAnalyticRunnerExecutable, const unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, const std::string& sAnalyticPluginFilename, const std::string& sInputAnalyticQueueAddress, const std::string& sOutputAnalyticQueueAddress);
+	AnalyticProcess(const std::string sPathToAnalyticRunnerExecutable, const unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, const std::string& sInputAnalyticQueueAddress, const std::string& sOutputAnalyticQueueAddress);
 	bool startAnalytic();
 	const std::string& getInputAnalyticQueueAddress() const;
 	const std::string& getOutputAnalyticQueueAddress() const;

@@ -3,12 +3,12 @@
 
 namespace analytic {
 
-AnalyticProcess::AnalyticProcess(const std::string sPathToAnalyticRunnerExecutable, const unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, const std::string& sAnalyticPluginFilename, const std::string& sInputAnalyticQueueAddress, const std::string& sOutputAnalyticQueueAddress) : opencctv::Process()
+AnalyticProcess::AnalyticProcess(const std::string sPathToAnalyticRunnerExecutable, const unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, const std::string& sInputAnalyticQueueAddress, const std::string& sOutputAnalyticQueueAddress) : opencctv::Process()
 {
 	_sPathToAnalyticRunnerExecutable = sPathToAnalyticRunnerExecutable;
 	_iAnalyticInstanceId = iAnalyticInstanceId;
 	_sAnalyticPluginDirLocation = sAnalyticPluginDirLocation;
-	_sAnalyticPluginFilename = sAnalyticPluginFilename;
+	//_sAnalyticPluginFilename = sAnalyticPluginFilename;
 	_sInputAnalyticQueueAddress = sInputAnalyticQueueAddress;
 	_sOutputAnalyticQueueAddress = sOutputAnalyticQueueAddress;
 
@@ -20,7 +20,7 @@ bool AnalyticProcess::startAnalytic()
 	std::stringstream ssArgs;
 	ssArgs << _iAnalyticInstanceId << " ";
 	ssArgs << _sAnalyticPluginDirLocation << " ";
-	ssArgs << _sAnalyticPluginFilename << " ";
+	//ssArgs << _sAnalyticPluginFilename << " ";
 	ssArgs << _sInputAnalyticQueueAddress << " ";
 	ssArgs << _sOutputAnalyticQueueAddress;
 

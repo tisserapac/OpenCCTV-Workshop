@@ -22,7 +22,7 @@ class AnalyticMessage {
 public:
 	//Request Extract
 	static std::string extractAnalyticRequestOperation(const std::string& sAnalyticRequest);
-	static void extractAnalyticStartRequestData(const std::string& sAnalyticStartRequest, unsigned int& iAnalyticInstanceId, std::string& sAnalyticDirLocation, std::string& sAnalyticFilename);
+	static void extractAnalyticStartRequestData(const std::string& sAnalyticStartRequest, unsigned int& iAnalyticInstanceId, std::string& sAnalyticDirLocation);
 	static void extractAnalyticStopRequestData(const std::string& sAnalyticStartRequest, unsigned int& iAnalyticInstanceId);
 
 	//Reply Extract
@@ -32,7 +32,7 @@ public:
 	void extractErrorReplyData(const std::string& sReply, std::string& sOperation, bool bDone, std::string& sMessage);
 
 	//Request XML Messages
-	static std::string getAnalyticStartRequest(const unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, const std::string& sAnalyticPluginFilename);
+	static std::string getAnalyticStartRequest(const unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation);
 	static std::string getAnalyticStopRequest(const unsigned int iAnalyticInstanceId);
 	static std::string getKillAllAnalyticProcessesRequest();
 

@@ -137,7 +137,7 @@ std::string AnalyticServerController::startAnalytic(const std::string& sRequest)
 	std::string sAnalyticOutputQueueAddress;
 	try
 	{
-		analytic::xml::AnalyticMessage::extractAnalyticStartRequestData(sRequest, iAnalyticInstanceId, sAnalyticDirPath, sAnalyticFilename);
+		analytic::xml::AnalyticMessage::extractAnalyticStartRequestData(sRequest, iAnalyticInstanceId, sAnalyticDirPath);
 
 		if(iAnalyticInstanceId > 0 && !sAnalyticDirPath.empty() && !sAnalyticFilename.empty())
 		{
@@ -163,7 +163,7 @@ std::string AnalyticServerController::startAnalytic(const std::string& sRequest)
 			sAnalyticRunnerPath.append("/");
 			sAnalyticRunnerPath.append(pConfig->get(analytic::util::PROPERTY_ANALYTIC_RUNNER_FILENAME));
 
-			analytic::AnalyticProcess* pAnalyticProcess = new analytic::AnalyticProcess(sAnalyticRunnerPath, iAnalyticInstanceId, sAnalyticDirPath, sAnalyticFilename, sAnalyticInputQueueAddress, sAnalyticOutputQueueAddress);
+			analytic::AnalyticProcess* pAnalyticProcess = new analytic::AnalyticProcess(sAnalyticRunnerPath, iAnalyticInstanceId, sAnalyticDirPath, sAnalyticInputQueueAddress, sAnalyticOutputQueueAddress);
 			bAIStarted = pAnalyticProcess->startAnalytic();
 
 			if(bAIStarted)
