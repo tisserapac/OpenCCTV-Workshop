@@ -254,7 +254,6 @@ bool ServerEvent::startServer()
 		if (pQueue && pConsumer && pProducer)
 		{
 			// Create and start Results Router threads
-			//std::cout << "No Results router threads = " << vAnalyticInstances.size() << std::endl;
 			for(size_t j = 0; j < vAnalyticInstances.size(); ++j)
 			{
 				opencctv::dto::AnalyticInstanceStream analyticInstance = vAnalyticInstances[j];
