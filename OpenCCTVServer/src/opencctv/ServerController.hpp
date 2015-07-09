@@ -16,6 +16,7 @@
 //#include "../analytic/xml/AnalyticMessage.hpp"
 #include "event/EventMessage.hpp"
 #include "event/ServerEvent.hpp"
+#include "event/AnalyticEvent.hpp"
 #include "event/EventType.hpp"
 
 namespace opencctv {

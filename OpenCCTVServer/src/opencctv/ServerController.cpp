@@ -86,31 +86,36 @@ void ServerController::executeOperation()
 	//Execute the operation according to the operation type
 	if(sOperation.compare(opencctv::event::SERVER_EVENT_START) == 0)
 	{
-		bool bResult = opencctv::event::ServerEvent::serverStart();
+		bool bResult = opencctv::event::ServerEvent::startServer();
 
 		if(bResult)
 		{
 			sReply = opencctv::event::EventMessage::getStartMessageReply();
 		}else
 		{
-			sReply = "Error";
+			sReply = opencctv::event::EventMessage::getInvalidMessageReply("Failed to start the OpenCCTV Server");
 		}
 		sendReply(sReply);
-	}
-	else if(sOperation.compare(opencctv::event::SERVER_EVENT_STOP) == 0)
+
+	}else if(sOperation.compare(opencctv::event::SERVER_EVENT_STOP) == 0)
 	{
-		bool bResult = opencctv::event::ServerEvent::serverStop();
+		bool bResult = opencctv::event::ServerEvent::stopServer();
 
 		if(bResult)
 		{
 			sReply = opencctv::event::EventMessage::getStopMessageReply();
 		}else
 		{
-			sReply = "Error";
+			sReply = opencctv::event::EventMessage::getInvalidMessageReply("Error occurred in stopping the OpenCCTV Server");
 		}
 		sendReply(sReply);
-	}
-	else
+
+	}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_STOP) == 0)
+	{
+		sReply = opencctv::event::AnalyticEvent::analyticStop(sRequest);
+		sendReply(sReply);
+
+	}else
 	{
 		std::string sErrMsg = "Request with an unknown Operation.\nRequest: ";
 		sErrMsg.append(sRequest);

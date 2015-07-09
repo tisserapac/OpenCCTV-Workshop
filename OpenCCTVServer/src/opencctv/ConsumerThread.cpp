@@ -2,7 +2,10 @@
 
 namespace opencctv {
 
-ConsumerThread::ConsumerThread(unsigned int iStreamId, ImageMulticaster* pImageMulticaster) {
+ConsumerThread::ConsumerThread(unsigned int iStreamId, ImageMulticaster* pImageMulticaster)
+{
+	_iStreamId = iStreamId;
+
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	_pQueue = NULL;
 	if(pModel->containsInternalQueue(iStreamId))
@@ -14,6 +17,8 @@ ConsumerThread::ConsumerThread(unsigned int iStreamId, ImageMulticaster* pImageM
 
 ConsumerThread::ConsumerThread(unsigned int iStreamId)
 {
+	_iStreamId = iStreamId;
+
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	_pQueue = NULL;
 	if(pModel->containsInternalQueue(iStreamId))
@@ -28,6 +33,9 @@ void ConsumerThread::operator ()()
 	if(_pImageMulticaster)
 	{
 		opencctv::util::log::Loggers::getDefaultLogger()->info("Consumer Thread started.");
+		std::stringstream ssMsg;
+		ssMsg << "Starting the Image Multicaster for the Consumer Thread " << _iStreamId;
+		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 		_pImageMulticaster->start();
 
 		delete _pImageMulticaster; _pImageMulticaster = NULL;

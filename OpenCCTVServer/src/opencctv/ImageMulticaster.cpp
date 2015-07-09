@@ -29,8 +29,8 @@ void ImageMulticaster::start()
 	{
 		//_mAISInfo = _pMulticastDestination->getAllDestinations();
 		_bEnable = true;
-		ssMsg << "Image Multicaster " << _iStreamId << " started.";
-		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+		//ssMsg << "Image Multicaster " << _iStreamId << " started.";
+		//opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 	}
 
 	std::map<unsigned int, AnalyticDestination>::iterator it;
@@ -85,9 +85,9 @@ void ImageMulticaster::start()
 		{
 			// Thread interruption request received, break the loop
 			_bEnable = false;
-			ssMsg.clear();
+			//ssMsg.clear();
 			//ssMsg <<  "Image Multicaster of Consumer thread : " << _iStreamId << "interrupted";
-			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+			//opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 			break;
 		}
 	}
@@ -176,7 +176,8 @@ void ImageMulticaster::stop() {
 	_bEnable = false;
 }
 
-ImageMulticaster::~ImageMulticaster() {
+ImageMulticaster::~ImageMulticaster()
+{
 }
 
 } /* namespace opencctv */

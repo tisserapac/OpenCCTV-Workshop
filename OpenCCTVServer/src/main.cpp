@@ -24,7 +24,7 @@
 
 
 void terminateHandler(int signum); // Terminate signal handler
-bool init(); //Initialize the OpenCCTV server at startup
+//bool init(); //Initialize the OpenCCTV server at startup
 
 bool bEnabled = false;
 
@@ -37,13 +37,6 @@ int main()
 	// Registering signal handlers
 	signal(SIGTERM, terminateHandler); // for Terminate signal
 	signal(SIGINT, terminateHandler); // for Ctrl + C keyboard interrupt
-
-	//Initialize the OpenCCTV server
-	/*bool bResult = init();
-	if(!bResult)
-	{
-		return -1;
-	}*/
 
 	//Listen to the events and respond
 	opencctv::ServerController* pServerController = NULL;
@@ -72,7 +65,7 @@ int main()
 	return 0;
 }
 
-bool init()
+/*bool init()
 {
 	// Initializing variables
 	test::gateway::TestStreamGateway* pStreamGateway;
@@ -311,7 +304,7 @@ bool init()
 	}
 	pModel->setServerStatus(opencctv::event::SERVER_STATUS_STARTED);
 	return true;
-}
+}*/
 
 // Signal handler for SIGTERM (Terminate signal)
 void terminateHandler(int signum) {

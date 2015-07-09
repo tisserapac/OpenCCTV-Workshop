@@ -12,6 +12,7 @@ namespace opencctv {
 
 class ConsumerThread {
 private:
+	unsigned int _iStreamId;
 	ImageMulticaster* _pImageMulticaster;
 	ConcurrentQueue<Image>* _pQueue;
 public:

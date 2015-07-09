@@ -21,7 +21,7 @@ void ResultRouterThread::operator()()
 	util::Config* pConfig = util::Config::getInstance();
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	std::stringstream ssMsg;
-	opencctv::db::AnalyticResultGateway* _pAnalyticResultGateway = NULL;
+	opencctv::db::AnalyticResultGateway* pAnalyticResultGateway = NULL;
 
 	if(pModel->containsResultsOutputQueueAddress(_iAnalyticInstanceId))
 	{
@@ -43,7 +43,7 @@ void ResultRouterThread::operator()()
 		//Create the AnalyticResultGateway to the DB
 		try
 		{
-			_pAnalyticResultGateway = new opencctv::db::AnalyticResultGateway();
+			pAnalyticResultGateway = new opencctv::db::AnalyticResultGateway();
 
 		}catch(opencctv::Exception &e)
 		{
@@ -51,7 +51,7 @@ void ResultRouterThread::operator()()
 		}
 
 		//Start inserting the analytic instance's results to the results DB
-		while(bConnected && _pFlowController && _pAnalyticResultGateway)
+		while(bConnected && _pFlowController && pAnalyticResultGateway)
 		{
 
 			//Define the interrupt point of the results router threads
@@ -63,7 +63,7 @@ void ResultRouterThread::operator()()
 			{
 				// Thread interruption request received, break the loop
 				//ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
-				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				//opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 				break;
 			}
 
@@ -87,8 +87,8 @@ void ResultRouterThread::operator()()
 			{
 				try
 				{
-					opencctv::db::AnalyticResultGateway analyticResultGateway;
-					analyticResultGateway.insertResults(_iAnalyticInstanceId, result);
+					//opencctv::db::AnalyticResultGateway analyticResultGateway;
+					pAnalyticResultGateway->insertResults(_iAnalyticInstanceId, result);
 					//sMsg = "\t\t\tResult written to the database";
 					util::log::Loggers::getDefaultLogger()->debug(sMsg);
 
@@ -114,13 +114,13 @@ void ResultRouterThread::operator()()
 			{
 				// Thread interruption request received, break the loop
 				//ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
-				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				//opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 				break;
 			}
 		}
 	}
 	delete _pSerializer; _pSerializer = NULL;
-	delete _pAnalyticResultGateway; _pAnalyticResultGateway = NULL;
+	delete pAnalyticResultGateway; pAnalyticResultGateway = NULL;
 	ssMsg.clear();
 	ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " Stopped";
 	opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());

@@ -5,7 +5,7 @@
 		<id> 1 </id>
 		<analyticinstanceid> 1 </analyticinstanceid>
 		<streamid> 1 </streamid>
-		<inputname> default </inputname>
+		<inputname> default1 </inputname>
 		<analyticdir>
 			MockAnalytic
 		</analyticdir>
@@ -14,6 +14,17 @@
 	
 	<analyticinstancestream>
 		<id> 2 </id>
+		<analyticinstanceid> 1 </analyticinstanceid>
+		<streamid> 2 </streamid>
+		<inputname> default2 </inputname>
+		<analyticdir>
+			MockAnalytic
+		</analyticdir>
+		<analyticfile> libMockAnalyticPlugin.so </analyticfile>
+	</analyticinstancestream>
+	
+	<analyticinstancestream>
+		<id> 3 </id>
 		<analyticinstanceid> 2 </analyticinstanceid>
 		<streamid> 1 </streamid>
 		<inputname> default </inputname>
@@ -24,9 +35,9 @@
 	</analyticinstancestream>
 	
 	<analyticinstancestream>
-		<id> 3 </id>
+		<id> 4 </id>
 		<analyticinstanceid> 3 </analyticinstanceid>
-		<streamid> 2 </streamid>
+		<streamid> 1 </streamid>
 		<inputname> default </inputname>
 		<analyticdir>
 			MockAnalytic
