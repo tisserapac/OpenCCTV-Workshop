@@ -351,7 +351,15 @@ void ApplicationModel::clear()
 
 		if(pPluginLoader)
 		{
-			pPluginLoader->deletePluginInstance(pVmsConnector);
+			try
+			{
+				pPluginLoader->deletePluginInstance(pVmsConnector);
+			}catch(opencctv::Exception& e)
+			{
+				std::string sErrorMsg = "ApplicationModel::clear - Error in deleting the VMS connector plugin - ";
+				sErrorMsg.append(e.what());
+				opencctv::util::log::Loggers::getDefaultLogger()->error(sErrorMsg);
+			}
 		}
 
 		_mVmsConnectors.erase(itVmsConnector++);
