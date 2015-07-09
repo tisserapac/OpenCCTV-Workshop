@@ -63,8 +63,7 @@ bool MqUtil::writeToSocket(zmq::socket_t* pSocket, const std::string* pSMessage)
 		zmq::message_t* pMessageToServer = NULL;
 		try {
 			pMessageToServer = new zmq::message_t(pSMessage->size());
-			memcpy((void *) pMessageToServer->data(), pSMessage->data(),
-					pSMessage->size());
+			memcpy((void *) pMessageToServer->data(), pSMessage->data(), pSMessage->size());
 			sent = pSocket->send(*pMessageToServer);
 		} catch (error_t &e) {
 			if (pMessageToServer) delete pMessageToServer;
@@ -82,8 +81,7 @@ bool MqUtil::writeToSocket(zmq::socket_t* pSocket, const std::string& sMessage) 
 	{
 		try {
 			zmq::message_t messageToServer(sMessage.size());
-			memcpy((void *) messageToServer.data(), sMessage.data(),
-					sMessage.size());
+			memcpy((void *) messageToServer.data(), sMessage.data(), sMessage.size());
 			sent = pSocket->send(messageToServer);
 		} catch (error_t &e) {
 			//throw std::runtime_error("Unable to send to the Socket");
@@ -107,18 +105,18 @@ std::string* MqUtil::readFromSocket(zmq::socket_t* pSocket) {
 		try {
 			received = pSocket->recv(pMessageFromServer);
 		} catch (error_t &e) {
-			if (pMessageFromServer) delete pMessageFromServer;
+			if (pMessageFromServer) {delete pMessageFromServer; pMessageFromServer = NULL;}
 			//throw std::runtime_error("Unable to receive from the Socket");
 			throw opencctv::Exception("Unable to receive from the Socket");
 		}
 		if (!received) {
-			if (pMessageFromServer) delete pMessageFromServer;
+			if (pMessageFromServer) {delete pMessageFromServer; pMessageFromServer = NULL;}
 			//throw std::runtime_error("Unable to receive from the Socket");
-			throw opencctv::Exception("Unable to receive from the Socket");
+			throw opencctv::Exception("No data received from the socket");
 		}
-		pSMessage = new std::string(static_cast<char*>(pMessageFromServer->data()),
-				pMessageFromServer->size());
-		if (pMessageFromServer) delete pMessageFromServer;
+		pSMessage = new std::string(static_cast<char*>(pMessageFromServer->data()),	pMessageFromServer->size());
+
+		if (pMessageFromServer) {delete pMessageFromServer; pMessageFromServer = NULL;}
 	}
 	return pSMessage;
 }
@@ -134,7 +132,7 @@ bool MqUtil::readFromSocket(zmq::socket_t* pSocket, std::string& sMessage) {
 	}
 	if (!received) {
 		//throw std::runtime_error("Unable to receive from the Socket");
-		throw opencctv::Exception("Unable to receive from the Socket");
+		throw opencctv::Exception("No data received from the socket");
 	}
 	sMessage = std::string(static_cast<char*>(messageFromServer.data()), messageFromServer.size());
 

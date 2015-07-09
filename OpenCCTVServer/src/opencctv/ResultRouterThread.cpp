@@ -50,10 +50,11 @@ void ResultRouterThread::operator()()
 			util::log::Loggers::getDefaultLogger()->error(e.what());
 		}
 
+		std::string* pSSerializedResult;
+		std::string sMsg = "";
 		//Start inserting the analytic instance's results to the results DB
 		while(bConnected && _pFlowController && pAnalyticResultGateway)
 		{
-
 			//Define the interrupt point of the results router threads
 			try
 			{
@@ -61,14 +62,10 @@ void ResultRouterThread::operator()()
 			}
 			catch(const boost::thread_interrupted&)
 			{
-				// Thread interruption request received, break the loop
-				//ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
-				//opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				// Thread interruption request received, break the loop;
 				break;
 			}
 
-
-			std::string* pSSerializedResult;
 			try
 			{
 				pSSerializedResult = receiver.receive();
@@ -78,7 +75,7 @@ void ResultRouterThread::operator()()
 			}
 
 			analytic::AnalyticResult result = _pSerializer->deserializeAnalyticResult(*pSSerializedResult);
-			std::string sMsg = "\t\tReceived Result of ";
+			sMsg = "\t\tReceived Result of ";
 			sMsg.append(result.getTimestamp());
 			util::log::Loggers::getDefaultLogger()->debug(sMsg);
 
@@ -87,17 +84,14 @@ void ResultRouterThread::operator()()
 			{
 				try
 				{
-					//opencctv::db::AnalyticResultGateway analyticResultGateway;
 					pAnalyticResultGateway->insertResults(_iAnalyticInstanceId, result);
-					//sMsg = "\t\t\tResult written to the database";
-					util::log::Loggers::getDefaultLogger()->debug(sMsg);
 
 				}catch(opencctv::Exception &e)
 				{
-					std::ostringstream sErrorMessage;
-					sErrorMessage << "Failed to write results to the results database : analytic id - ";
-					sErrorMessage << _iAnalyticInstanceId;
-					sMsg = sErrorMessage.str();
+					ssMsg.clear();
+					ssMsg << "Failed to write results to the results database : analytic id - ";
+					ssMsg << _iAnalyticInstanceId;
+					sMsg = ssMsg.str();
 					util::log::Loggers::getDefaultLogger()->error(sMsg);
 				}
 			}
@@ -112,9 +106,7 @@ void ResultRouterThread::operator()()
 			}
 			catch(const boost::thread_interrupted&)
 			{
-				// Thread interruption request received, break the loop
-				//ssMsg <<  "Results router thread of analytic instance : " << _iAnalyticInstanceId << " interrupted";
-				//opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				// Thread interruption request received, break the loop;
 				break;
 			}
 		}
