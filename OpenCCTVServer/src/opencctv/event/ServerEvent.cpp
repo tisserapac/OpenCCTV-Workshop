@@ -113,9 +113,10 @@ bool ServerEvent::startServer()
 				try {
 					// start Analytic Instance, store Analytic Input, Output queue addresses into the Application Model.
 					bAIStarted = pAnalyticInstanceManager->startAnalyticInstance(
-							analyticInstance.getAnalyticInstanceId(),
-							analyticInstance.getAnalyticDirLocation(),
-							analyticInstance.getAnalyticFilename(), sAnalyticQueueInAddress, sAnalyticQueueOutAddress);
+									analyticInstance.getAnalyticInstanceId(),
+									analyticInstance.getAnalyticDirLocation(),
+									sAnalyticQueueInAddress,
+									sAnalyticQueueOutAddress);
 				} catch (opencctv::Exception &e) {
 					std::stringstream ssErrMsg;
 					ssErrMsg << "Failed to start Analytic Instance ";

@@ -40,7 +40,7 @@ const std::string& AnalyticInstanceStream::getAnalyticDirLocation() const {
 	return _sAnalyticDirLocation;
 }
 
-void AnalyticInstanceStream::setAnalyticFilename(const std::string& sFilename)
+/*void AnalyticInstanceStream::setAnalyticFilename(const std::string& sFilename)
 {
 	_sAnalyticFilename = sFilename;
 }
@@ -48,7 +48,7 @@ void AnalyticInstanceStream::setAnalyticFilename(const std::string& sFilename)
 const std::string& AnalyticInstanceStream::getAnalyticFilename() const
 {
 	return _sAnalyticFilename;
-}
+}*/
 
 AnalyticInstanceStream::~AnalyticInstanceStream() {
 }

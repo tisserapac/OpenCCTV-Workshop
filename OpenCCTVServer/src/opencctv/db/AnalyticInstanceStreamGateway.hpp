@@ -26,11 +26,13 @@ private:
 	DbConnector* _pDbConnectorPtr;
 	sql::Connection* _pConnectionPtr;
 	sql::PreparedStatement* _pStatementPtr;
-	static const std::string _SELECT_ANALYTIC_INSTANCE_STREAM_SQL;
+	static const std::string _SELECT_ALL_FOR_STREAM_SQL;
+	static const std::string _SELECT_ALL_FOR_ANALYTIC_INSTANCE_SQL;
 
 public:
 	AnalyticInstanceStreamGateway();
 	void findAllForStream(unsigned int iStreamId, std::vector<opencctv::dto::AnalyticInstanceStream>& vToStoreAIS);
+	void findAllForAnalyticInstance(unsigned int iAnalyticInstanceId, std::vector<opencctv::dto::AnalyticInstanceStream>& vAnalyticInstanceStream);
 	virtual ~AnalyticInstanceStreamGateway();
 };
 

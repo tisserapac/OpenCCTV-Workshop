@@ -16,7 +16,7 @@ AnalyticInstanceManager::AnalyticInstanceManager(const std::string& sAnalyticSer
 	}
 }
 
-bool AnalyticInstanceManager::startAnalyticInstance(unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, const std::string& sAnalyticPluginFilename, std::string& sAnalyticQueueInAddress, std::string& sAnalyticQueueOutAddress)
+bool AnalyticInstanceManager::startAnalyticInstance(unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, std::string& sAnalyticQueueInAddress, std::string& sAnalyticQueueOutAddress)
 {
 	bool bRet = false;
 	if(_pSocket)
@@ -24,7 +24,7 @@ bool AnalyticInstanceManager::startAnalyticInstance(unsigned int iAnalyticInstan
 		std::string sRequest, sReply;
 		try
 		{
-			sRequest = xml::AnalyticMessage::getAnalyticStartRequest(iAnalyticInstanceId, sAnalyticPluginDirLocation, sAnalyticPluginFilename);
+			sRequest = xml::AnalyticMessage::getAnalyticStartRequest(iAnalyticInstanceId, sAnalyticPluginDirLocation);
 
 			if (!opencctv::mq::MqUtil::writeToSocket(_pSocket, sRequest))
 			{

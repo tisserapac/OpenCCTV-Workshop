@@ -22,13 +22,13 @@ std::string AnalyticMessage::extractAnalyticRequestOperation(const std::string& 
 }
 
 //===========Analytic Start====================
-std::string AnalyticMessage::getAnalyticStartRequest(const unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation, const std::string& sAnalyticPluginFilename)
+std::string AnalyticMessage::getAnalyticStartRequest(const unsigned int iAnalyticInstanceId, const std::string& sAnalyticPluginDirLocation)
 {
 	boost::property_tree::ptree pt;
 	pt.put("analyticrequest.operation", OPERATION_START_ANALYTIC);
 	pt.put("analyticrequest.analyticinstanceid", iAnalyticInstanceId);
 	pt.put("analyticrequest.analyticdirlocation", sAnalyticPluginDirLocation);
-	pt.put("analyticrequest.analyticfilename", sAnalyticPluginFilename);
+	//pt.put("analyticrequest.analyticfilename", sAnalyticPluginFilename);
 	std::ostringstream oss;
 	try {
 		write_xml(oss, pt);
@@ -41,7 +41,7 @@ std::string AnalyticMessage::getAnalyticStartRequest(const unsigned int iAnalyti
 	return message;
 }
 
-void AnalyticMessage::extractAnalyticStartRequestData(const std::string& sAnalyticStartRequest, unsigned int& iAnalyticInstanceId, std::string& sAnalyticDirLocation, std::string& sAnalyticFilename)
+void AnalyticMessage::extractAnalyticStartRequestData(const std::string& sAnalyticStartRequest, unsigned int& iAnalyticInstanceId, std::string& sAnalyticDirLocation)
 {
 	boost::property_tree::ptree pt;
 	std::istringstream iss(sAnalyticStartRequest);
@@ -49,9 +49,9 @@ void AnalyticMessage::extractAnalyticStartRequestData(const std::string& sAnalyt
 		read_xml(iss, pt);
 		iAnalyticInstanceId = pt.get<unsigned int>("analyticrequest.analyticinstanceid");
 		sAnalyticDirLocation = pt.get<std::string>("analyticrequest.analyticdirlocation");
-		sAnalyticFilename = pt.get<std::string>("analyticrequest.analyticfilename");
+		//sAnalyticFilename = pt.get<std::string>("analyticrequest.analyticfilename");
 		boost::algorithm::trim (sAnalyticDirLocation);
-		boost::algorithm::trim (sAnalyticFilename);
+		//boost::algorithm::trim (sAnalyticFilename);
 	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
 		std::string sErrMsg = "Failed to parse Analytic Start Request. ";
 		sErrMsg.append(e.what());

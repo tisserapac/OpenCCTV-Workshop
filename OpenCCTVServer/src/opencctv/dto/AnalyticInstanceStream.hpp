@@ -12,7 +12,7 @@ private:
 	unsigned int _iAnalyticInstanceId;
 	std::string _sInputName;
 	std::string _sAnalyticDirLocation;
-	std::string _sAnalyticFilename;
+	//std::string _sAnalyticFilename;
 public:
 	AnalyticInstanceStream();
 	virtual ~AnalyticInstanceStream();
@@ -24,8 +24,8 @@ public:
 	const std::string& getInputName() const;
 	void setAnalyticDirLocation(const std::string& sLocation);
 	const std::string& getAnalyticDirLocation() const;
-	void setAnalyticFilename(const std::string& sFilename);
-	const std::string& getAnalyticFilename() const;
+	//void setAnalyticFilename(const std::string& sFilename);
+	//const std::string& getAnalyticFilename() const;
 };
 
 } /* namespace dto */

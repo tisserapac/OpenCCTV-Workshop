@@ -25,8 +25,8 @@ void TestAnalyticInstanceStreamGateway::findAllForStream(unsigned int iStreamId,
 						Util::trim(v.second.get<std::string>("inputname")));
 				ais.setAnalyticDirLocation(
 						Util::trim(v.second.get<std::string>("analyticdir")));
-				ais.setAnalyticFilename(
-						Util::trim(v.second.get<std::string>("analyticfile")));
+				/*ais.setAnalyticFilename(
+						Util::trim(v.second.get<std::string>("analyticfile")));*/
 				vToStoreAIS.push_back(ais);
 			}
 	}
