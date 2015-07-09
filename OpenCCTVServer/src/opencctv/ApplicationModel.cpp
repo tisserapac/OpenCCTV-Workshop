@@ -222,7 +222,7 @@ void ApplicationModel::clear()
 	{
 		pThread = itThread->second;
 
-		while (pThread->timed_join(boost::posix_time::seconds(1))==false)
+		while (pThread->timed_join(boost::posix_time::millisec(100))==false)
 		{
 			pThread->interrupt();
 		}
@@ -238,7 +238,7 @@ void ApplicationModel::clear()
 	{
 		pThread = itThread->second;
 
-		while (pThread->timed_join(boost::posix_time::seconds(1))==false)
+		while (pThread->timed_join(boost::posix_time::millisec(100))==false)
 		{
 			pThread->interrupt();
 		}
@@ -253,7 +253,7 @@ void ApplicationModel::clear()
 	{
 		pThread = itThread->second;
 
-		while (pThread->timed_join(boost::posix_time::seconds(1))==false)
+		while (pThread->timed_join(boost::posix_time::millisec(100))==false)
 		{
 			pThread->interrupt();
 		}
