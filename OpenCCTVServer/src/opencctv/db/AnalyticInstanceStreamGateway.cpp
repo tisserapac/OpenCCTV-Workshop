@@ -16,8 +16,9 @@ AnalyticInstanceStreamGateway::AnalyticInstanceStreamGateway()
 {
 	try
 	{
-		_pDbConnPtr = DbConnector::getConnection();
-		_pStatementPtr = (*_pDbConnPtr).prepareStatement(_SELECT_ANALYTIC_INSTANCE_STREAM_SQL);
+		_pDbConnectorPtr = new DbConnector();
+		_pConnectionPtr = (*_pDbConnectorPtr).getConnection();
+		_pStatementPtr = (*_pConnectionPtr).prepareStatement(_SELECT_ANALYTIC_INSTANCE_STREAM_SQL);
 
 	}catch(sql::SQLException &e)
 	{
@@ -28,12 +29,6 @@ AnalyticInstanceStreamGateway::AnalyticInstanceStreamGateway()
 	{
 		throw opencctv::Exception(e);
 	}
-}
-
-AnalyticInstanceStreamGateway::~AnalyticInstanceStreamGateway() {
-	(*_pStatementPtr).close();
-	delete _pStatementPtr;  _pStatementPtr = NULL;
-	delete _pDbConnPtr; _pDbConnPtr = NULL;
 }
 
 void AnalyticInstanceStreamGateway::findAllForStream(unsigned int iStreamId, std::vector<opencctv::dto::AnalyticInstanceStream>& vToStoreAIS)
@@ -65,6 +60,14 @@ void AnalyticInstanceStreamGateway::findAllForStream(unsigned int iStreamId, std
 		throw opencctv::Exception(sErrorMsg.append(e.what()));
 		//TODO :: Add to log
 	}
+}
+
+AnalyticInstanceStreamGateway::~AnalyticInstanceStreamGateway()
+{
+	(*_pStatementPtr).close();
+	delete _pStatementPtr;  _pStatementPtr = NULL;
+	delete _pConnectionPtr; _pConnectionPtr = NULL;
+	delete _pDbConnectorPtr; _pDbConnectorPtr = NULL;
 }
 
 } /* namespace db */

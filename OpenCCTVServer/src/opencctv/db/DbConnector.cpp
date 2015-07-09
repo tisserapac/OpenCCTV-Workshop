@@ -10,10 +10,15 @@
 namespace opencctv {
 namespace db {
 
+DbConnector::DbConnector()
+{
+	_driverPrt = get_driver_instance();
+}
+
 sql::Connection* DbConnector::getConnection()
 {
 	sql::Connection* connPrt = NULL;
-	sql::Driver* driverPrt;
+	//sql::Driver* driverPrt;
 	std::string dbUrl, mysqlUsername, mysqlPassword, dbName, mysqlServerName, mysqlPort;
 
 	try
@@ -38,8 +43,8 @@ sql::Connection* DbConnector::getConnection()
 
 	try
 	{
-		driverPrt = get_driver_instance();
-		connPrt = (*driverPrt).connect(dbUrl, mysqlUsername, mysqlPassword);
+		//driverPrt = get_driver_instance();
+		connPrt = (*_driverPrt).connect(dbUrl, mysqlUsername, mysqlPassword);
 		(*connPrt).setSchema(dbName);
 	}
 	catch(sql::SQLException &e)
@@ -54,7 +59,7 @@ sql::Connection* DbConnector::getConnection()
 sql::Connection* DbConnector::getConnection_ResultsDB()
 {
 	sql::Connection* connPrt = NULL;
-	sql::Driver* driverPrt;
+	//sql::Driver* driverPrt;
 	std::string dbUrl, mysqlUsername, mysqlPassword, dbName, mysqlServerName, mysqlPort;
 	try
 		{
@@ -78,9 +83,18 @@ sql::Connection* DbConnector::getConnection_ResultsDB()
 
 		try
 		{
-			driverPrt = get_driver_instance();
-			connPrt = (*driverPrt).connect(dbUrl, mysqlUsername, mysqlPassword);
-			(*connPrt).setSchema(dbName);
+			if(_driverPrt)
+			{
+				connPrt = (*_driverPrt).connect(dbUrl, mysqlUsername, mysqlPassword);
+				(*connPrt).setSchema(dbName);
+			}else
+			{
+				throw opencctv::Exception("MySQL database driver not initialized");
+			}
+			//driverPrt = get_driver_instance();
+			//connPrt = (*driverPrt).connect(dbUrl, mysqlUsername, mysqlPassword);
+			//(*connPrt).setSchema(dbName);
+			//driverPrt->threadEnd();
 		}
 		catch(sql::SQLException &e)
 		{
@@ -89,6 +103,11 @@ sql::Connection* DbConnector::getConnection_ResultsDB()
 			throw opencctv::Exception(sErrorMsg.append(e.what()));
 		}
 		return connPrt;
+}
+
+DbConnector::~DbConnector()
+{
+	_driverPrt->threadEnd();
 }
 
 } /* namespace db */

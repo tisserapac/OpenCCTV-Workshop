@@ -21,13 +21,18 @@ namespace opencctv {
 namespace db {
 
 class DbConnector {
+private:
+	sql::Driver* _driverPrt;
+
 public:
+	DbConnector();
+	virtual ~DbConnector();
 	/**
 	 * Creates connection to a particular mysql db
 	 * using the given server IP, port number, username, password and database name.
 	 */
-	static sql::Connection* getConnection();
-	static sql::Connection* getConnection_ResultsDB();
+	sql::Connection* getConnection();
+	sql::Connection* getConnection_ResultsDB();
 };
 
 } /* namespace db */

@@ -25,7 +25,8 @@ namespace db {
 class AnalyticResultGateway {
 private:
 private:
-	sql::Connection* _pDbConnPtr;
+	DbConnector* _pDbConnectorPtr;
+	sql::Connection* _pConnectionPtr;
 	sql::PreparedStatement* _pStatementPtr;
 	static const std::string _INSERT_ANALYTIC_RESULT_SQL;
 

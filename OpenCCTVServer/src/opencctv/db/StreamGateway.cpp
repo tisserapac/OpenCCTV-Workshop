@@ -16,8 +16,9 @@ StreamGateway::StreamGateway()
 {
 	try
 	{
-		_pDbConnPtr = DbConnector::getConnection();
-		_pStatement = (*_pDbConnPtr).createStatement();
+		_pDbConnectorPtr = new DbConnector();
+		_pConnectionPtr = (*_pDbConnectorPtr).getConnection();
+		_pStatement = (*_pConnectionPtr).createStatement();
 	}catch(sql::SQLException &e)
 	{
 		std::string sErrorMsg = "Error while initializing the StreamGateway - .";
@@ -28,12 +29,6 @@ StreamGateway::StreamGateway()
 		throw opencctv::Exception(e);
 	}
 
-}
-
-StreamGateway::~StreamGateway() {
-	(*_pStatement).close();
-	delete _pStatement; _pStatement = NULL;
-	delete _pDbConnPtr; _pDbConnPtr = NULL;
 }
 
 void StreamGateway::findAll(std::vector<opencctv::dto::Stream>& vToStoreStreams)
@@ -71,6 +66,14 @@ void StreamGateway::findAll(std::vector<opencctv::dto::Stream>& vToStoreStreams)
 		//std::cerr << "StreamGateway:findAll: Error while finding all streams from the database. " << e.what() << std::endl;
 		// TODO: log
 	}
+}
+
+StreamGateway::~StreamGateway()
+{
+	(*_pStatement).close();
+	delete _pStatement; _pStatement = NULL;
+	delete _pConnectionPtr; _pConnectionPtr = NULL;
+	delete _pDbConnectorPtr; _pDbConnectorPtr = NULL;
 }
 
 } /* namespace db */

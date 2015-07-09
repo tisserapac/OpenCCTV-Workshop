@@ -16,8 +16,9 @@ AnalyticResultGateway::AnalyticResultGateway()
 {
 	try
 	{
-		_pDbConnPtr = DbConnector::getConnection_ResultsDB();
-		_pStatementPtr = (*_pDbConnPtr).prepareStatement(_INSERT_ANALYTIC_RESULT_SQL);
+		_pDbConnectorPtr = new DbConnector();
+		_pConnectionPtr = (*_pDbConnectorPtr).getConnection_ResultsDB();
+		_pStatementPtr = (*_pConnectionPtr).prepareStatement(_INSERT_ANALYTIC_RESULT_SQL);
 
 	}catch(sql::SQLException &e)
 	{
@@ -28,15 +29,6 @@ AnalyticResultGateway::AnalyticResultGateway()
 	{
 		throw opencctv::Exception(e);
 	}
-}
-
-AnalyticResultGateway::~AnalyticResultGateway() {
-	(*_pStatementPtr).close();
-	delete _pStatementPtr;
-	_pStatementPtr = NULL;
-
-	delete _pDbConnPtr;
-	_pDbConnPtr = NULL;
 }
 
 int AnalyticResultGateway::insertResults(unsigned int iAnalyticInstanceId,analytic::AnalyticResult analyticResult)
@@ -58,6 +50,14 @@ int AnalyticResultGateway::insertResults(unsigned int iAnalyticInstanceId,analyt
 
 	return result;
 
+}
+
+AnalyticResultGateway::~AnalyticResultGateway()
+{
+	(*_pStatementPtr).close();
+	delete _pStatementPtr; _pStatementPtr = NULL;
+	delete _pDbConnectorPtr; _pDbConnectorPtr = NULL;
+	delete _pDbConnectorPtr; _pDbConnectorPtr = NULL;
 }
 
 
