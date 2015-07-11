@@ -179,9 +179,6 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 		bool bStartThreadResult = false;
 		if(!pModel->containsResultsRouterThread(iAnalyticInstanceId))
 		{
-			/*ssMsg << "Starting the results router thread for the analytic instance " << iAnalyticInstanceId;
-			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-			ssMsg.str("");*/
 
 			if(pModel->containsResultsOutputQueueAddress(iAnalyticInstanceId))
 			{
@@ -194,12 +191,11 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 				}
 			}
 
+		}else
+		{
+			bStartThreadResult = true;
 		}
 
-		//Start the consumer thread
-		/*ssMsg << "Starting the consumer thread " << iStreamId;
-		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-		ssMsg.str("");*/
 		if(bStartThreadResult)
 		{
 			bStartThreadResult = EventUtil::startThread(opencctv::event::CONSUMER_THREAD, iStreamId);
@@ -214,9 +210,6 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 		//start the producer thread if it does not exist
 		if(bStartThreadResult && !pModel->containsProducerThread(iStreamId))
 		{
-			/*ssMsg << "Starting the producer thread " << iStreamId;
-			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-			ssMsg.str("");*/
 			bStartThreadResult = EventUtil::startThread(opencctv::event::PRODUCER_THREAD, iStreamId);
 			if(bStartThreadResult)
 			{
@@ -242,10 +235,11 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 		sReply = EventMessage::getAnalyticStartReply(iAnalyticInstanceId);
 	}else //If Error remove the analytic instance and undo the streams
 	{
-		analyticStop(iAnalyticInstanceId, vStreamIds);
 		std::stringstream ss;
 		ss << "Failed to start the analytic " << iAnalyticInstanceId;
 		opencctv::util::log::Loggers::getDefaultLogger()->error(ss.str());
+		opencctv::util::log::Loggers::getDefaultLogger()->error("Reverting the analytic start........");
+		analyticStop(iAnalyticInstanceId, vStreamIds);
 		sReply =  EventMessage::getInvalidMessageReply(ss.str());
 	}
 
