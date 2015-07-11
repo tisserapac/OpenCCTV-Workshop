@@ -110,6 +110,7 @@
 									<listOptionValue builtIn="false" value="zmq"/>
 									<listOptionValue builtIn="false" value="mysqlclient"/>
 									<listOptionValue builtIn="false" value="mysqlcppconn"/>
+									<listOptionValue builtIn="false" value="boost_chrono"/>
 								</option>
 								<option id="gnu.cpp.link.option.flags.312410049" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-pthread" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1772629490" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">

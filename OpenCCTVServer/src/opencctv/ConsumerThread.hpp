@@ -14,7 +14,7 @@ class ConsumerThread {
 private:
 	unsigned int _iStreamId;
 	ImageMulticaster* _pImageMulticaster;
-	ConcurrentQueue<Image>* _pQueue;
+	//ConcurrentQueue<Image>* _pQueue;
 public:
 	ConsumerThread(unsigned int iStreamId, ImageMulticaster* pImageMulticaster);
 	ConsumerThread(unsigned int iStreamId);

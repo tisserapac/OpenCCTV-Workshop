@@ -110,6 +110,11 @@ void ServerController::executeOperation()
 		}
 		sendReply(sReply);
 
+	}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_START) == 0)
+	{
+		sReply = opencctv::event::AnalyticEvent::analyticStart(sRequest);
+		sendReply(sReply);
+
 	}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_STOP) == 0)
 	{
 		sReply = opencctv::event::AnalyticEvent::analyticStop(sRequest);
