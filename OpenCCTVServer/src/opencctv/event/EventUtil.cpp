@@ -218,7 +218,7 @@ bool EventUtil::stopThread(const std::string& sThreadType, const unsigned int iT
 	boost::thread* pThread = NULL;
 	boost::thread_group* pThreadGroup = NULL;
 
-	std::cout << "sThreadType : " << sThreadType << " iThreadId : " << iThreadId << std::endl;
+	//std::cout << "sThreadType : " << sThreadType << " iThreadId : " << iThreadId << std::endl;
 
 	std::map<unsigned int, boost::thread*>::iterator itThread;
 

@@ -299,8 +299,8 @@ std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticId, std::vec
 				for(unsigned int i=0; i<vStreamIds.size(); ++i)
 				{
 					iStreamId = vStreamIds.at(i);
-					std::cout<< "i = " << i << std::endl;
-					std::cout<< "iStreamId = " << iStreamId << std::endl;
+					/*std::cout<< "i = " << i << std::endl;
+					std::cout<< "iStreamId = " << iStreamId << std::endl;*/
 
 					if(pModel->containsMulticastDestination(iStreamId))
 					{
