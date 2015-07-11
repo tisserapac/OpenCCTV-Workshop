@@ -25,8 +25,6 @@
 #include "../ProducerThread.hpp"
 #include "../ResultRouterThread.hpp"
 #include "../db/StreamGateway.hpp"
-#include "../db/AnalyticInstanceGateway.hpp"
-#include "../dto/AnalyticInstance.hpp"
 #include "EventType.hpp"
 #include "EventMessage.hpp"
 #include "EventUtil.hpp"
