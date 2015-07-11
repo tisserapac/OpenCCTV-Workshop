@@ -179,33 +179,51 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 		bool bStartThreadResult = false;
 		if(!pModel->containsResultsRouterThread(iAnalyticInstanceId))
 		{
-			ssMsg << "Starting the results router thread for the analytic instance " << iAnalyticInstanceId;
+			/*ssMsg << "Starting the results router thread for the analytic instance " << iAnalyticInstanceId;
 			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-			ssMsg.str("");
+			ssMsg.str("");*/
 
 			if(pModel->containsResultsOutputQueueAddress(iAnalyticInstanceId))
 			{
 				bStartThreadResult = EventUtil::startThread(opencctv::event::RESULTS_ROUTER_THREAD, iAnalyticInstanceId);
+				if(bStartThreadResult)
+				{
+					ssMsg << "Results router thread for the analytic instance " << iAnalyticInstanceId << " started";
+					opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+					ssMsg.str("");
+				}
 			}
 
 		}
 
 		//Start the consumer thread
-		ssMsg << "Starting the consumer thread " << iStreamId;
+		/*ssMsg << "Starting the consumer thread " << iStreamId;
 		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-		ssMsg.str("");
+		ssMsg.str("");*/
 		if(bStartThreadResult)
 		{
 			bStartThreadResult = EventUtil::startThread(opencctv::event::CONSUMER_THREAD, iStreamId);
+			if(bStartThreadResult)
+			{
+				ssMsg << "Consumer thread for the stream " << iStreamId << " started";
+				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				ssMsg.str("");
+			}
 		}
 
 		//start the producer thread if it does not exist
 		if(bStartThreadResult && !pModel->containsProducerThread(iStreamId))
 		{
-			ssMsg << "Starting the producer thread " << iStreamId;
+			/*ssMsg << "Starting the producer thread " << iStreamId;
 			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-			ssMsg.str("");
+			ssMsg.str("");*/
 			bStartThreadResult = EventUtil::startThread(opencctv::event::PRODUCER_THREAD, iStreamId);
+			if(bStartThreadResult)
+			{
+				ssMsg << "Producer thread for the stream " << iStreamId << " started";
+				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				ssMsg.str("");
+			}
 		}
 
 		if(!bStartThreadResult)
