@@ -129,44 +129,6 @@ bool ImageMulticaster::send(mq::Sender* pMqSender, Image* pImage) {
 	return bSent;
 }
 
-/*void ImageMulticaster::addDestination(const dto::AnalyticInstanceStream& analyticInstance)
-{
-	ApplicationModel* pModel = ApplicationModel::getInstance();
-	if(pModel->containsImageInputQueueAddress(analyticInstance.getAnalyticInstanceId()))
-	{
-		mq::TcpMqSender* pSender = new mq::TcpMqSender();
-		bool bConnectedToMq = false;
-		try {
-			bConnectedToMq = pSender->connectToMq(util::Config::getInstance()->get(util::PROPERTY_ANALYTIC_SERVER_IP),
-					pModel->getImageInputQueueAddresses()[analyticInstance.getAnalyticInstanceId()]);
-			pModel->getMulticastDestinations()[analyticInstance.getId()] = pSender;
-		} catch (Exception &e) {
-			std::stringstream ssErrMsg;
-			ssErrMsg << "Failed to connect to Input Image Queue of Analytic Instance ";
-			ssErrMsg << analyticInstance.getAnalyticInstanceId() << ". ";
-			ssErrMsg << e.what();
-			throw Exception(ssErrMsg.str());
-		}
-		if(bConnectedToMq)
-		{
-			Element e = {analyticInstance.getAnalyticInstanceId(), analyticInstance.getInputName()};
-			_mAISInfo[analyticInstance.getId()] = e;
-			std::stringstream ssMsg;
-			ssMsg << "Connection established to Input Image Queue of Analytic Instance ";
-			ssMsg << analyticInstance.getAnalyticInstanceId() << ". ";
-			util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-		}
-		else
-		{
-			if(pSender) delete pSender;
-			std::stringstream ssErrMsg;
-			ssErrMsg << "Failed to connect to Input Image Queue of Analytic Instance ";
-			ssErrMsg << analyticInstance.getAnalyticInstanceId() << ". ";
-			util::log::Loggers::getDefaultLogger()->error(ssErrMsg.str());
-		}
-	}
-}*/
-
 size_t ImageMulticaster::getNumberOfDestinations()
 {
 	return _mAISInfo.size();

@@ -4,18 +4,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../src/opencctv/db/AnalyticInstanceGateway.cpp \
 ../src/opencctv/db/AnalyticInstanceStreamGateway.cpp \
 ../src/opencctv/db/AnalyticResultGateway.cpp \
 ../src/opencctv/db/DbConnector.cpp \
 ../src/opencctv/db/StreamGateway.cpp 
 
 OBJS += \
+./src/opencctv/db/AnalyticInstanceGateway.o \
 ./src/opencctv/db/AnalyticInstanceStreamGateway.o \
 ./src/opencctv/db/AnalyticResultGateway.o \
 ./src/opencctv/db/DbConnector.o \
 ./src/opencctv/db/StreamGateway.o 
 
 CPP_DEPS += \
+./src/opencctv/db/AnalyticInstanceGateway.d \
 ./src/opencctv/db/AnalyticInstanceStreamGateway.d \
 ./src/opencctv/db/AnalyticResultGateway.d \
 ./src/opencctv/db/DbConnector.d \
