@@ -27,12 +27,8 @@ public:
 	static std::string extractEventRequestOperation(const std::string& sEventRequest);
 
 	//Analytic stop
-	static void extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticInstanceId, std::vector<unsigned int>& vStreamIds);
+	static void extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticId, std::vector<unsigned int>& vStreamIds);
 	static std::string getAnalyticStopReply(const unsigned int& iAnalyticId);
-
-	//Analytic start
-	static void extractAnalyticStartRequest(const std::string& sEventRequest, unsigned int& iAnalyticInstanceId, std::string& sAnalyticPluginDir, std::vector<std::pair<unsigned int,std::string> >& vInputStreams);
-	static std::string getAnalyticStartReply(const unsigned int& iAnalyticId);
 
 	//Server start/stop
 	static std::string getStartMessageReply();

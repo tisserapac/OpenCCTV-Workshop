@@ -117,16 +117,14 @@ bool ServerEvent::startServer()
 									analyticInstance.getAnalyticDirLocation(),
 									sAnalyticQueueInAddress,
 									sAnalyticQueueOutAddress);
-				} catch (opencctv::Exception &e)
-				{
+				} catch (opencctv::Exception &e) {
 					std::stringstream ssErrMsg;
 					ssErrMsg << "Failed to start Analytic Instance ";
 					ssErrMsg << analyticInstance.getAnalyticInstanceId() << ". ";
 					ssErrMsg << e.what();
 					opencctv::util::log::Loggers::getDefaultLogger()->error(ssErrMsg.str());
 				}
-				if (bAIStarted)
-				{
+				if (bAIStarted) {
 					// store analytic input queue address and output queue address in model
 					pModel->getImageInputQueueAddresses()[analyticInstance.getAnalyticInstanceId()] = sAnalyticQueueInAddress;
 					pModel->getResultsOutputQueueAddresses()[analyticInstance.getAnalyticInstanceId()] = sAnalyticQueueOutAddress;
@@ -139,8 +137,7 @@ bool ServerEvent::startServer()
 					ssMsg << " started.";
 					opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 				}
-				else
-				{
+				else {
 					std::stringstream ssErrMsg;
 					ssErrMsg << "Starting Analytic Instance " << analyticInstance.getAnalyticInstanceId();
 					ssErrMsg << " failed.";
@@ -148,16 +145,14 @@ bool ServerEvent::startServer()
 				}
 			}
 			// Adding Input Image Queue destinations to Image Multicaster
-			try
-			{
+			try {
 				if(pModel->containsImageInputQueueAddress(analyticInstance.getAnalyticInstanceId()))
 				{
 					sAnalyticQueueInAddress = pModel->getImageInputQueueAddresses()[analyticInstance.getAnalyticInstanceId()];
 					pMulticastDestination->addDestination(analyticInstance.getAnalyticInstanceId(), analyticInstance.getInputName(),sAnalyticQueueInAddress);
 					//pMulticaster->addDestination(analyticInstance);
 				}
-			} catch (opencctv::Exception &e)
-			{
+			} catch (opencctv::Exception &e) {
 				std::string sErrMsg = "Failed to add destination to Image Multicaster. ";
 				sErrMsg.append(e.what());
 				opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
@@ -192,10 +187,8 @@ bool ServerEvent::startServer()
 				pVmsPluginLoader = pModel->getVmsPluginLoaders()[stream.getVmsTypeId()];
 			}
 			// if VMS Plugin Loader has not been constructed, construct it.
-			else
-			{
-				try
-				{
+			else {
+				try {
 					pVmsPluginLoader = new opencctv::PluginLoader<opencctv::api::VmsConnector>();
 
 					std::string sVmsPluginPath;
@@ -203,8 +196,7 @@ bool ServerEvent::startServer()
 					//std::cout << "sVmsPluginPath : " << sVmsPluginPath << std::endl;
 					pVmsPluginLoader->loadPlugin(sVmsPluginPath);
 					pModel->getVmsPluginLoaders()[stream.getVmsTypeId()] = pVmsPluginLoader;
-				} catch (opencctv::Exception &e)
-				{
+				} catch (opencctv::Exception &e) {
 					std::string sErrMsg = "Failed to load VMS Connector Plugin using VMS Connector Plugin Loader. ";
 					sErrMsg.append(e.what());
 					opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
@@ -213,15 +205,13 @@ bool ServerEvent::startServer()
 			// create VMS Connector using the VMS Plugin Loader
 			if(pVmsPluginLoader)
 			{
-				try
-				{
+				try {
 					pVmsConnector = pVmsPluginLoader->createPluginInstance();
 					std::stringstream ssMsg;
 					ssMsg << "VMS Connector plugin for Stream " << stream.getId();
 					ssMsg << " constructed.";
 					opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-				} catch (opencctv::Exception &e)
-				{
+				} catch (opencctv::Exception &e) {
 					std::string sErrMsg = "Failed to create VMS Connector plugin. ";
 					sErrMsg.append(e.what());
 					opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
@@ -307,20 +297,6 @@ bool ServerEvent::startServer()
 	delete pAnalyticInstanceGateway;
 
 	pModel->setServerStatus(opencctv::event::SERVER_STATUS_STARTED);
-
-	/*boost::thread* pThread = NULL;
-	std::map<unsigned int, boost::thread*>::iterator itThread;
-	std::map<unsigned int, boost::thread*> _mProducerThreads = pModel->getProducerThreads();
-
-	//Remove all producer threads
-	opencctv::util::log::Loggers::getDefaultLogger()->info("All producer threads");
-	for(itThread = _mProducerThreads.begin(); itThread != _mProducerThreads.end(); it increment below)
-	{
-		std::cout << "Producer Thread = " << itThread->first << std::endl;
-		++itThread;
-	}*/
-
-
 	return true;
 }
 
