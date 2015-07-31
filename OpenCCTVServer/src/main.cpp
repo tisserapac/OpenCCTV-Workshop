@@ -13,8 +13,6 @@
 #include "opencctv/event/EventType.hpp"
 #include "opencctv/event/ServerEvent.hpp"
 
-
-
 void terminateHandler(int signum); // Terminate signal handler
 //bool init(); //Initialize the OpenCCTV server at startup
 
