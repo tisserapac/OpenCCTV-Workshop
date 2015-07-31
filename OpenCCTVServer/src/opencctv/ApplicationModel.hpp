@@ -3,6 +3,8 @@
 #define OPENCCTV_APPLICATIONMODEL_HPP_
 
 #include <map>
+#include <list>
+#include <algorithm>
 #include <string>
 #include <boost/thread/thread.hpp>
 #include "mq/Mq.hpp"
@@ -27,6 +29,8 @@ private:
 	boost::thread_group* _pProducerThreadGroup;
 	boost::thread_group* _pConsumerThreadGroup;
 	boost::thread_group* _pResultsRouterThreadGroup;
+
+	std::list<unsigned int> _lAnalyticInstances; //A vector to keep the ID of currently running analytic instances
 
 	std::map<unsigned int, boost::thread*> _mProducerThreads; // Stream ID as key
 	std::map<unsigned int, boost::thread*> _mConsumerThreads; // Stream ID as key
@@ -54,6 +58,8 @@ public:
 	boost::thread_group*& getResultsRouterThreadGroup();
 	void setResultsRouterThreadGroup(boost::thread_group*& resultsRouterThreadGroup);
 
+	bool containsAnalyticInstance(unsigned int iAnalyticInstanceId);
+
 	bool containsProducerThread(unsigned int iStreamId);
 	bool containsConsumerThread(unsigned int iStreamId);
 	bool containsResultsRouterThread(unsigned int iAnalyticInstanceId);
@@ -67,6 +73,8 @@ public:
 	bool containsAnalyticInstanceManager(unsigned int iAnalyticServerId);
 
 	bool containsVmsConnector(unsigned int iStreamId);
+
+	std::list<unsigned int>& getAnalyticInstances();
 
 	std::map<unsigned int, boost::thread*>& getConsumerThreads();
 	std::map<unsigned int, boost::thread*>& getProducerThreads();

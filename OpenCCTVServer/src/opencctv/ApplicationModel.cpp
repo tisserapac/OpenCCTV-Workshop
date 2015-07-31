@@ -19,6 +19,20 @@ ApplicationModel::ApplicationModel()
 	_pResultsRouterThreadGroup = NULL;
 }
 
+bool ApplicationModel::containsAnalyticInstance(unsigned int iAnalyticInstanceId)
+{
+	bool bResult = false;
+	std::list<unsigned int>::iterator it;
+
+	it = std::find (_lAnalyticInstances.begin(), _lAnalyticInstances.end(), iAnalyticInstanceId);
+	if (it != _lAnalyticInstances.end())
+	{
+		bResult = true;
+	}
+
+	return bResult;
+}
+
 bool ApplicationModel::containsProducerThread(unsigned int iStreamId)
 {
 	std::map<unsigned int, boost::thread*>::iterator it = _mProducerThreads.find(iStreamId);
@@ -151,15 +165,23 @@ void ApplicationModel::setResultsRouterThreadGroup(boost::thread_group*& results
 	_pResultsRouterThreadGroup = resultsRouterThreadGroup;
 }
 
-std::map<unsigned int, boost::thread*>& ApplicationModel::getConsumerThreads(){
+std::list<unsigned int>& ApplicationModel::getAnalyticInstances()
+{
+	return _lAnalyticInstances;
+}
+
+std::map<unsigned int, boost::thread*>& ApplicationModel::getConsumerThreads()
+{
 	return _mConsumerThreads;
 }
 
-std::map<unsigned int, boost::thread*>& ApplicationModel::getProducerThreads(){
+std::map<unsigned int, boost::thread*>& ApplicationModel::getProducerThreads()
+{
 	return _mProducerThreads;
 }
 
-std::map<unsigned int, boost::thread*>& ApplicationModel::getResultsRouterThreads(){
+std::map<unsigned int, boost::thread*>& ApplicationModel::getResultsRouterThreads()
+{
 	return _mResultsRouterThreads;
 }
 
@@ -203,11 +225,13 @@ std::map<unsigned int, std::pair <unsigned int,opencctv::api::VmsConnector*> >& 
 	return _mVmsConnectors;
 }
 
-const std::string& ApplicationModel::getServerStatus() const {
+const std::string& ApplicationModel::getServerStatus() const
+{
 	return sServerStatus;
 }
 
-void ApplicationModel::setServerStatus(const std::string& serverStatus) {
+void ApplicationModel::setServerStatus(const std::string& serverStatus)
+{
 	sServerStatus = serverStatus;
 }
 
@@ -260,6 +284,12 @@ void ApplicationModel::clear()
 		_pResultsRouterThreadGroup->remove_thread(pThread);
 		delete pThread; pThread = NULL;
 		_mResultsRouterThreads.erase(itThread++);
+	}
+
+	//Remove all analytic instances
+	while (!_lAnalyticInstances.empty())
+	{
+		_lAnalyticInstances.pop_back();
 	}
 
 	//Remove the thread groups
