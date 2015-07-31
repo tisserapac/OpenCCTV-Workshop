@@ -136,7 +136,7 @@ std::string EventMessage::getStatusMessageReply()
 
 //==========Analytic Stop===================
 //sRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><opencctvmsg><type>StopAnalyticInstance</type><analyticinstanceid>1</analyticinstanceid><inputstreams><streamid>1</streamid></inputstreams></opencctvmsg>";
-void EventMessage::extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticInstanceId, std::vector<unsigned int>& vStreamIds)
+void EventMessage::extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticInstanceId)
 {
 	boost::property_tree::ptree pt;
 	std::istringstream iss(sEventRequest);
@@ -145,16 +145,6 @@ void EventMessage::extractAnalyticStopRequest(const std::string& sEventRequest, 
 		//sRet = pt.get<std::string>("opencctvmsg.type");
 
 		iAnalyticInstanceId = pt.get<unsigned int>("opencctvmsg.analyticinstanceid");
-		unsigned int iStreamId;
-
-		BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("opencctvmsg.inputstreams") )
-		{
-			if (v.first == "streamid")
-			{
-				iStreamId = boost::lexical_cast<unsigned int>(v.second.data());
-				vStreamIds.push_back(iStreamId);
-			}
-		}
 
 	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
 		std::string sErrMsg = "Failed to parse Analytic Stop Request. ";

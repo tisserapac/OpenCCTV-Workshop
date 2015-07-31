@@ -29,7 +29,7 @@ public:
 	static std::string extractEventRequestOperation(const std::string& sEventRequest);
 
 	//Analytic stop
-	static void extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticInstanceId, std::vector<unsigned int>& vStreamIds);
+	static void extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticInstanceId);
 	static std::string getAnalyticStopReply(const unsigned int& iAnalyticId);
 
 	//Analytic start
