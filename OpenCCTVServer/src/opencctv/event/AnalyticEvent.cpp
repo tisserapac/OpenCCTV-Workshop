@@ -14,7 +14,7 @@ AnalyticEvent::AnalyticEvent()
 {
 }
 
-std::string AnalyticEvent::analyticStart(const std::string& sRequest)
+std::string AnalyticEvent::startAnalytic(const std::string& sRequest)
 {
 	std::string sReply;
 	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
@@ -28,10 +28,9 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 	}
 
 	unsigned int iAnalyticInstanceId = 0;
-	std::string sAnalyticPluginDir;
+	std::string sAnalyticPluginDir = "";
 	std::vector<std::pair<unsigned int,std::string> > vInputStreams;
 	std::string sErrorMessages;
-	opencctv::util::Config* pConfig = opencctv::util::Config::getInstance();
 
 	//Extract the details from the XML request
 	try
@@ -45,8 +44,18 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 		return sReply;
 	}
 
+	sReply = startAnalytic(iAnalyticInstanceId, sAnalyticPluginDir, vInputStreams);
 
-	if(iAnalyticInstanceId == 0 || sAnalyticPluginDir.empty() || vInputStreams.empty())
+	return sReply;
+}
+
+std::string AnalyticEvent::startAnalytic(const unsigned int iAnalyticInstanceId, std::string& sAnalyticPluginDir, std::vector<std::pair<unsigned int,std::string> >& vInputStreams)
+{
+	std::string sReply;
+	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
+	opencctv::util::Config* pConfig = opencctv::util::Config::getInstance();
+
+	if(iAnalyticInstanceId <= 0 || sAnalyticPluginDir.empty() || vInputStreams.empty())
 	{
 		sReply = EventMessage::getInvalidMessageReply("Failed to retrieve analytic instance details");
 		return sReply;
@@ -83,6 +92,13 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 	ssMsg << "Analytic Instance " << iAnalyticInstanceId << " started on the analytic server.";
 	opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 	ssMsg.str("");
+
+	//Add the analytic instance details to the ApplicationModel
+	if(!pModel->containsAnalyticInstance(iAnalyticInstanceId))
+	{
+		std::list<unsigned int> lStreamIds;
+		pModel->getAnalyticInstances().insert(std::pair< unsigned int,std::list<unsigned int> >(iAnalyticInstanceId,lStreamIds));
+	}
 
 	unsigned int iStreamId = 0;
 	std::string sInputName;
@@ -232,6 +248,8 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 			break;
 		}
 
+		pModel->getAnalyticInstances()[iAnalyticInstanceId].push_back(iStreamId);
+
 	}//End For Loop
 
 	if(!bResult)
@@ -240,14 +258,12 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 		ss << "Failed to start the analytic " << iAnalyticInstanceId;
 		opencctv::util::log::Loggers::getDefaultLogger()->error(ss.str());
 		opencctv::util::log::Loggers::getDefaultLogger()->error("Reverting the analytic start........");
-		analyticStop(iAnalyticInstanceId, vStreamIds);
+		//stopAnalytic(iAnalyticInstanceId, vStreamIds);
+		stopAnalytic(iAnalyticInstanceId);
 		sReply =  EventMessage::getInvalidMessageReply(ss.str());
 
 		return sReply;
 	}
-
-	//Insert the analytic instance id to the list in the ApplicationModel
-	pModel->getAnalyticInstances().push_back(iAnalyticInstanceId);
 
 	try
 	{
@@ -270,7 +286,7 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 	return sReply;
 }
 
-std::string AnalyticEvent::analyticStop(const std::string& sRequest)
+std::string AnalyticEvent::stopAnalytic(const std::string& sRequest)
 {
 	std::string sReply;
 	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
@@ -284,13 +300,13 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 	}
 
 	unsigned int iAnalyticInstanceId = 0;
-	std::vector<unsigned int> vInputStreams;
+	//std::vector<unsigned int> vInputStreams;
 	std::string sErrorMessages;
 	std::stringstream ssMsg;
 
 	try
 	{
-		EventMessage::extractAnalyticStopRequest(sRequest, iAnalyticInstanceId, vInputStreams);
+		EventMessage::extractAnalyticStopRequest(sRequest, iAnalyticInstanceId);
 	}catch(opencctv::Exception &e)
 	{
 		sErrorMessages = "Error occurred in stopping the analytic instance : ";
@@ -298,7 +314,7 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 		sReply = EventMessage::getInvalidMessageReply(sErrorMessages);
 	}
 
-	if(iAnalyticInstanceId == 0 || vInputStreams.empty())
+	if(iAnalyticInstanceId <= 0)
 	{
 		sReply = EventMessage::getInvalidMessageReply("Error occurred in stopping the analytic instance : Failed to retrieve analytic instance details");
 		return sReply;
@@ -311,12 +327,13 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 		return sReply;
 	}
 
-	sReply = analyticStop(iAnalyticInstanceId,  vInputStreams);
+	//sReply = analyticStop(iAnalyticInstanceId,  vInputStreams);
+	sReply = stopAnalytic(iAnalyticInstanceId);
 
 	return sReply;
 }
 
-std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticInstanceId, std::vector<unsigned int>& vStreamIds)
+std::string AnalyticEvent::stopAnalytic(const unsigned int iAnalyticInstanceId)
 {
 	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
 	std::string sErrorMessages;
@@ -331,17 +348,15 @@ std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticInstanceId, 
 			ConcurrentQueue<Image>* pConcurrentQueue = NULL;
 			util::flow::FlowController* pFlowController = NULL;
 
-			if(!vStreamIds.empty())
+			if(pModel->containsAnalyticInstance(iAnalyticInstanceId))
 			{
-				for(unsigned int i=0; i<vStreamIds.size(); ++i)
+				while(!pModel->getAnalyticInstances()[iAnalyticInstanceId].empty())
 				{
-					iStreamId = vStreamIds.at(i);
-					/*std::cout<< "i = " << i << std::endl;
-					std::cout<< "iStreamId = " << iStreamId << std::endl;*/
+					iStreamId = pModel->getAnalyticInstances()[iAnalyticInstanceId].back();
+					pModel->getAnalyticInstances()[iAnalyticInstanceId].pop_back();
 
 					if(pModel->containsMulticastDestination(iStreamId))
 					{
-
 						ssMsg << "Pausing the consumer thread " << iStreamId;
 						opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 						ssMsg.str("");
@@ -394,7 +409,6 @@ std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticInstanceId, 
 						}
 					}
 				}
-
 			}
 
 			//Remove the results router thread
@@ -411,8 +425,11 @@ std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticInstanceId, 
 				ssMsg.str("");
 			}
 
-			//Remove the analytic instance id from the list in the ApplicationModel
-			pModel->getAnalyticInstances().remove(iAnalyticInstanceId);
+			//Remove the analytic instance id from the map in the ApplicationModel
+			if(pModel->containsAnalyticInstance(iAnalyticInstanceId))
+			{
+				pModel->getAnalyticInstances().erase(iAnalyticInstanceId);
+			}
 
 			//Remove the flow controller of the analytic instance
 			ssMsg << "Removing the flow controller of the analytic instance " << iAnalyticInstanceId;

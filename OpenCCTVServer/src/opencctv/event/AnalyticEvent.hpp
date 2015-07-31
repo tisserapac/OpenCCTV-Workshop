@@ -35,11 +35,16 @@ namespace event {
 
 class AnalyticEvent {
 private:
-	static std::string analyticStop(const unsigned int iAnalyticInstanceId, std::vector<unsigned int>& vStreamIds);
+	//static std::string analyticStop(const unsigned int iAnalyticInstanceId, std::vector<unsigned int>& vStreamIds);
+	//static std::string analyticStart(const unsigned int iAnalyticInstanceId, std::string& sAnalyticPluginDir, std::vector<std::pair<unsigned int,std::string> >& vInputStreams);
+
 public:
 	AnalyticEvent();
-	static std::string analyticStart(const std::string& sRequest);
-	static std::string analyticStop(const std::string& sRequest);
+	static std::string startAnalytic(const std::string& sRequest);
+	static std::string startAnalytic(const unsigned int iAnalyticInstanceId, std::string& sAnalyticPluginDir, std::vector<std::pair<unsigned int,std::string> >& vInputStreams);
+	static std::string stopAnalytic(const std::string& sRequest);
+	static std::string stopAnalytic(const unsigned int iAnalyticInstanceId);
+
 	virtual ~AnalyticEvent();
 };
 

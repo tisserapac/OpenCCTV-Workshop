@@ -276,7 +276,7 @@ bool ServerEvent::startServer()
 						opencctv::ResultRouterThread* pResultsRouter = new opencctv::ResultRouterThread(analyticInstance.getAnalyticInstanceId());
 						boost::thread* pResultsRouterThread = new boost::thread(*pResultsRouter);
 						pModel->getResultsRouterThreads()[analyticInstance.getAnalyticInstanceId()] = pResultsRouterThread;
-						pModel->getAnalyticInstances().push_back(analyticInstance.getAnalyticInstanceId());
+						//pModel->getAnalyticInstances().push_back(analyticInstance.getAnalyticInstanceId());
 						if(pResultsRouterThread->joinable())
 						{
 							_pResultsRouterThreadGroup->add_thread(pResultsRouterThread);
@@ -286,7 +286,17 @@ bool ServerEvent::startServer()
 					}
 
 				}
+
+				//Add the analytic instance details to the ApplicationModel
+				if(!pModel->containsAnalyticInstance(analyticInstance.getAnalyticInstanceId()))
+				{
+					std::list<unsigned int> lStreamIds;
+					pModel->getAnalyticInstances().insert(std::pair< unsigned int,std::list<unsigned int> >(analyticInstance.getAnalyticInstanceId(),lStreamIds));
+				}
+
+				pModel->getAnalyticInstances()[analyticInstance.getAnalyticInstanceId()].push_back(stream.getId());
 			}
+
 			// Start Consumer and Producer threads
 			boost::thread* pConsumerThread = new boost::thread(*pConsumer);
 			pModel->getConsumerThreads()[stream.getId()] = pConsumerThread;
