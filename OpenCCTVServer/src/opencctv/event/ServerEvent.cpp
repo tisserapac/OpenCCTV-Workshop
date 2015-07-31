@@ -306,21 +306,7 @@ bool ServerEvent::startServer()
 	delete pStreamGateway;
 	delete pAnalyticInstanceGateway;
 
-	pModel->setServerStatus(opencctv::event::SERVER_STATUS_STARTED);
-
-	/*boost::thread* pThread = NULL;
-	std::map<unsigned int, boost::thread*>::iterator itThread;
-	std::map<unsigned int, boost::thread*> _mProducerThreads = pModel->getProducerThreads();
-
-	//Remove all producer threads
-	opencctv::util::log::Loggers::getDefaultLogger()->info("All producer threads");
-	for(itThread = _mProducerThreads.begin(); itThread != _mProducerThreads.end(); it increment below)
-	{
-		std::cout << "Producer Thread = " << itThread->first << std::endl;
-		++itThread;
-	}*/
-
-
+	updateServerStatus(opencctv::event::SERVER_STATUS_STARTED);
 	return true;
 }
 
@@ -328,8 +314,27 @@ bool ServerEvent::stopServer()
 {
 	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
 	pModel->clear();
-	pModel->setServerStatus(opencctv::event::SERVER_STATUS_STOPPED);
+
+	updateServerStatus(opencctv::event::SERVER_STATUS_STOPPED);
+
 	return true;
+}
+
+void ServerEvent::updateServerStatus(std::string sStatus)
+{
+	opencctv::ApplicationModel::getInstance()->setServerStatus(sStatus);
+
+	try
+	{
+		opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
+		analyticInstanceGateway.updateAllAnalyticInstanceStatus();
+
+	}catch(opencctv::Exception &e)
+	{
+		std::string sErrMsg = "ServerEvent::updateServerStatus - Failed to update status of analytic instances : ";
+		sErrMsg.append(e.what());
+		opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+	}
 }
 
 ServerEvent::~ServerEvent()

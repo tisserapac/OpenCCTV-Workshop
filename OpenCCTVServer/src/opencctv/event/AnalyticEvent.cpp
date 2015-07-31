@@ -227,13 +227,7 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 
 	}//End For Loop
 
-	if(bResult)
-	{
-		ssMsg << "Successfully started the analytic " << iAnalyticInstanceId;
-		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-		ssMsg.str("");
-		sReply = EventMessage::getAnalyticStartReply(iAnalyticInstanceId);
-	}else //If Error remove the analytic instance and undo the streams
+	if(!bResult)
 	{
 		std::stringstream ss;
 		ss << "Failed to start the analytic " << iAnalyticInstanceId;
@@ -241,6 +235,39 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 		opencctv::util::log::Loggers::getDefaultLogger()->error("Reverting the analytic start........");
 		analyticStop(iAnalyticInstanceId, vStreamIds);
 		sReply =  EventMessage::getInvalidMessageReply(ss.str());
+
+		return sReply;
+	}
+
+	try
+	{
+		opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
+		analyticInstanceGateway.updateAnalyticInstanceStatus(iAnalyticInstanceId, opencctv::event::ANALYTIC_STATUS_STARTED);
+	}catch(opencctv::Exception &e)
+	{
+
+	}
+
+	if(bResult)
+	{
+		try
+		{
+			opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
+			analyticInstanceGateway.updateAnalyticInstanceStatus(iAnalyticInstanceId, opencctv::event::ANALYTIC_STATUS_STARTED);
+
+			ssMsg << "Successfully started the analytic " << iAnalyticInstanceId;
+			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+			ssMsg.str("");
+			sReply = EventMessage::getAnalyticStartReply(iAnalyticInstanceId);
+
+		}catch(opencctv::Exception &e)
+		{
+			std::stringstream ss;
+			ss << "Failed to update the status of the analytic instance " << iAnalyticInstanceId;
+			opencctv::util::log::Loggers::getDefaultLogger()->error(ss.str());
+			sReply =  EventMessage::getInvalidMessageReply(ss.str());
+		}
+
 	}
 
 	return sReply;
@@ -279,7 +306,7 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 	return sReply;
 }
 
-std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticId, std::vector<unsigned int>& vStreamIds)
+std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticInstanceId, std::vector<unsigned int>& vStreamIds)
 {
 	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
 	std::string sErrorMessages;
@@ -288,7 +315,7 @@ std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticId, std::vec
 
 	try
 	{
-		if(!iAnalyticId == 0)
+		if(!iAnalyticInstanceId == 0)
 		{
 			unsigned int iStreamId;
 			ConcurrentQueue<Image>* pConcurrentQueue = NULL;
@@ -311,11 +338,11 @@ std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticId, std::vec
 						EventUtil::stopThread(opencctv::event::CONSUMER_THREAD, iStreamId);
 
 						//Remove this analytic from the multicast destinations of the stream
-						ssMsg << "Removing analytic instance " << iAnalyticId << " from the destinations of stream " << iStreamId;
+						ssMsg << "Removing analytic instance " << iAnalyticInstanceId << " from the destinations of stream " << iStreamId;
 						opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 						ssMsg.str("");
 						MulticastDestination* destinations = pModel->getMulticastDestinations()[iStreamId];
-						destinations->removeDestination(iAnalyticId);
+						destinations->removeDestination(iAnalyticInstanceId);
 
 						//If no of Consumer’s multicast destinations = 0
 						if(destinations->getNumberOfDestinations() == 0)
@@ -361,33 +388,38 @@ std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticId, std::vec
 			}
 
 			//Remove the results router thread
-			ssMsg << "Removing the results router thread " << iAnalyticId;
+			ssMsg << "Removing the results router thread " << iAnalyticInstanceId;
 			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 			ssMsg.str("");
-			EventUtil::stopThread(opencctv::event::RESULTS_ROUTER_THREAD,iAnalyticId);
+			EventUtil::stopThread(opencctv::event::RESULTS_ROUTER_THREAD,iAnalyticInstanceId);
 
 			//Stop the analytic instance on the analytic server
-			if(!EventUtil::stopAnalyticInstance(iAnalyticId))
+			if(!EventUtil::stopAnalyticInstance(iAnalyticInstanceId))
 			{
-				ssMsg << "Error occurred in stopping the analytic instance " << iAnalyticId << "on Analytic Server";
+				ssMsg << "Error occurred in stopping the analytic instance " << iAnalyticInstanceId << "on Analytic Server";
 				sErrorMessages = ssMsg.str();
 				ssMsg.str("");
 			}
 
 			//Remove the flow controller of the analytic instance
-			ssMsg << "Removing the flow controller of the analytic instance " << iAnalyticId;
+			ssMsg << "Removing the flow controller of the analytic instance " << iAnalyticInstanceId;
 			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 			ssMsg.str("");
-			if(pModel->containsFlowController(iAnalyticId))
+			if(pModel->containsFlowController(iAnalyticInstanceId))
 			{
-				pFlowController = pModel->getFlowControllers()[iAnalyticId];
+				pFlowController = pModel->getFlowControllers()[iAnalyticInstanceId];
 				delete pFlowController; pFlowController = NULL;
-				pModel->getFlowControllers().erase(iAnalyticId);
+				pModel->getFlowControllers().erase(iAnalyticInstanceId);
 			}
+
+			//Updated the analytic instance status in the DB
+			opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
+			analyticInstanceGateway.updateAnalyticInstanceStatus(iAnalyticInstanceId, opencctv::event::ANALYTIC_STATUS_STOPPED);
+
 
 			if(sErrorMessages.empty())
 			{
-				sReply = EventMessage::getAnalyticStopReply(iAnalyticId);
+				sReply = EventMessage::getAnalyticStopReply(iAnalyticInstanceId);
 			}else
 			{
 				sReply = EventMessage::getInvalidMessageReply(sErrorMessages);

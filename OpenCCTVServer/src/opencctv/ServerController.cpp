@@ -74,65 +74,101 @@ void ServerController::executeOperation()
 	{
 		opencctv::mq::MqUtil::readFromSocket(_pSocket, sRequest);
 		sOperation = opencctv::event::EventMessage::extractEventRequestOperation(sRequest);
-	}
-	catch(opencctv::Exception &e)
+
+	}catch(opencctv::Exception &e)
 	{
 		sOperation = opencctv::event::EVENT_UNKNOWN;
 		sMessage = e.what();
 	}
 
-	std::cout << "sOperation : " << sOperation << std::endl;
+	std::cout << "sRequest : " << sRequest << std::endl;
 
 	//Execute the operation according to the operation type
-	if(sOperation.compare(opencctv::event::SERVER_EVENT_START) == 0)
+	try
 	{
-		bool bResult = opencctv::event::ServerEvent::startServer();
-
-		if(bResult)
+		if(sOperation.compare(opencctv::event::SERVER_EVENT_START) == 0)
 		{
-			sReply = opencctv::event::EventMessage::getStartMessageReply();
+			bool bResult = opencctv::event::ServerEvent::startServer();
+
+			if(bResult)
+			{
+				sReply = opencctv::event::EventMessage::getStartMessageReply();
+			}else
+			{
+				sReply = opencctv::event::EventMessage::getInvalidMessageReply("Failed to start the OpenCCTV Server");
+			}
+			sendReply(sReply);
+
+		}else if(sOperation.compare(opencctv::event::SERVER_EVENT_STOP) == 0)
+		{
+			bool bResult = opencctv::event::ServerEvent::stopServer();
+
+			if(bResult)
+			{
+				sReply = opencctv::event::EventMessage::getStopMessageReply();
+			}else
+			{
+				sReply = opencctv::event::EventMessage::getInvalidMessageReply("Error occurred in stopping the OpenCCTV Server");
+			}
+			sendReply(sReply);
+
+		}else if(sOperation.compare(opencctv::event::SERVER_EVENT_RESTART) == 0)
+		{
+			bool bResult = opencctv::event::ServerEvent::stopServer();
+
+			if(bResult)
+			{
+				bResult = opencctv::event::ServerEvent::startServer();
+			}
+
+			if(bResult)
+			{
+				sReply = opencctv::event::EventMessage::getStatusMessageReply();
+			}else
+			{
+				sReply = opencctv::event::EventMessage::getInvalidMessageReply("Error occurred in restarting the OpenCCTV Server");
+			}
+			sendReply(sReply);
+
+		}else if(sOperation.compare(opencctv::event::SERVER_EVENT_STATUS) == 0)
+		{
+			sReply = opencctv::event::EventMessage::getStatusMessageReply();
+			sendReply(sReply);
+
+		}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_START) == 0)
+		{
+			sReply = opencctv::event::AnalyticEvent::analyticStart(sRequest);
+			sendReply(sReply);
+
+		}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_STOP) == 0)
+		{
+			sReply = opencctv::event::AnalyticEvent::analyticStop(sRequest);
+			sendReply(sReply);
+
 		}else
 		{
-			sReply = opencctv::event::EventMessage::getInvalidMessageReply("Failed to start the OpenCCTV Server");
+			std::string sErrMsg = "Request with an unknown operation.\nRequest: ";
+			sErrMsg.append(sRequest);
+			opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+			sReply = opencctv::event::EventMessage::getInvalidMessageReply("Request with an unknown operation");
+			sendReply(sReply);
 		}
-		sendReply(sReply);
 
-	}else if(sOperation.compare(opencctv::event::SERVER_EVENT_STOP) == 0)
+	}catch(opencctv::Exception &e)
 	{
-		bool bResult = opencctv::event::ServerEvent::stopServer();
-
-		if(bResult)
-		{
-			sReply = opencctv::event::EventMessage::getStopMessageReply();
-		}else
-		{
-			sReply = opencctv::event::EventMessage::getInvalidMessageReply("Error occurred in stopping the OpenCCTV Server");
-		}
-		sendReply(sReply);
-
-	}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_START) == 0)
-	{
-		sReply = opencctv::event::AnalyticEvent::analyticStart(sRequest);
-		sendReply(sReply);
-
-	}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_STOP) == 0)
-	{
-		sReply = opencctv::event::AnalyticEvent::analyticStop(sRequest);
-		sendReply(sReply);
-
-	}else
-	{
-		std::string sErrMsg = "Request with an unknown Operation.\nRequest: ";
-		sErrMsg.append(sRequest);
-		opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
-		//sReply = analytic::xml::AnalyticMessage::getErrorReply(analytic::xml::OPERATION_UNKNOWN, false, sMessage);
-		sReply = "Error";
+		std::string sErrMsg = "OpenCCTV server error - ";
+		sErrMsg.append(e.what());
+		sReply = opencctv::event::EventMessage::getInvalidMessageReply(sErrMsg);
 		sendReply(sReply);
 	}
+
+
 }
 
 void ServerController::sendReply(const std::string& sMessage)
 {
+	std::cout << "sReply : " << sMessage << std::endl;
+
 	if(_pSocket)
 	{
 		try {

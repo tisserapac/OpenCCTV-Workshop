@@ -96,6 +96,44 @@ std::string EventMessage::getStopMessageReply()
 	return sReplyMessage;
 }
 
+//==============Server Status==================
+std::string EventMessage::getStatusMessageReply()
+{
+	std::string sReplyMessage = "";
+	std::string sContent = "";
+
+	boost::property_tree::ptree pt;
+	opencctv::ApplicationModel* _pModel = opencctv::ApplicationModel::getInstance();
+	std::string sServerStatus = _pModel->getServerStatus();
+	pid_t iServerProcessId = getpid();
+
+	if(sServerStatus.compare(opencctv::event::SERVER_STATUS_STARTED) == 0)
+	{
+		sContent = "OpenCCTV Server is Running";
+	}else
+	{
+		sContent = "OpenCCTV Server Stopped";
+	}
+
+	pt.put("opencctvmsg.type", "StatusReply");
+	pt.put("opencctvmsg.content", sContent);
+	pt.put("opencctvmsg.serverstatus", sServerStatus);
+	pt.put("opencctvmsg.serverpid", iServerProcessId);
+
+	std::ostringstream oss;
+	try
+	{
+		write_xml(oss, pt);
+		sReplyMessage = oss.str();
+	}catch (boost::property_tree::xml_parser::xml_parser_error &e)
+	{
+		std::string sMessage = "EventMessage::getStatusReply: XML parsing error ";
+		throw opencctv::Exception(sMessage.append(e.what()));
+	}
+
+	return sReplyMessage;
+}
+
 //==========Analytic Stop===================
 //sRequest = "<?xml version=\"1.0\" encoding=\"utf-8\"?><opencctvmsg><type>StopAnalyticInstance</type><analyticinstanceid>1</analyticinstanceid><inputstreams><streamid>1</streamid></inputstreams></opencctvmsg>";
 void EventMessage::extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticInstanceId, std::vector<unsigned int>& vStreamIds)

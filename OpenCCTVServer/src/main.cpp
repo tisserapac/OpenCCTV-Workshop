@@ -1,25 +1,17 @@
-#include "test/gateway/TestStreamGateway.hpp"
-#include "test/gateway/TestAnalyticInstanceStreamGateway.hpp"
+//#include "test/gateway/TestStreamGateway.hpp"
+//#include "test/gateway/TestAnalyticInstanceStreamGateway.hpp"
 #include "opencctv/util/Config.hpp"
 #include "opencctv/ApplicationModel.hpp"
 #include "opencctv/Exception.hpp"
 #include "analytic/AnalyticInstanceManager.hpp"
 #include "opencctv/util/log/Loggers.hpp"
-#include "opencctv/util/flow/SimpleFlowController.hpp"
-//#include "opencctv/util/flow/BasicFlowController.hpp"
-#include "opencctv/ImageMulticaster.hpp"
-#include "opencctv/ConsumerThread.hpp"
-#include "opencctv/ProducerThread.hpp"
-#include "opencctv/ResultRouterThread.hpp"
-/* boost includes (/user/local/include) */
-/* boost libraries (/usr/local/lib) -lboost_system */
 #include <boost/thread/thread.hpp> // -lboost_thread -pthread
-#include <boost/lockfree/queue.hpp>
 #include <boost/lexical_cast.hpp> // to cast values
 #include <signal.h> // to handle terminate signal
-#include "opencctv/db/StreamGateway.hpp"
-#include "opencctv/db/AnalyticInstanceStreamGateway.hpp"
+#include "opencctv/db/AnalyticInstanceGateway.hpp"
 #include "opencctv/ServerController.hpp"
+#include "opencctv/event/EventType.hpp"
+#include "opencctv/event/ServerEvent.hpp"
 
 
 
@@ -46,6 +38,8 @@ int main()
 		pServerController = opencctv::ServerController::getInstance();
 		if(pServerController)
 		{
+			//updateServerStatus(opencctv::event::SERVER_STATUS_STOPPED);
+			opencctv::event::ServerEvent::updateServerStatus(opencctv::event::SERVER_STATUS_STOPPED);
 			bEnabled = true;
 		}
 	}catch(opencctv::Exception &e)
@@ -337,6 +331,10 @@ void terminateHandler(int signum) {
 	{
 		opencctv::util::log::Loggers::getDefaultLogger()->info("Reset all the Analytic Servers.");
 	}
+
+	opencctv::event::ServerEvent::updateServerStatus(opencctv::event::SERVER_STATUS_STOPPED);
+
 	bEnabled = false;
 	exit(signum);
 }
+

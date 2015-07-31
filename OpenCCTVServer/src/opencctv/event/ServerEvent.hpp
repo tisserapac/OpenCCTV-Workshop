@@ -26,6 +26,7 @@
 #include "../MulticastDestination.hpp"
 #include "../db/StreamGateway.hpp"
 #include "../db/AnalyticInstanceStreamGateway.hpp"
+#include "../db/AnalyticInstanceGateway.hpp"
 #include "EventType.hpp"
 
 
@@ -37,6 +38,7 @@ public:
 	ServerEvent();
 	static bool startServer();
 	static bool stopServer();
+	static void updateServerStatus(std::string sStatus);
 	virtual ~ServerEvent();
 };
 
