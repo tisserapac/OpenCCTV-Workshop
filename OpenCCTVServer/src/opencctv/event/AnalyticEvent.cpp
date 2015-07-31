@@ -52,6 +52,13 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 		return sReply;
 	}
 
+	//If the analytic instance is already running, just send a reply
+	if(pModel->containsResultsRouterThread(iAnalyticInstanceId) && pModel->containsResultsOutputQueueAddress(iAnalyticInstanceId) && pModel->containsImageInputQueueAddress(iAnalyticInstanceId))
+	{
+		sReply = EventMessage::getAnalyticStartReply(iAnalyticInstanceId);
+		return sReply;
+	}
+
 	//Start the analytic instance at the analytic server
 	bool bAIStarted = false;
 	try
