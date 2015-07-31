@@ -314,8 +314,15 @@ bool ServerEvent::startServer()
 bool ServerEvent::stopServer()
 {
 	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
-	pModel->clear();
 
+	//If the server is already stopped just return TRUE
+	std::string sServerStatus = pModel->getServerStatus();
+	if(sServerStatus.compare(opencctv::event::SERVER_STATUS_STOPPED) == 0)
+	{
+		return true;
+	}
+
+	pModel->clear();
 	updateServerStatus(opencctv::event::SERVER_STATUS_STOPPED);
 
 	return true;
