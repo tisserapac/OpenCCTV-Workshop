@@ -251,8 +251,8 @@ std::string AnalyticServerController::stopAnalytic(const std::string& sRequest)
 				analytic::ApplicationModel::getInstance()->getAnalyticPorts().push_back(iPort);
 
 				//Remove the analytic from the ApplicationModel
-				analytic::ApplicationModel::getInstance()->getAnalyticProcesses().erase(iAnalyticInstanceId);
 				delete pAnalyticProcess; pAnalyticProcess = NULL;
+				analytic::ApplicationModel::getInstance()->getAnalyticProcesses().erase(iAnalyticInstanceId);
 
 				if(bDone)
 				{
