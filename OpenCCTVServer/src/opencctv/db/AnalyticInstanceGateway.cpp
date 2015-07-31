@@ -13,6 +13,7 @@ namespace db {
 const std::string AnalyticInstanceGateway::_SELECT_ANALYTIC_INSTANCE_SQL = "SELECT ai.id, ai.name, ai.description, ai.analytic_id, a.filename FROM analytic_instances as ai, analytics a WHERE ai.analytic_id = a.id AND ai.id = ?";
 const std::string AnalyticInstanceGateway::_UPDATE_ALL_SQL = "UPDATE analytic_instances SET status = ? WHERE id > 0";
 const std::string AnalyticInstanceGateway::_UPDATE_ANALYTIC_INSTANCE_SQL = "UPDATE analytic_instances SET status = ? WHERE id = ?";
+const std::string AnalyticInstanceGateway::_SELECT_ANALYTIC_INSTANCE_STATUS_SQL = "SELECT status from analytic_instances WHERE id = ?";
 
 AnalyticInstanceGateway::AnalyticInstanceGateway()
 {
@@ -87,6 +88,42 @@ void AnalyticInstanceGateway::updateAnalyticInstanceStatus(const unsigned int iA
 
 }
 
+std::string AnalyticInstanceGateway::getAnalyticInstanceStatus(const unsigned int iAnalyticInstanceId)
+{
+	sql::PreparedStatement* _pStatementPtr = NULL;
+	sql::ResultSet* pResultsPtr = NULL;
+	std::string sStatus = "";
+	try
+	{
+
+		_pStatementPtr = (*_pConnectionPtr).prepareStatement(_SELECT_ANALYTIC_INSTANCE_STATUS_SQL);
+		(*_pStatementPtr).setInt(1, iAnalyticInstanceId);
+		pResultsPtr = (*_pStatementPtr).executeQuery();
+
+		while((*pResultsPtr).next())
+		{
+			sStatus = (*pResultsPtr).getString("status");
+		}
+		(*pResultsPtr).close();
+		delete pResultsPtr; pResultsPtr = NULL;
+		(*_pStatementPtr).close();
+		delete _pStatementPtr;  _pStatementPtr = NULL;
+	}
+	catch(sql::SQLException &e)
+	{
+		(*pResultsPtr).close();
+		delete pResultsPtr; pResultsPtr = NULL;
+		(*_pStatementPtr).close();
+		delete _pStatementPtr;  _pStatementPtr = NULL;
+
+		std::string sErrorMsg = "AnalyticInstanceGateway::getAnalyticInstanceStatus: ";
+		throw opencctv::Exception(sErrorMsg.append(e.what()));
+		//TODO :: Add to log
+	}
+
+	return sStatus;
+}
+
 void AnalyticInstanceGateway::findAnalyticInstance(const unsigned int iAnalyticInstanceId, opencctv::dto::AnalyticInstance& ai)
 {
 	sql::PreparedStatement* _pStatementPtr = NULL;
@@ -123,7 +160,6 @@ void AnalyticInstanceGateway::findAnalyticInstance(const unsigned int iAnalyticI
 		throw opencctv::Exception(sErrorMsg.append(e.what()));
 		//TODO :: Add to log
 	}
-
 }
 
 AnalyticInstanceGateway::~AnalyticInstanceGateway()

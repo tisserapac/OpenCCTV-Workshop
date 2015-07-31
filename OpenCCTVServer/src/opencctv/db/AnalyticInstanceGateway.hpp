@@ -27,6 +27,7 @@ private:
 	sql::Connection* _pConnectionPtr;
 	//sql::PreparedStatement* _pStatementPtr;
 	static const std::string _SELECT_ANALYTIC_INSTANCE_SQL;
+	static const std::string _SELECT_ANALYTIC_INSTANCE_STATUS_SQL;
 	static const std::string _UPDATE_ALL_SQL;
 	static const std::string _UPDATE_ANALYTIC_INSTANCE_SQL;
 public:
@@ -34,6 +35,7 @@ public:
 	void findAnalyticInstance(const unsigned int iAnalyticInstanceId, opencctv::dto::AnalyticInstance& ai);
 	void updateAllAnalyticInstanceStatus();
 	void updateAnalyticInstanceStatus(const unsigned int iAnalyticInstanceId, const std::string& sStatus);
+	std::string getAnalyticInstanceStatus(const unsigned int iAnalyticInstanceId);
 	virtual ~AnalyticInstanceGateway();
 };
 
