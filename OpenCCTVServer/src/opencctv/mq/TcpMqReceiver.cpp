@@ -22,8 +22,10 @@ bool TcpMqReceiver::createMq(const std::string& serverPortStr) {
 
 bool TcpMqReceiver::connectToMq(const std::string& serverName,
 		const std::string& serverPortStr) {
-	try {
-		_pSocket = MqUtil::connectToMq(serverName, serverPortStr, ZMQ_PULL);
+	try
+	{
+		int timeout = 2000;
+		_pSocket = MqUtil::connectToMq(serverName, serverPortStr, ZMQ_PULL,timeout);
 	} catch(opencctv::Exception &e)
 	{
 		throw e;

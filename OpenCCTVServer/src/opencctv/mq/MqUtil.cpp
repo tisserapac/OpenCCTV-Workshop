@@ -34,7 +34,33 @@ zmq::socket_t* MqUtil::connectToMq(const std::string& serverName, const std::str
 	zmq::socket_t* pSocket = NULL;
 	try {
 		pSocket = new zmq::socket_t(*pContext, zmqClientSocketType);
-		int timeout = 2000;
+		/*int timeout = 2000;
+		pSocket->setsockopt(ZMQ_RCVTIMEO, &timeout, sizeof(timeout));*/
+
+		if (pSocket) {
+			pSocket->connect(getZmqServerConnectUrl(serverName, serverPortStr).data());
+		}
+	} catch (error_t &e) {
+		std::string sErrMsg = "Failed to connect to MQ at: ";
+		sErrMsg.append(serverName);
+		sErrMsg.append(":");
+		sErrMsg.append(serverPortStr);
+		//throw std::runtime_error(sErrMsg);
+		throw opencctv::Exception(sErrMsg);
+	}
+	return pSocket;
+}
+
+/**
+ * Alert! Please remember to close() and delete returned zmq::socket_t
+ * when you are done with it. It was created on the heap using new operator.
+ */
+zmq::socket_t* MqUtil::connectToMq(const std::string& serverName, const std::string& serverPortStr, int zmqClientSocketType, unsigned int iRecTimeoutMS)
+{
+	zmq::socket_t* pSocket = NULL;
+	try {
+		pSocket = new zmq::socket_t(*pContext, zmqClientSocketType);
+		int timeout = iRecTimeoutMS;
 		pSocket->setsockopt(ZMQ_RCVTIMEO, &timeout, sizeof(timeout));
 
 		if (pSocket) {

@@ -23,6 +23,7 @@ private:
 public:
 	static zmq::socket_t* createNewMq(const std::string& serverPortStr, int zmqServerSocketType);
 	static zmq::socket_t* connectToMq(const std::string& serverName, const std::string& serverPortStr, int zmqClientSocketType);
+	static zmq::socket_t* connectToMq(const std::string& serverName, const std::string& serverPortStr, int zmqClientSocketType, unsigned int iRecTimeoutMS);
 	static bool writeToSocket(zmq::socket_t* pSocket, const std::string* pSMessage);
 	static std::string* readFromSocket(zmq::socket_t* pSocket);
 	static bool writeToSocket(zmq::socket_t* pSocket, const std::string& sMessage);
