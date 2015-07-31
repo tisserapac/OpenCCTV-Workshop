@@ -53,7 +53,7 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 	}
 
 	//If the analytic instance is already running, just send a reply
-	if(pModel->containsResultsRouterThread(iAnalyticInstanceId) && pModel->containsResultsOutputQueueAddress(iAnalyticInstanceId) && pModel->containsImageInputQueueAddress(iAnalyticInstanceId))
+	if(pModel->containsAnalyticInstance(iAnalyticInstanceId))
 	{
 		sReply = EventMessage::getAnalyticStartReply(iAnalyticInstanceId);
 		return sReply;
@@ -246,35 +246,25 @@ std::string AnalyticEvent::analyticStart(const std::string& sRequest)
 		return sReply;
 	}
 
+	//Insert the analytic instance id to the list in the ApplicationModel
+	pModel->getAnalyticInstances().push_back(iAnalyticInstanceId);
+
 	try
 	{
 		opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
 		analyticInstanceGateway.updateAnalyticInstanceStatus(iAnalyticInstanceId, opencctv::event::ANALYTIC_STATUS_STARTED);
+
+		ssMsg << "Successfully started the analytic " << iAnalyticInstanceId;
+		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+		ssMsg.str("");
+		sReply = EventMessage::getAnalyticStartReply(iAnalyticInstanceId);
+
 	}catch(opencctv::Exception &e)
 	{
-
-	}
-
-	if(bResult)
-	{
-		try
-		{
-			opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
-			analyticInstanceGateway.updateAnalyticInstanceStatus(iAnalyticInstanceId, opencctv::event::ANALYTIC_STATUS_STARTED);
-
-			ssMsg << "Successfully started the analytic " << iAnalyticInstanceId;
-			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-			ssMsg.str("");
-			sReply = EventMessage::getAnalyticStartReply(iAnalyticInstanceId);
-
-		}catch(opencctv::Exception &e)
-		{
-			std::stringstream ss;
-			ss << "Failed to update the status of the analytic instance " << iAnalyticInstanceId;
-			opencctv::util::log::Loggers::getDefaultLogger()->error(ss.str());
-			sReply =  EventMessage::getInvalidMessageReply(ss.str());
-		}
-
+		std::stringstream ss;
+		ss << "Failed to update the status of the analytic instance " << iAnalyticInstanceId;
+		opencctv::util::log::Loggers::getDefaultLogger()->error(ss.str());
+		sReply =  EventMessage::getInvalidMessageReply(ss.str());
 	}
 
 	return sReply;
@@ -293,22 +283,35 @@ std::string AnalyticEvent::analyticStop(const std::string& sRequest)
 		return sReply;
 	}
 
-	unsigned int iAnalyticId = 0;
-	std::vector<unsigned int> vStreamIds;
+	unsigned int iAnalyticInstanceId = 0;
+	std::vector<unsigned int> vInputStreams;
 	std::string sErrorMessages;
 	std::stringstream ssMsg;
 
 	try
 	{
-		EventMessage::extractAnalyticStopRequest(sRequest, iAnalyticId, vStreamIds);
-		sReply = analyticStop(iAnalyticId,  vStreamIds);
-
+		EventMessage::extractAnalyticStopRequest(sRequest, iAnalyticInstanceId, vInputStreams);
 	}catch(opencctv::Exception &e)
 	{
 		sErrorMessages = "Error occurred in stopping the analytic instance : ";
 		sErrorMessages.append(e.what());
 		sReply = EventMessage::getInvalidMessageReply(sErrorMessages);
 	}
+
+	if(iAnalyticInstanceId == 0 || vInputStreams.empty())
+	{
+		sReply = EventMessage::getInvalidMessageReply("Error occurred in stopping the analytic instance : Failed to retrieve analytic instance details");
+		return sReply;
+	}
+
+	//If the analytic instance is not present, it is already stopped; thus send a reply
+	if(!pModel->containsAnalyticInstance(iAnalyticInstanceId))
+	{
+		sReply = EventMessage::getAnalyticStopReply(iAnalyticInstanceId);
+		return sReply;
+	}
+
+	sReply = analyticStop(iAnalyticInstanceId,  vInputStreams);
 
 	return sReply;
 }
@@ -322,7 +325,7 @@ std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticInstanceId, 
 
 	try
 	{
-		if(!iAnalyticInstanceId == 0)
+		if(iAnalyticInstanceId > 0)
 		{
 			unsigned int iStreamId;
 			ConcurrentQueue<Image>* pConcurrentQueue = NULL;
@@ -407,6 +410,9 @@ std::string AnalyticEvent::analyticStop(const unsigned int iAnalyticInstanceId, 
 				sErrorMessages = ssMsg.str();
 				ssMsg.str("");
 			}
+
+			//Remove the analytic instance id from the list in the ApplicationModel
+			pModel->getAnalyticInstances().remove(iAnalyticInstanceId);
 
 			//Remove the flow controller of the analytic instance
 			ssMsg << "Removing the flow controller of the analytic instance " << iAnalyticInstanceId;
