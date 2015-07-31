@@ -7,8 +7,7 @@ class OpenCctvServer < ActiveRecord::Base
   def send_to_server(message_type)
 
     msg_details = nil
-    reply = nil
-    error_reply = reply = "<?xml version=\"1.0\" encoding=\"utf-8\"?><opencctvmsg><type>Error</type><content>Connecting to OpenCCTV Sever on #{self.host}:#{self.port} Failed</content><serverstatus>Unknown</serverstatus><serverpid>0</serverpid></opencctvmsg>"
+    reply = 'Error'
 
     context = ZMQ::Context.new(1)
     requester = nil
@@ -37,7 +36,13 @@ class OpenCctvServer < ActiveRecord::Base
     requester.close unless requester.nil?
     context.terminate
 
-    reply.nil? ? msg_details = parse_reply(error_reply) : msg_details = parse_reply(reply)
+    if(reply.eql? 'Error')
+      msg_details[:type] = 'Error'
+      msg_details[:content] = "Connecting to OpenCCTV Sever on #{self.host}:#{self.port} Failed"
+      return msg_details
+    end
+
+    msg_details = parse_reply(reply)
     return msg_details
   end
 

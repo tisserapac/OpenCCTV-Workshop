@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150602024820) do
+ActiveRecord::Schema.define(version: 20150714194034) do
 
   create_table "analytic_input_streams", force: true do |t|
     t.string   "name"
@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 20150602024820) do
     t.integer  "analytic_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "status"
   end
 
   add_index "analytic_instances", ["analytic_id"], name: "index_analytic_instances_on_analytic_id", using: :btree
@@ -75,6 +76,16 @@ ActiveRecord::Schema.define(version: 20150602024820) do
     t.integer  "pid"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "results", force: true do |t|
+    t.integer  "analytic_id"
+    t.string   "timestamp"
+    t.text     "result_text"
+    t.datetime "time"
+    t.integer  "count"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
   create_table "streams", force: true do |t|

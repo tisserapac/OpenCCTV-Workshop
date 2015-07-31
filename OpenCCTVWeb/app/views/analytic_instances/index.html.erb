@@ -21,6 +21,13 @@
     </div>
     </p>
 <%else%>
+    <%
+       status = nil
+       @server = OpenCctvServer.last
+       if(@server.nil?)
+        status = 'Unknown'
+       end
+    %>
     <div class="media">
       <table class="table table-hover">
 
@@ -31,6 +38,7 @@
           <th>Name</th>
           <th>Analytic Type</th>
           <th>Description</th>
+          <th>Status</th>
           <th colspan="3"></th>
         </tr>
         </thead>
@@ -44,6 +52,22 @@
               <td><%= analytic_instance.name %></td>
               <td><%= analytic_instance.analytic.name %></td>
               <td><%= analytic_instance.description %></td>
+
+              <td>
+                <% if status.eql? 'Unknown' %>
+                    Unknown
+                <%else%>
+                    <% status =  analytic_instance.status%>
+                    <%if (status.eql? 'Stopped') %>
+                        <%= link_to 'Start', analytic_instance_start_path(analytic_instance), :class => "btn btn-xs btn-success"%>
+                    <%elsif (status.eql? 'Started') %>
+                        <%= link_to 'Stop', analytic_instance_stop_path(analytic_instance), :class => "btn btn-xs btn-danger"%>
+                    <%else%>
+                        Unknown
+                    <%end%>
+                <%end%>
+              </td>
+
               <td><%= link_to 'Show', analytic_instance, :class => "btn btn-xs btn-default"%></td>
               <td><%= link_to 'Edit', edit_analytic_instance_path(analytic_instance), :class => "btn btn-xs btn-warning" %></td>
               <td><%= link_to 'Destroy', analytic_instance, method: :delete, :class => "btn btn-xs btn-danger", data: { confirm: 'Are you sure?' } %></td>

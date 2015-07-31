@@ -46,6 +46,10 @@ Rails.application.routes.draw do
 
   get '/open_cctv_servers/:id/restart' => 'open_cctv_servers#restart_server', as: :open_cctv_servers_restart
 
+  get '/analytic_instances/:id/start' => 'analytic_instances#start_analytic', as: :analytic_instance_start
+
+  get '/analytic_instances/:id/stop' => 'analytic_instances#stop_analytic', as: :analytic_instance_stop
+
   # Example resource route with options:
   #   resources :products do
   #     member do

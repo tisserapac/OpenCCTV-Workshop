@@ -59,15 +59,15 @@ class OpenCctvServersController < ApplicationController
   end
 
   def start_server
-    exec_server_cmd('StartRequest')
+    exec_server_cmd('StartServer')
   end
 
   def stop_server
-    exec_server_cmd('StopRequest')
+    exec_server_cmd('StopServer')
   end
 
   def restart_server
-    exec_server_cmd('RestartRequest')
+    exec_server_cmd('RestartServer')
   end
 
   private
@@ -95,7 +95,7 @@ class OpenCctvServersController < ApplicationController
   end
 
   def request_server_status
-    server_reply = @open_cctv_server.send_to_server('StatusRequest')
+    server_reply = @open_cctv_server.send_to_server('ServerStatus')
     #flash[:alert] = "server_reply : #{server_reply}"
 
     @open_cctv_server.update_attribute(:status, server_reply[:server_status])

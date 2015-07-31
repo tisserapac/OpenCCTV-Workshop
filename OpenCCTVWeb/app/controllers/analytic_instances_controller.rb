@@ -1,5 +1,5 @@
 class AnalyticInstancesController < ApplicationController
-  before_action :set_analytic_instance, only: [:show, :edit, :update, :destroy]
+  before_action :set_analytic_instance, only: [:show, :edit, :update, :destroy, :start_analytic, :stop_analytic]
   respond_to :html
 
   # GET /analytic_instances
@@ -26,6 +26,7 @@ class AnalyticInstancesController < ApplicationController
   # POST /analytic_instances
   def create
     @analytic_instance = AnalyticInstance.new(analytic_instance_params)
+    @analytic_instance.status = 'Stopped'
     @analytic_instance.save
     respond_with(@analytic_instance)
   end
@@ -40,6 +41,30 @@ class AnalyticInstancesController < ApplicationController
   def destroy
     @analytic_instance.destroy
     respond_with(@analytic_instance)
+  end
+
+  def start_analytic
+    server_reply = @analytic_instance.exec_analytic_event('Analytic Start')
+    if(server_reply[:type].eql? 'Error')
+      flash[:error] = "#{server_reply[:content]}"
+    else
+      flash[:notice] = "#{server_reply[:content]}"
+    end
+
+    redirect_to analytic_instances_path
+
+  end
+
+  def stop_analytic
+    server_reply = @analytic_instance.exec_analytic_event('Analytic Stop')
+    if(server_reply[:type].eql? 'Error')
+      flash[:error] = "#{server_reply[:content]}"
+    else
+      flash[:notice] = "#{server_reply[:content]}"
+    end
+
+    redirect_to analytic_instances_path
+
   end
 
   private
