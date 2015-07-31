@@ -137,12 +137,12 @@ void ServerController::executeOperation()
 
 		}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_START) == 0)
 		{
-			sReply = opencctv::event::AnalyticEvent::analyticStart(sRequest);
+			sReply = opencctv::event::AnalyticEvent::startAnalytic(sRequest);
 			sendReply(sReply);
 
 		}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_STOP) == 0)
 		{
-			sReply = opencctv::event::AnalyticEvent::analyticStop(sRequest);
+			sReply = opencctv::event::AnalyticEvent::stopAnalytic(sRequest);
 			sendReply(sReply);
 
 		}else
