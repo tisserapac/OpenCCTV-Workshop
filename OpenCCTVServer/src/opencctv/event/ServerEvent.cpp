@@ -276,6 +276,7 @@ bool ServerEvent::startServer()
 						opencctv::ResultRouterThread* pResultsRouter = new opencctv::ResultRouterThread(analyticInstance.getAnalyticInstanceId());
 						boost::thread* pResultsRouterThread = new boost::thread(*pResultsRouter);
 						pModel->getResultsRouterThreads()[analyticInstance.getAnalyticInstanceId()] = pResultsRouterThread;
+						pModel->getAnalyticInstances().push_back(analyticInstance.getAnalyticInstanceId());
 						if(pResultsRouterThread->joinable())
 						{
 							_pResultsRouterThreadGroup->add_thread(pResultsRouterThread);
