@@ -21,16 +21,11 @@ ApplicationModel::ApplicationModel()
 
 bool ApplicationModel::containsAnalyticInstance(unsigned int iAnalyticInstanceId)
 {
-	bool bResult = false;
-	std::list<unsigned int>::iterator it;
-
-	it = std::find (_lAnalyticInstances.begin(), _lAnalyticInstances.end(), iAnalyticInstanceId);
-	if (it != _lAnalyticInstances.end())
-	{
-		bResult = true;
+	std::map<unsigned int, std::list<unsigned int> >::iterator it = _mAnalyticInstances.find(iAnalyticInstanceId);
+	if (it != _mAnalyticInstances.end()) {
+		return true;
 	}
-
-	return bResult;
+	return false;
 }
 
 bool ApplicationModel::containsProducerThread(unsigned int iStreamId)
@@ -165,9 +160,9 @@ void ApplicationModel::setResultsRouterThreadGroup(boost::thread_group*& results
 	_pResultsRouterThreadGroup = resultsRouterThreadGroup;
 }
 
-std::list<unsigned int>& ApplicationModel::getAnalyticInstances()
+std::map<unsigned int, std::list<unsigned int> >& ApplicationModel::getAnalyticInstances()
 {
-	return _lAnalyticInstances;
+	return _mAnalyticInstances;
 }
 
 std::map<unsigned int, boost::thread*>& ApplicationModel::getConsumerThreads()
@@ -286,12 +281,6 @@ void ApplicationModel::clear()
 		_mResultsRouterThreads.erase(itThread++);
 	}
 
-	//Remove all analytic instances
-	while (!_lAnalyticInstances.empty())
-	{
-		_lAnalyticInstances.pop_back();
-	}
-
 	//Remove the thread groups
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Removing all thread groups");
 	delete _pProducerThreadGroup; _pProducerThreadGroup = NULL;
@@ -320,6 +309,19 @@ void ApplicationModel::clear()
 			opencctv::util::log::Loggers::getDefaultLogger()->error(sMessage);
 			++itAnalyticInstanceManager;
 		}
+	}
+
+	//Remove all analytic instances
+	opencctv::util::log::Loggers::getDefaultLogger()->info("Removing all analytic instances");
+	std::map<unsigned int, std::list<unsigned int> >::iterator itAnalyticInstance;
+	for(itAnalyticInstance = _mAnalyticInstances.begin(); itAnalyticInstance != _mAnalyticInstances.end(); /*it increment below*/)
+	{
+		std::list<unsigned int> lStreamIds = itAnalyticInstance->second;
+		while (!lStreamIds.empty())
+		{
+			lStreamIds.pop_back();
+		}
+		_mAnalyticInstances.erase(itAnalyticInstance++);
 	}
 
 	//Remove the concurrent queues
