@@ -30,11 +30,15 @@ public:
 
 	//Analytic stop
 	static void extractAnalyticStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticInstanceId);
-	static std::string getAnalyticStopReply(const unsigned int& iAnalyticId);
+	static std::string getAnalyticStopReply(const unsigned int& iAnalyticInstanceId);
 
 	//Analytic start
 	static void extractAnalyticStartRequest(const std::string& sEventRequest, unsigned int& iAnalyticInstanceId, std::string& sAnalyticPluginDir, std::vector<std::pair<unsigned int,std::string> >& vInputStreams);
-	static std::string getAnalyticStartReply(const unsigned int& iAnalyticId);
+	static std::string getAnalyticStartReply(const unsigned int& iAnalyticInstanceId);
+
+	//Analytics stop
+	static void extractAnalyticsStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticId, std::vector<unsigned int>& vAnalyticInstanceIds);
+	static std::string getAnalyticsStopReply(const unsigned int& iAnalyticId);
 
 	//Server start/stop/status
 	static std::string getStartMessageReply();

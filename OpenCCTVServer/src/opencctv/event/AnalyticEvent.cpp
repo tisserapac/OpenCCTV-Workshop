@@ -321,16 +321,85 @@ std::string AnalyticEvent::stopAnalytic(const std::string& sRequest)
 	}
 
 	//If the analytic instance is not present, it is already stopped; thus send a reply
-	if(!pModel->containsAnalyticInstance(iAnalyticInstanceId))
+	/*if(!pModel->containsAnalyticInstance(iAnalyticInstanceId))
 	{
 		sReply = EventMessage::getAnalyticStopReply(iAnalyticInstanceId);
 		return sReply;
-	}
+	}*/
 
 	//sReply = analyticStop(iAnalyticInstanceId,  vInputStreams);
 	sReply = stopAnalytic(iAnalyticInstanceId);
 
 	return sReply;
+}
+
+std::string AnalyticEvent::stopAnalytics(const std::string& sRequest)
+{
+	std::string sReply;
+	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
+
+	//If the server is not running send an error reply
+	std::string sServerStatus = pModel->getServerStatus();
+	if(sServerStatus.compare(opencctv::event::SERVER_STATUS_STOPPED) == 0)
+	{
+		sReply = EventMessage::getInvalidMessageReply("Invalid operation request. OpenCCTV server is currently not running");
+		return sReply;
+	}
+
+	unsigned int iAnalyticId = 0;
+	std::vector<unsigned int> vAnalyticInstnceIds;
+	std::string sErrorMessages;
+
+	//Extract the details from the XML request
+	try
+	{
+		EventMessage::extractAnalyticsStopRequest(sRequest, iAnalyticId, vAnalyticInstnceIds);
+	}catch(opencctv::Exception& e)
+	{
+		sErrorMessages = "Error occurred in stopping the analytic instances - ";
+		sErrorMessages.append(e.what());
+		sReply = EventMessage::getInvalidMessageReply(sErrorMessages);
+		return sReply;
+	}
+
+	if(iAnalyticId <= 0 || vAnalyticInstnceIds.empty())
+	{
+		sReply = EventMessage::getInvalidMessageReply("Failed to retrieve analytic instance details");
+		return sReply;
+	}
+
+	unsigned int iAnalyticInstanceId = 0;
+	std::stringstream ssMsg;
+	bool bErrors = false;
+
+	ssMsg << "Errors occurred in stopping analytic instance(s) ";
+
+	for(unsigned int i=0; i<vAnalyticInstnceIds.size(); ++i)
+	{
+		iAnalyticInstanceId = vAnalyticInstnceIds.at(i);
+		sReply = stopAnalytic(iAnalyticInstanceId);
+
+		if (sReply.find("Error") != std::string::npos)
+		{
+			bErrors = true;
+			ssMsg << iAnalyticInstanceId;
+			ssMsg << ", ";
+		}
+	}
+
+	if(bErrors)
+	{
+		sErrorMessages = ssMsg.str();
+		sErrorMessages = sErrorMessages.substr(0, sErrorMessages.size() - 2);
+		sReply = EventMessage::getInvalidMessageReply(sErrorMessages);
+	}
+	else
+	{
+		sReply = EventMessage::getAnalyticsStopReply(iAnalyticId);
+	}
+
+	return sReply;
+
 }
 
 std::string AnalyticEvent::stopAnalytic(const unsigned int iAnalyticInstanceId)
@@ -409,43 +478,39 @@ std::string AnalyticEvent::stopAnalytic(const unsigned int iAnalyticInstanceId)
 						}
 					}
 				}
-			}
 
-			//Remove the results router thread
-			ssMsg << "Removing the results router thread " << iAnalyticInstanceId;
-			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-			ssMsg.str("");
-			EventUtil::stopThread(opencctv::event::RESULTS_ROUTER_THREAD,iAnalyticInstanceId);
-
-			//Stop the analytic instance on the analytic server
-			if(!EventUtil::stopAnalyticInstance(iAnalyticInstanceId))
-			{
-				ssMsg << "Error occurred in stopping the analytic instance " << iAnalyticInstanceId << "on Analytic Server";
-				sErrorMessages = ssMsg.str();
+				//Remove the results router thread
+				ssMsg << "Removing the results router thread " << iAnalyticInstanceId;
+				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
 				ssMsg.str("");
-			}
+				EventUtil::stopThread(opencctv::event::RESULTS_ROUTER_THREAD,iAnalyticInstanceId);
 
-			//Remove the analytic instance id from the map in the ApplicationModel
-			if(pModel->containsAnalyticInstance(iAnalyticInstanceId))
-			{
+				//Stop the analytic instance on the analytic server
+				if(!EventUtil::stopAnalyticInstance(iAnalyticInstanceId))
+				{
+					ssMsg << "Error occurred in stopping the analytic instance " << iAnalyticInstanceId << "on Analytic Server";
+					sErrorMessages = ssMsg.str();
+					ssMsg.str("");
+				}
+
+				//Remove the analytic instance id from the map in the ApplicationModel
 				pModel->getAnalyticInstances().erase(iAnalyticInstanceId);
+
+				//Remove the flow controller of the analytic instance
+				ssMsg << "Removing the flow controller of the analytic instance " << iAnalyticInstanceId;
+				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				ssMsg.str("");
+				if(pModel->containsFlowController(iAnalyticInstanceId))
+				{
+					pFlowController = pModel->getFlowControllers()[iAnalyticInstanceId];
+					delete pFlowController; pFlowController = NULL;
+					pModel->getFlowControllers().erase(iAnalyticInstanceId);
+				}
+
+				//Updated the analytic instance status in the DB
+				opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
+				analyticInstanceGateway.updateAnalyticInstanceStatus(iAnalyticInstanceId, opencctv::event::ANALYTIC_STATUS_STOPPED);
 			}
-
-			//Remove the flow controller of the analytic instance
-			ssMsg << "Removing the flow controller of the analytic instance " << iAnalyticInstanceId;
-			opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-			ssMsg.str("");
-			if(pModel->containsFlowController(iAnalyticInstanceId))
-			{
-				pFlowController = pModel->getFlowControllers()[iAnalyticInstanceId];
-				delete pFlowController; pFlowController = NULL;
-				pModel->getFlowControllers().erase(iAnalyticInstanceId);
-			}
-
-			//Updated the analytic instance status in the DB
-			opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
-			analyticInstanceGateway.updateAnalyticInstanceStatus(iAnalyticInstanceId, opencctv::event::ANALYTIC_STATUS_STOPPED);
-
 
 			if(sErrorMessages.empty())
 			{

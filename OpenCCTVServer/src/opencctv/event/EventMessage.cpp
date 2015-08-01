@@ -249,6 +249,68 @@ std::string EventMessage::getAnalyticStartReply(const unsigned int& iAnalyticIns
 	return sReplyMessage;
 }
 
+//==========Multiple Analytics Stop========
+//<?xml version="1.0"?><opencctvmsg><type>StopAnalyticInstances</type><analyticid>1</analyticid><analyticinstances><analyticinstanceid>11</analyticinstanceid><analyticinstanceid>12</analyticinstanceid></analyticinstances></opencctvmsg>
+void EventMessage::extractAnalyticsStopRequest(const std::string& sEventRequest, unsigned int& iAnalyticId, std::vector<unsigned int>& vAnalyticInstanceIds)
+{
+	boost::property_tree::ptree pt;
+	std::istringstream iss(sEventRequest);
+	try {
+		read_xml(iss, pt);
+		iAnalyticId = pt.get<unsigned int>("opencctvmsg.analyticid");
+
+		unsigned int iAnalyticInstanceId = 0;
+
+		BOOST_FOREACH( boost::property_tree::ptree::value_type const& v, pt.get_child("opencctvmsg.analyticinstances") )
+		{
+			if (v.first == "analyticinstanceid")
+			{
+				iAnalyticInstanceId = boost::lexical_cast<unsigned int>(v.second.data());
+				vAnalyticInstanceIds.push_back(iAnalyticInstanceId);
+			}
+		}
+
+	} catch (boost::property_tree::xml_parser::xml_parser_error &e) {
+		std::string sErrMsg = "Failed to parse Analytic Start Request. ";
+		sErrMsg.append(e.what());
+		throw opencctv::Exception(sErrMsg);
+	}catch (boost::property_tree::ptree_error &e)
+	{
+		std::string sErrMsg = "Failed to parse Analytic Start Request. ";
+		sErrMsg.append(e.what());
+		throw opencctv::Exception(sErrMsg);
+	}
+
+}
+
+std::string EventMessage::getAnalyticsStopReply(const unsigned int& iAnalyticId)
+{
+	std::string sReplyMessage = "";
+
+	std::stringstream ss;
+	ss << "Analytic plugin " << iAnalyticId << " successfully deleted";
+
+	std::string sContent = ss.str();
+
+	boost::property_tree::ptree pt;
+	pt.put("opencctvmsg.type", "AnalyticsStopReply");
+	pt.put("opencctvmsg.content", sContent);
+
+	std::ostringstream oss;
+	try
+	{
+		write_xml(oss, pt);
+		sReplyMessage = oss.str();
+	}
+	catch (boost::property_tree::xml_parser::xml_parser_error &e)
+	{
+		std::string sMessage = "EventMessage::getAnalyticsStopReply: XML parsing error ";
+		throw opencctv::Exception(sMessage.append(e.what()));
+	}
+
+	return sReplyMessage;
+}
+
 //==========Invalid Reply===================
 std::string EventMessage::getInvalidMessageReply(const std::string& sContent)
 {

@@ -135,14 +135,19 @@ void ServerController::executeOperation()
 			sReply = opencctv::event::EventMessage::getStatusMessageReply();
 			sendReply(sReply);
 
-		}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_START) == 0)
+		}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_START_INSTANCE) == 0)
 		{
 			sReply = opencctv::event::AnalyticEvent::startAnalytic(sRequest);
 			sendReply(sReply);
 
-		}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_STOP) == 0)
+		}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_STOP_INSTANCE) == 0)
 		{
 			sReply = opencctv::event::AnalyticEvent::stopAnalytic(sRequest);
+			sendReply(sReply);
+
+		}else if(sOperation.compare(opencctv::event::ANALYTIC_EVENT_STOP_INSTANCES) == 0)
+		{
+			sReply = opencctv::event::AnalyticEvent::stopAnalytics(sRequest);
 			sendReply(sReply);
 
 		}else

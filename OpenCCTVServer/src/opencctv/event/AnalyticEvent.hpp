@@ -45,6 +45,8 @@ public:
 	static std::string stopAnalytic(const std::string& sRequest);
 	static std::string stopAnalytic(const unsigned int iAnalyticInstanceId);
 
+	static std::string stopAnalytics(const std::string& sRequest);
+
 	virtual ~AnalyticEvent();
 };
 
