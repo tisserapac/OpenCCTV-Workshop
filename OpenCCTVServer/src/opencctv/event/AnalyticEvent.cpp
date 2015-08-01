@@ -258,7 +258,6 @@ std::string AnalyticEvent::startAnalytic(const unsigned int iAnalyticInstanceId,
 		ss << "Failed to start the analytic " << iAnalyticInstanceId;
 		opencctv::util::log::Loggers::getDefaultLogger()->error(ss.str());
 		opencctv::util::log::Loggers::getDefaultLogger()->error("Reverting the analytic start........");
-		//stopAnalytic(iAnalyticInstanceId, vStreamIds);
 		stopAnalytic(iAnalyticInstanceId);
 		sReply =  EventMessage::getInvalidMessageReply(ss.str());
 
@@ -320,14 +319,6 @@ std::string AnalyticEvent::stopAnalytic(const std::string& sRequest)
 		return sReply;
 	}
 
-	//If the analytic instance is not present, it is already stopped; thus send a reply
-	/*if(!pModel->containsAnalyticInstance(iAnalyticInstanceId))
-	{
-		sReply = EventMessage::getAnalyticStopReply(iAnalyticInstanceId);
-		return sReply;
-	}*/
-
-	//sReply = analyticStop(iAnalyticInstanceId,  vInputStreams);
 	sReply = stopAnalytic(iAnalyticInstanceId);
 
 	return sReply;
@@ -362,7 +353,7 @@ std::string AnalyticEvent::stopAnalytics(const std::string& sRequest)
 		return sReply;
 	}
 
-	if(iAnalyticId <= 0 || vAnalyticInstnceIds.empty())
+	if(iAnalyticId <= 0)
 	{
 		sReply = EventMessage::getInvalidMessageReply("Failed to retrieve analytic instance details");
 		return sReply;
@@ -379,7 +370,7 @@ std::string AnalyticEvent::stopAnalytics(const std::string& sRequest)
 		iAnalyticInstanceId = vAnalyticInstnceIds.at(i);
 		sReply = stopAnalytic(iAnalyticInstanceId);
 
-		if (sReply.find("Error") != std::string::npos)
+		if ((sReply.find("Error") != std::string::npos) || (sReply.find("error") != std::string::npos))
 		{
 			bErrors = true;
 			ssMsg << iAnalyticInstanceId;
@@ -411,118 +402,122 @@ std::string AnalyticEvent::stopAnalytic(const unsigned int iAnalyticInstanceId)
 
 	try
 	{
-		if(iAnalyticInstanceId > 0)
-		{
-			unsigned int iStreamId;
-			ConcurrentQueue<Image>* pConcurrentQueue = NULL;
-			util::flow::FlowController* pFlowController = NULL;
-
-			if(pModel->containsAnalyticInstance(iAnalyticInstanceId))
-			{
-				while(!pModel->getAnalyticInstances()[iAnalyticInstanceId].empty())
-				{
-					iStreamId = pModel->getAnalyticInstances()[iAnalyticInstanceId].back();
-					pModel->getAnalyticInstances()[iAnalyticInstanceId].pop_back();
-
-					if(pModel->containsMulticastDestination(iStreamId))
-					{
-						ssMsg << "Pausing the consumer thread " << iStreamId;
-						opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-						ssMsg.str("");
-						EventUtil::stopThread(opencctv::event::CONSUMER_THREAD, iStreamId);
-
-						//Remove this analytic from the multicast destinations of the stream
-						ssMsg << "Removing analytic instance " << iAnalyticInstanceId << " from the destinations of stream " << iStreamId;
-						opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-						ssMsg.str("");
-						MulticastDestination* destinations = pModel->getMulticastDestinations()[iStreamId];
-						destinations->removeDestination(iAnalyticInstanceId);
-
-						//If no of Consumer’s multicast destinations = 0
-						if(destinations->getNumberOfDestinations() == 0)
-						{
-							//Remove the MulticastDestinations from the ApplicationModel
-							delete destinations; destinations = NULL;
-							pModel->getMulticastDestinations().erase(iStreamId);
-
-							//Remove the producer thread
-							ssMsg << "Removing the producer thread " << iStreamId;
-							opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-							ssMsg.str("");
-							EventUtil::stopThread(opencctv::event::PRODUCER_THREAD, iStreamId);
-
-							//Remove the VMS connector instance used by the producer thread
-							ssMsg << "Removing VMS plugin used by the producer thread " << iStreamId;
-							opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-							ssMsg.str("");
-							EventUtil::deleteVmsConnector(iStreamId);
-
-							//Remove the concurrent queue
-							ssMsg << "Removing the concurrent queue " << iStreamId;
-							opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-							ssMsg.str("");
-							if(pModel->containsInternalQueue(iStreamId))
-							{
-								pConcurrentQueue = pModel->getInternalQueues()[iStreamId];
-								delete pConcurrentQueue; pConcurrentQueue = NULL;
-								pModel->getInternalQueues().erase(iStreamId);
-							}
-
-						}else
-						{
-							//Restart the consumer thread
-							ssMsg << "Resuming the consumer thread " << iStreamId;
-							opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-							ssMsg.str("");
-							EventUtil::startThread(opencctv::event::CONSUMER_THREAD,iStreamId);
-						}
-					}
-				}
-
-				//Remove the results router thread
-				ssMsg << "Removing the results router thread " << iAnalyticInstanceId;
-				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-				ssMsg.str("");
-				EventUtil::stopThread(opencctv::event::RESULTS_ROUTER_THREAD,iAnalyticInstanceId);
-
-				//Stop the analytic instance on the analytic server
-				if(!EventUtil::stopAnalyticInstance(iAnalyticInstanceId))
-				{
-					ssMsg << "Error occurred in stopping the analytic instance " << iAnalyticInstanceId << "on Analytic Server";
-					sErrorMessages = ssMsg.str();
-					ssMsg.str("");
-				}
-
-				//Remove the analytic instance id from the map in the ApplicationModel
-				pModel->getAnalyticInstances().erase(iAnalyticInstanceId);
-
-				//Remove the flow controller of the analytic instance
-				ssMsg << "Removing the flow controller of the analytic instance " << iAnalyticInstanceId;
-				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
-				ssMsg.str("");
-				if(pModel->containsFlowController(iAnalyticInstanceId))
-				{
-					pFlowController = pModel->getFlowControllers()[iAnalyticInstanceId];
-					delete pFlowController; pFlowController = NULL;
-					pModel->getFlowControllers().erase(iAnalyticInstanceId);
-				}
-
-				//Updated the analytic instance status in the DB
-				opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
-				analyticInstanceGateway.updateAnalyticInstanceStatus(iAnalyticInstanceId, opencctv::event::ANALYTIC_STATUS_STOPPED);
-			}
-
-			if(sErrorMessages.empty())
-			{
-				sReply = EventMessage::getAnalyticStopReply(iAnalyticInstanceId);
-			}else
-			{
-				sReply = EventMessage::getInvalidMessageReply(sErrorMessages);
-			}
-
-		}else
+		if(iAnalyticInstanceId <= 0)//Invalid Analytic instance Id
 		{
 			sErrorMessages = "Error occurred in stopping the analytic instance : Invalid analytic instance details";
+			sReply = EventMessage::getInvalidMessageReply(sErrorMessages);
+			return sReply;
+
+		}
+
+		if(!pModel->containsAnalyticInstance(iAnalyticInstanceId)) //Analytic is already stopped; just send reply
+		{
+			sReply = EventMessage::getAnalyticStopReply(iAnalyticInstanceId);
+			return sReply;
+		}
+
+		unsigned int iStreamId;
+		ConcurrentQueue<Image>* pConcurrentQueue = NULL;
+		util::flow::FlowController* pFlowController = NULL;
+
+		//Process the input streams of the analytic instance
+		while(!pModel->getAnalyticInstances()[iAnalyticInstanceId].empty())
+		{
+			iStreamId = pModel->getAnalyticInstances()[iAnalyticInstanceId].back();
+			pModel->getAnalyticInstances()[iAnalyticInstanceId].pop_back();
+
+			if(pModel->containsMulticastDestination(iStreamId))
+			{
+				ssMsg << "Pausing the consumer thread " << iStreamId;
+				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				ssMsg.str("");
+				EventUtil::stopThread(opencctv::event::CONSUMER_THREAD, iStreamId);
+
+				//Remove this analytic from the multicast destinations of the stream
+				ssMsg << "Removing analytic instance " << iAnalyticInstanceId << " from the destinations of stream " << iStreamId;
+				opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+				ssMsg.str("");
+				MulticastDestination* destinations = pModel->getMulticastDestinations()[iStreamId];
+				destinations->removeDestination(iAnalyticInstanceId);
+
+				//If no of Consumer’s multicast destinations = 0
+				if(destinations->getNumberOfDestinations() == 0)
+				{
+					//Remove the MulticastDestinations from the ApplicationModel
+					delete destinations; destinations = NULL;
+					pModel->getMulticastDestinations().erase(iStreamId);
+
+					//Remove the producer thread
+					ssMsg << "Removing the producer thread " << iStreamId;
+					opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+					ssMsg.str("");
+					EventUtil::stopThread(opencctv::event::PRODUCER_THREAD, iStreamId);
+
+					//Remove the VMS connector instance used by the producer thread
+					ssMsg << "Removing VMS plugin used by the producer thread " << iStreamId;
+					opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+					ssMsg.str("");
+					EventUtil::deleteVmsConnector(iStreamId);
+
+					//Remove the concurrent queue
+					ssMsg << "Removing the concurrent queue " << iStreamId;
+					opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+					ssMsg.str("");
+					if(pModel->containsInternalQueue(iStreamId))
+					{
+						pConcurrentQueue = pModel->getInternalQueues()[iStreamId];
+						delete pConcurrentQueue; pConcurrentQueue = NULL;
+						pModel->getInternalQueues().erase(iStreamId);
+					}
+
+				}else
+				{
+					//Restart the consumer thread
+					ssMsg << "Resuming the consumer thread " << iStreamId;
+					opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+					ssMsg.str("");
+					EventUtil::startThread(opencctv::event::CONSUMER_THREAD,iStreamId);
+				}
+			}
+		}//End Process the input streams of the analytic instance while loop
+
+		//Remove the results router thread
+		ssMsg << "Removing the results router thread " << iAnalyticInstanceId;
+		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+		ssMsg.str("");
+		EventUtil::stopThread(opencctv::event::RESULTS_ROUTER_THREAD,iAnalyticInstanceId);
+
+		//Stop the analytic instance on the analytic server
+		if(!EventUtil::stopAnalyticInstance(iAnalyticInstanceId))
+		{
+			ssMsg << "Error occurred in stopping the analytic instance " << iAnalyticInstanceId << "on Analytic Server";
+			sErrorMessages = ssMsg.str();
+			ssMsg.str("");
+		}
+
+		//Remove the analytic instance id from the map in the ApplicationModel
+		pModel->getAnalyticInstances().erase(iAnalyticInstanceId);
+
+		//Remove the flow controller of the analytic instance
+		ssMsg << "Removing the flow controller of the analytic instance " << iAnalyticInstanceId;
+		opencctv::util::log::Loggers::getDefaultLogger()->info(ssMsg.str());
+		ssMsg.str("");
+		if(pModel->containsFlowController(iAnalyticInstanceId))
+		{
+			pFlowController = pModel->getFlowControllers()[iAnalyticInstanceId];
+			delete pFlowController; pFlowController = NULL;
+			pModel->getFlowControllers().erase(iAnalyticInstanceId);
+		}
+
+		//Updated the analytic instance status in the DB
+		opencctv::db::AnalyticInstanceGateway analyticInstanceGateway;
+		analyticInstanceGateway.updateAnalyticInstanceStatus(iAnalyticInstanceId, opencctv::event::ANALYTIC_STATUS_STOPPED);
+
+		if(sErrorMessages.empty())
+		{
+			sReply = EventMessage::getAnalyticStopReply(iAnalyticInstanceId);
+		}else
+		{
 			sReply = EventMessage::getInvalidMessageReply(sErrorMessages);
 		}
 
