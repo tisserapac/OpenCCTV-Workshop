@@ -8,12 +8,23 @@
 
 <%= render 'info' %>
 
+<% status =  @analytic_instance.status%>
+
 <div class="container">
   <p>
-    <a href="<%= new_analytic_instance_analytic_instance_stream_path(@analytic_instance)%>" class="btn btn-success"> <span class="glyphicon glyphicon-plus"></span> Add Input Stream </a>
+  <%if (status.eql? 'Stopped') %>
+      <%= link_to 'Start', analytic_instance_start_path(@analytic_instance), :class => "btn btn-success"%>
+      <%= link_to 'Edit', edit_analytic_instance_path(@analytic_instance), :class => "btn btn-warning" %>
+      <%= link_to 'Add Input Stream', new_analytic_instance_analytic_instance_stream_path(@analytic_instance), :class => "btn btn-success"%>
+  <%else%>
+        <%= link_to 'Stop', analytic_instance_stop_path(@analytic_instance), :class => "btn btn-danger"%>
+        <%= link_to 'Edit', '#', :class => "btn btn-warning", data: { confirm: 'Stop the analytic instance first, in order to edit it' } %>
+        <%= link_to 'Add Input Stream', '#', :class => "btn btn-success", data: { confirm: 'Stop the analytic instance first, in order to add new input streams' } %>
+  <%end%>
   </p>
-
   <br/>
+
+
 
   <div class="media">
     <%if @analytic_instance.analytic_instance_streams.empty?%>
@@ -44,8 +55,14 @@
                     <td><%= input_stream.analytic_input_stream.name %></td>
                     <td><%= input_stream.stream.name %></td>
                     <td><%= link_to 'Show', analytic_instance_analytic_instance_stream_path(@analytic_instance,input_stream), class: "btn btn-xs btn-default"%></td>
-                    <td><%= link_to 'Edit', edit_analytic_instance_analytic_instance_stream_path(@analytic_instance,input_stream), class: "btn btn-xs btn-warning" %>
-                    <td><%= link_to 'Destroy', analytic_instance_analytic_instance_stream_path(@analytic_instance,input_stream), method: :delete, class: "btn btn-xs btn-danger", data: { confirm: 'Are you sure?' } %></td>
+
+                    <%if (status.eql? 'Stopped') %>
+                        <td><%= link_to 'Edit', edit_analytic_instance_analytic_instance_stream_path(@analytic_instance,input_stream), class: "btn btn-xs btn-warning" %>
+                        <td><%= link_to 'Destroy', analytic_instance_analytic_instance_stream_path(@analytic_instance,input_stream), method: :delete, class: "btn btn-xs btn-danger", data: { confirm: 'Are you sure?' } %></td>
+                    <%else%>
+                        <td><%= link_to 'Edit', '#', class: "btn btn-xs btn-warning", data: { confirm: 'Stop the analytic instance first, in order to edit it input streams' } %>
+                        <td><%= link_to 'Destroy', '#', class: "btn btn-xs btn-danger", data: { confirm: 'Stop the analytic instance first, in order to delete its input streams' }%></td>
+                    <%end%>
                   </tr>
                   <% i = i + 1 %>
               <% end %>

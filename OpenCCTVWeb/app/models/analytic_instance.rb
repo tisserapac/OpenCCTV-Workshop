@@ -7,7 +7,7 @@ class AnalyticInstance < ActiveRecord::Base
   validates :name, presence: true
 
   def exec_analytic_event(operation_name)
-    msg_details = nil
+    msg_details = {}
     message = nil
 
     if(operation_name == 'Analytic Start')
@@ -122,18 +122,13 @@ class AnalyticInstance < ActiveRecord::Base
   end
 
   def get_analytic_stop_request
-    #<?xml version="1.0" encoding="utf-8"?><opencctvmsg><type>StopAnalyticInstance</type><analyticinstanceid>1</analyticinstanceid><inputstreams><streamid>1</streamid><streamid>2</streamid></inputstreams></opencctvmsg>
+    #<?xml version="1.0" encoding="utf-8"?><opencctvmsg><type>StopAnalyticInstance</type><analyticinstanceid>1</analyticinstanceid></opencctvmsg>
     message = nil
 
     builder = Nokogiri::XML::Builder.new do |xml|
       xml.opencctvmsg {
         xml.type "StopAnalyticInstance"
         xml.analyticinstanceid self.id
-        xml.inputstreams{
-          self.analytic_instance_streams.each do |instance_stream|
-            xml.streamid instance_stream.stream_id
-          end
-        }
       }
     end
 

@@ -33,26 +33,38 @@ class AnalyticInstancesController < ApplicationController
 
   # PATCH/PUT /analytic_instances/1
   def update
-    @analytic_instance.update(analytic_instance_params)
+    if(@analytic_instance.status.eql? 'Stopped')
+      @analytic_instance.update(analytic_instance_params)
+    else
+      flash[:error] = "Unable to update the analytic instance #{@analytic_instance.id}; Stop the analytic instance first, in order to edit its details"
+    end
+
     respond_with(@analytic_instance)
   end
 
   # DELETE /analytic_instances/1
   def destroy
-    @analytic_instance.destroy
+    if(@analytic_instance.status.eql? 'Stopped')
+      @analytic_instance.destroy
+    else
+      flash[:error] = "Unable to delete the analytic instance #{@analytic_instance.id}; Stop the analytic instance first, in order to delete it"
+    end
     respond_with(@analytic_instance)
   end
 
   def start_analytic
-    server_reply = @analytic_instance.exec_analytic_event('Analytic Start')
-    if(server_reply[:type].eql? 'Error')
-      flash[:error] = "#{server_reply[:content]}"
+    if(@analytic_instance.analytic_instance_streams.empty?)
+      flash[:error] = "Unable to start analytic instance #{@analytic_instance.id}; no inputs streams are configured with this analytic instance"
     else
-      flash[:notice] = "#{server_reply[:content]}"
+      server_reply = @analytic_instance.exec_analytic_event('Analytic Start')
+      if(server_reply[:type].eql? 'Error')
+        flash[:error] = "#{server_reply[:content]}"
+      else
+        flash[:notice] = "#{server_reply[:content]}"
+      end
     end
-
-    redirect_to analytic_instances_path
-
+    #redirect_to analytic_instances_path
+    redirect_to :back
   end
 
   def stop_analytic
@@ -62,9 +74,8 @@ class AnalyticInstancesController < ApplicationController
     else
       flash[:notice] = "#{server_reply[:content]}"
     end
-
-    redirect_to analytic_instances_path
-
+    #redirect_to analytic_instances_path
+    redirect_to :back
   end
 
   private

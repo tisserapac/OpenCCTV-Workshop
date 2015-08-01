@@ -34,22 +34,39 @@ class VmsesController < ApplicationController
   end
 
   def update
-    @vms.update(vms_params)
-    if !@vms.errors.any?
-      begin
-        if(@vms.validate_connection)
-          flash[:notice] = 'Successfully connected to the VMS.'
-          Camera.destroy_all(vms: @vms)
-          @vms.add_cameras
-        else
-          @vms.set_verification(false)
+    is_instance_streams = false
+
+    @vms.cameras.each do |camera|
+      camera.streams.each do |stream|
+        if(!AnalyticInstanceStream.find_by_stream_id(stream.id).nil?)
+          is_instance_streams = true
+          break
         end
-      rescue Exception => e
-        @vms.set_verification(false)
-        flash[:error] = e.message
       end
-      respond_with @vms
     end
+
+    if(is_instance_streams)
+      flash[:error] = "There are analytic instances that are using cameras connected to this VMS . Unable to edit the details of the VMS -  #{@vms.name}; "
+    else
+      @vms.update(vms_params)
+      if !@vms.errors.any?
+        begin
+          if(@vms.validate_connection)
+            flash[:notice] = 'Successfully connected to the VMS.'
+            Camera.destroy_all(vms: @vms)
+            @vms.add_cameras
+          else
+            @vms.set_verification(false)
+          end
+        rescue Exception => e
+          @vms.set_verification(false)
+          flash[:error] = e.message
+        end
+        #respond_with @vms
+      end
+    end
+    redirect_to vmses_path
+
   end
 
   # def update
@@ -90,8 +107,23 @@ class VmsesController < ApplicationController
   # end
 
   def destroy
-    @vms.destroy
-    flash[:notice] = 'VMS was successfully destroyed.'
+    is_instance_streams = false
+
+    @vms.cameras.each do |camera|
+      camera.streams.each do |stream|
+        if(!AnalyticInstanceStream.find_by_stream_id(stream.id).nil?)
+          is_instance_streams = true
+          break
+        end
+      end
+    end
+
+    if(is_instance_streams)
+      flash[:error] = "There are analytic instances that are using cameras connected to this VMS . Unable to delete the VMS -  #{@vms.name}; "
+    else
+      @vms.destroy
+    end
+
     redirect_to vmses_url
   end
 

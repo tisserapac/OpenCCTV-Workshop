@@ -69,6 +69,16 @@ class AnalyticsController < ApplicationController
 
   # DELETE /analytics/1
   def destroy
+
+    if(!@analytic.analytic_instances.empty?)
+      server_reply = @analytic.exec_stop_analytics
+      if(server_reply[:type].eql? 'Error')
+        flash[:error] = "#{server_reply[:content]}"
+      else
+        flash[:notice] = "#{server_reply[:content]}"
+      end
+    end
+
     path_to_file = Rails.root.join('app/uploads', 'analytics', (@analytic.filename + '.zip'))
     File.delete(path_to_file) if File.exist?(path_to_file)
     @analytic.destroy

@@ -37,20 +37,29 @@ class AnalyticInputStreamsController < ApplicationController
 
   # PATCH/PUT /analytic_input_streams/1
   def update
-    @analytic_input_stream.update(name: params[:analytic_input_stream][:name], description: params[:analytic_input_stream][:description])
 
-    if @analytic_input_stream.errors.any?
-      respond_with(@analytic_input_stream)
+    if(!@analytic_input_stream.analytic_instance_streams.empty?)
+      flash[:error] = "There are analytic instances that are using this input stream type.Unable to edit analytic input stream #{@analytic_input_stream.name}; "
     else
-      #redirect_to analytic_analytic_input_stream_path(@analytic, @analytic_input_stream)
-      redirect_to analytic_path(@analytic)
+      @analytic_input_stream.update(name: params[:analytic_input_stream][:name], description: params[:analytic_input_stream][:description])
+
+      if @analytic_input_stream.errors.any?
+        respond_with(@analytic_input_stream)
+      end
     end
+
+      redirect_to analytic_path(@analytic)
+
   end
 
   # DELETE /analytic_input_streams/1
   def destroy
-    @analytic_input_stream.destroy
-    redirect_to analytic_path(@analytic)
+    if(!@analytic_input_stream.analytic_instance_streams.empty?)
+      flash[:error] = "There are analytic instances that are using this input stream type.Unable to delete analytic input stream #{@analytic_input_stream.name}; "
+    else
+      @analytic_input_stream.destroy
+    end
+      redirect_to analytic_path(@analytic)
   end
 
   private

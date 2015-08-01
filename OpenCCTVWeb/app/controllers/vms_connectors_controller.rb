@@ -45,10 +45,28 @@ class VmsConnectorsController < ApplicationController
   end
 
   def destroy
-    path_to_file = Rails.root.join('app/uploads', 'vms_connectors', (@vms_connector.filename + '.zip'))
-    File.delete(path_to_file) if File.exist?(path_to_file)
-    @vms_connector.destroy
-    respond_with @vms_connector
+    is_instance_streams = false
+
+    @vms_connector.vmses.each do |vms|
+      vms.cameras.each do |camera|
+        camera.streams.each do |stream|
+          if(!AnalyticInstanceStream.find_by_stream_id(stream.id).nil?)
+            is_instance_streams = true
+            break
+          end
+        end
+      end
+    end
+
+    if(is_instance_streams)
+      flash[:error] = "There are analytic instances that are using VMSs conected via this connector type . Unable to delete the VMS connector plugin -  #{@vms_connector.name}; "
+    else
+      path_to_file = Rails.root.join('app/uploads', 'vms_connectors', (@vms_connector.filename + '.zip'))
+      File.delete(path_to_file) if File.exist?(path_to_file)
+      @vms_connector.destroy
+    end
+    #respond_with @vms_connector
+    redirect_to vms_connectors_path
   end
 
   private

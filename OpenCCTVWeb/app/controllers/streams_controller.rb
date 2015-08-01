@@ -33,28 +33,44 @@ class StreamsController < ApplicationController
         end
       else
       end
-      redirect_to vms_camera_stream_path(@stream.camera.vms, @stream.camera, @stream)
+      #redirect_to vms_camera_stream_path(@stream.camera.vms, @stream.camera, @stream)
     end
+
+    redirect_to vms_camera_path(@stream.camera.vms, @stream.camera)
+
   end
 
   def update
-    @stream.update(:name => params[:stream][:name], :width => params[:stream][:width], :height => params[:stream][:height], :keep_aspect_ratio => params[:stream][:keep_aspect_ratio], :allow_upsizing => params[:stream][:allow_upsizing], :compression_rate => params[:stream][:compression_rate], :description => params[:stream][:description])
-    if (!@stream.errors.any?)
-      if (@stream.camera.vms.vms_connector.name == "Milestone")
-        if(@stream.milestone_validate_stream)
-          @stream.set_verification(true)
-          is_stream_valid, width, height = @stream.milestone_grab_stream_frame
+    if(@stream.analytic_instance_streams.empty?)
+      @stream.update(:name => params[:stream][:name], :width => params[:stream][:width], :height => params[:stream][:height], :keep_aspect_ratio => params[:stream][:keep_aspect_ratio], :allow_upsizing => params[:stream][:allow_upsizing], :compression_rate => params[:stream][:compression_rate], :description => params[:stream][:description])
+      if (!@stream.errors.any?)
+        if (@stream.camera.vms.vms_connector.name == "Milestone")
+          if(@stream.milestone_validate_stream)
+            @stream.set_verification(true)
+            is_stream_valid, width, height = @stream.milestone_grab_stream_frame
+          else
+            @stream.set_verification(false)
+          end
         else
-          @stream.set_verification(false)
+          #Validation of other types of VMS connectors
         end
-      else
       end
-      redirect_to vms_camera_stream_path(@stream.camera.vms, @stream.camera, @stream)
+    else
+      flash[:error] = "There are analytic instances that are using this video stream. Unable to edit the stream #{@stream.name}; "
     end
+
+    redirect_to vms_camera_path(@stream.camera.vms, @stream.camera)
+
+    #redirect_to vms_camera_stream_path(@stream.camera.vms, @stream.camera, @stream)
+
   end
 
   def destroy
-    @stream.destroy
+    if(@stream.analytic_instance_streams.empty?)
+      @stream.destroy
+    else
+      flash[:error] = "There are analytic instances that are using this video stream. Unable to delete the stream #{@stream.name}; "
+    end
     redirect_to vms_camera_path(@vms, @camera)
   end
 end

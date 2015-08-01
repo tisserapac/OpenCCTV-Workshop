@@ -28,41 +28,57 @@ class AnalyticInstanceStreamsController < ApplicationController
 
   # POST /analytic_instance_streams
   def create
-    @analytic_instance_stream = AnalyticInstanceStream.new
-    @analytic_instance_stream.analytic_instance = @analytic_instance
 
-    if params[:analytic_instance_stream][:analytic_input_stream_id].present?
-      @analytic_instance_stream.analytic_input_stream = AnalyticInputStream.find(params[:analytic_instance_stream][:analytic_input_stream_id])
-    end
+    if(@analytic_instance.status.eql? 'Stopped')
 
-    if params[:analytic_instance_stream][:stream_id].present?
-      @analytic_instance_stream.stream = Stream.find(params[:analytic_instance_stream][:stream_id])
-    end
+      @analytic_instance_stream = AnalyticInstanceStream.new
+      @analytic_instance_stream.analytic_instance = @analytic_instance
 
-    @analytic_instance_stream.save
+      if params[:analytic_instance_stream][:analytic_input_stream_id].present?
+        @analytic_instance_stream.analytic_input_stream = AnalyticInputStream.find(params[:analytic_instance_stream][:analytic_input_stream_id])
+      end
 
-    if @analytic_instance_stream.errors.any?
-      respond_with(@analytic_instance_stream)
+      if params[:analytic_instance_stream][:stream_id].present?
+        @analytic_instance_stream.stream = Stream.find(params[:analytic_instance_stream][:stream_id])
+      end
+
+      @analytic_instance_stream.save
+
+      if @analytic_instance_stream.errors.any?
+        respond_with(@analytic_instance_stream)
+      end
     else
-      redirect_to analytic_instance_path(@analytic_instance)
+      flash[:error] = "Unable to create a new input stream for the analytic instance #{@analytic_instance.id}; Stop the analytic instance first, in order to add new input streams"
     end
+
+    redirect_to analytic_instance_path(@analytic_instance)
   end
 
   # PATCH/PUT /analytic_instance_streams/1
   def update
-    @analytic_instance_stream.update(analytic_input_stream_id: params[:analytic_instance_stream][:analytic_input_stream_id], stream_id: params[:analytic_instance_stream][:stream_id]   )
+    if(@analytic_instance.status.eql? 'Stopped')
+      @analytic_instance_stream.update(analytic_input_stream_id: params[:analytic_instance_stream][:analytic_input_stream_id], stream_id: params[:analytic_instance_stream][:stream_id]   )
 
-    if @analytic_instance_stream.errors.any?
-      respond_with(@analytic_instance_stream)
+      if @analytic_instance_stream.errors.any?
+        respond_with(@analytic_instance_stream)
+      end
+
     else
-      redirect_to analytic_instance_path(@analytic_instance)
-      #redirect_to analytic_instance_analytic_instance_stream_path(@analytic_instance, @analytic_instance_stream)
+      flash[:error] = "Unable to update the analytic instance stream #{@analytic_instance_stream.id}; Stop the analytic instance first, in order to edit its input stream details"
     end
+
+    redirect_to analytic_instance_path(@analytic_instance)
+
   end
 
   # DELETE /analytic_instance_streams/1
   def destroy
-    @analytic_instance_stream.destroy
+    if(@analytic_instance.status.eql? 'Stopped')
+      @analytic_instance_stream.destroy
+    else
+      flash[:error] = "Unable to delete the analytic instance stream #{@analytic_instance_stream.id}; Stop the analytic instance first, in order to edit its input streams"
+    end
+
     redirect_to analytic_instance_path(@analytic_instance)
   end
 

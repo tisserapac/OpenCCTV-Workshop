@@ -26,4 +26,15 @@
     Running new/customized Video Analytics on the videos from cameras connected to VMSes has become a challenging task.
     With OpenCCTV, we implement a standard method to run custom Video Analytics on videos from CCTV cameras.
   </p>
+
+  <br>
+
+  <p>
+  <%@open_cctv_server = OpenCctvServer.last%>
+  <%if @open_cctv_server.nil?%>
+      <div class="container">
+        <a href="<%=new_open_cctv_server_path%>" class="btn btn-success"> <span class="glyphicon glyphicon-plus"></span>Register a Connection to OpenCCTV Server</a>
+      </div>
+  <%end%>
+  </p>
 </div>

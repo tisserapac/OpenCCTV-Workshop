@@ -12,13 +12,19 @@
 
   <tbody>
     <% @analytic_instance_streams.each do |analytic_instance_stream| %>
+      <% status =  analytic_instance_stream.analytic_instance.status%>
       <tr>
         <td><%= analytic_instance_stream.analytic_instance.name %></td>
         <td><%= analytic_instance_stream.analytic_input_stream.name %></td>
         <td><%= analytic_instance_stream.stream.name %></td>
         <td><%= link_to 'Show', analytic_instance_stream %></td>
-        <td><%= link_to 'Edit', edit_analytic_instance_stream_path(analytic_instance_stream) %></td>
-        <td><%= link_to 'Destroy', analytic_instance_stream, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <%if (status.eql? 'Stopped') %>
+            <td><%= link_to 'Edit', edit_analytic_instance_stream_path(analytic_instance_stream) %></td>
+            <td><%= link_to 'Destroy', analytic_instance_stream, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <%else%>
+            <td><%= link_to 'Edit', '#' , data: {confirm: 'Stop the analytic instance first, in order to edit it input stream details'} %></td>
+            <td><%= link_to 'Destroy', '#', data: { confirm: 'Stop the analytic instance first, in order to delete its input streams' } %></td>
+        <%end%>
       </tr>
     <% end %>
   </tbody>

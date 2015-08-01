@@ -6,7 +6,7 @@ class OpenCctvServer < ActiveRecord::Base
 
   def send_to_server(message_type)
 
-    msg_details = nil
+    msg_details = {}
     reply = 'Error'
 
     context = ZMQ::Context.new(1)

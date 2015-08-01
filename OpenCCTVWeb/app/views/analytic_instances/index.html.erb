@@ -69,8 +69,14 @@
               </td>
 
               <td><%= link_to 'Show', analytic_instance, :class => "btn btn-xs btn-default"%></td>
-              <td><%= link_to 'Edit', edit_analytic_instance_path(analytic_instance), :class => "btn btn-xs btn-warning" %></td>
-              <td><%= link_to 'Destroy', analytic_instance, method: :delete, :class => "btn btn-xs btn-danger", data: { confirm: 'Are you sure?' } %></td>
+
+              <%if (status.eql? 'Stopped') %>
+                  <td><%= link_to 'Edit', edit_analytic_instance_path(analytic_instance), :class => "btn btn-xs btn-warning" %></td>
+                  <td><%= link_to 'Destroy', analytic_instance, method: :delete, :class => "btn btn-xs btn-danger", data: { confirm: 'Are you sure?' } %></td>
+              <%else%>
+                  <td><%= link_to 'Edit', '#', :class => "btn btn-xs btn-warning", data: { confirm: 'Stop the analytic instance first, in order to edit it' } %></td>
+                  <td><%= link_to 'Destroy', '#', :class => "btn btn-xs btn-danger", data: { confirm: 'Stop the analytic instance first, in order to delete it' } %></td>
+              <%end%>
             </tr>
             <% i = i + 1 %>
         <% end %>

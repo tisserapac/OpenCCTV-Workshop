@@ -33,11 +33,26 @@ class CamerasController < ApplicationController
 
   def update
     @camera.update(:name => params[:camera][:name], :camera_id => params[:camera][:camera_id], :description => params[:camera][:description])
-    redirect_to vms_camera_path(@vms, @camera)
+    #redirect_to vms_camera_path(@vms, @camera)
+    redirect_to vms_path(@vms)
   end
 
   def destroy
-    @camera.destroy
+    is_instance_streams = false
+
+    @camera.streams.each do |stream|
+      if(!AnalyticInstanceStream.find_by_stream_id(stream.id).nil?)
+        is_instance_streams = true
+        break
+      end
+    end
+
+    if(is_instance_streams)
+      flash[:error] = "There are analytic instances that are using video streams from this camera. Unable to delete the camera #{@camera.name}; "
+    else
+      @camera.destroy
+    end
+
     redirect_to vms_path(@vms)
   end
 

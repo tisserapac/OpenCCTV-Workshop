@@ -23,16 +23,19 @@
       <p>
       <div class="actions">
         <%= f.submit 'Update', :class => 'btn btn-success btn-mini'%>
+        <%= link_to 'Cancel', @analytic, :class => "btn btn-danger" %>
       </div>
       </p>
   <% end %> <!--Form ends-->
 
   <br>
   <div>
-    <strong>Changing analytic plugin archive zip file:</strong> <br>
-    If you need to change the analytic plugin archive, please
-    <%= link_to 'Delete', @analytic, method: :delete, :class => "btn btn-xs btn-danger", data: { confirm: 'Are you sure?' } %>
-    the current analytic plugin and upload a new.
+    <strong>Changing analytic plugin archive zip file:</strong>
+    <br>
+    If you need to change the analytic plugin archive(.zip file), please
+    <%= link_to 'Delete', @analytic, method: :delete, :class => "btn btn-xs btn-danger", data: { confirm: "This will stop and delete all the analytic instance of the type #{@analytic.name} on the server. Are you sure?" } %>
+    the current analytic plugin and re-create the analytic type.
+    <br>
     <p>
       <strong>Archive info:</strong>
       <% if(@analytic.verified?) %>

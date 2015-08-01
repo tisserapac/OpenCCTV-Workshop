@@ -55,7 +55,7 @@
               </td>
               <td><%= link_to 'Show', analytic, :class => "btn btn-xs btn-default"%></td>
               <td><%= link_to 'Edit', edit_analytic_path(analytic), :class => "btn btn-xs btn-warning" %></td>
-              <td><%= link_to 'Destroy', analytic, method: :delete, :class => "btn btn-xs btn-danger", data: { confirm: 'Are you sure?' } %></td>
+              <td><%= link_to 'Destroy', analytic, method: :delete, :class => "btn btn-xs btn-danger", data: { confirm: "This will stop and delete all the analytic instance of the type #{analytic.name} on the server. Are you sure?" } %></td>
               <% i = i + 1 %>
             </tr>
         <% end %>
