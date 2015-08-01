@@ -26,20 +26,13 @@ typedef struct {
 
 class MulticastDestination {
 private:
-	/*typedef struct {
-		unsigned int iAnalyticInstanceId;
-		std::string sInputName;
-		mq::TcpMqSender* pMqSender;
-	} Element;*/
-
 	boost::mutex _mutex;
-	//std::map<unsigned int, AnalyticDestination> ::iterator it;
 	std::map<unsigned int, AnalyticDestination> _mAISInfo; // Analytic Instance id as the key
+
 public:
 
 	MulticastDestination();
 	void addDestination(const unsigned int& iAnalyticInstanceId, const std::string& sInputName, const std::string& sInputQueueAddress);
-	//bool getNextDestination(unsigned int& iAnalyticInstanceId, std::string& sInputName, mq::TcpMqSender*& pSender);
 	bool getDestination(const unsigned int& iAnalyticInstanceId, std::string& sInputName, mq::TcpMqSender*& pSender);
 	bool removeDestination(const unsigned int& iAnalyticInstanceId);
 	void removeAllDestinations();

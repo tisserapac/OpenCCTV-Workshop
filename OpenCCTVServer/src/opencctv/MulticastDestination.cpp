@@ -49,36 +49,6 @@ void MulticastDestination::addDestination(const unsigned int& iAnalyticInstanceI
 	}
 }
 
-/*bool MulticastDestination::getNextDestination(unsigned int& iAnalyticInstanceId, std::string& sInputName, mq::TcpMqSender*& pSender)
-{
-	boost::mutex::scoped_lock lock(_mutex);
-
-	if(_mAISInfo.empty())
-	{
-		return false;
-	}
-
-	bool bResult = false;
-
-	if(it != _mAISInfo.end())
-	{
-		AnalyticDestination e = it->second;
-		iAnalyticInstanceId = e.iAnalyticInstanceId;
-		sInputName = e.sInputName;
-		pSender = e.pMqSender;
-
-		++it;
-
-		bResult =  true;
-	}else
-	{
-		it = _mAISInfo.begin();
-		bResult =  false;
-	}
-
-	return bResult;
-}*/
-
 bool MulticastDestination::getDestination(const unsigned int& iAnalyticInstanceId, std::string& sInputName, mq::TcpMqSender*& pSender)
 {
 	boost::mutex::scoped_lock lock(_mutex);
