@@ -10,7 +10,7 @@
 namespace opencctv {
 namespace db {
 
-const std::string AnalyticResultGateway::_INSERT_ANALYTIC_RESULT_SQL = "INSERT INTO results (analytic_id, timestamp, result_text) VALUES (?, ?, ?)";
+const std::string AnalyticResultGateway::_INSERT_ANALYTIC_RESULT_SQL = "INSERT INTO results (analytic_instance_id, timestamp, result_text) VALUES (?, ?, ?)";
 
 AnalyticResultGateway::AnalyticResultGateway()
 {
@@ -59,8 +59,6 @@ AnalyticResultGateway::~AnalyticResultGateway()
 	delete _pDbConnectorPtr; _pDbConnectorPtr = NULL;
 	delete _pDbConnectorPtr; _pDbConnectorPtr = NULL;
 }
-
-
 
 } /* namespace db */
 } /* namespace opencctv */

@@ -75,9 +75,9 @@ void ResultRouterThread::operator()()
 			}
 
 			analytic::AnalyticResult result = _pSerializer->deserializeAnalyticResult(*pSSerializedResult);
-			sMsg = "\t\tReceived Result of ";
+			/*sMsg = "\t\tReceived Result of ";
 			sMsg.append(result.getTimestamp());
-			util::log::Loggers::getDefaultLogger()->debug(sMsg);
+			util::log::Loggers::getDefaultLogger()->debug(sMsg);*/
 
 			//Saving to DB
 			if(result.getWriteToDatabase())
@@ -85,6 +85,9 @@ void ResultRouterThread::operator()()
 				try
 				{
 					pAnalyticResultGateway->insertResults(_iAnalyticInstanceId, result);
+					sMsg = "\t\tResult written to the database: ";
+					sMsg.append(result.getTimestamp());
+					util::log::Loggers::getDefaultLogger()->info(sMsg);
 
 				}catch(opencctv::Exception &e)
 				{
