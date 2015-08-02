@@ -17,3 +17,14 @@
 
 /app/uploads/analytics/*.zip
 /app/uploads/vms_connectors/*.zip
+
+app/assets/images/*.jpeg
+app/assets/images/*.jpg
+app/assets/programs/PluginArchiveValidator/Debug/
+app/assets/programs/PluginArchiveValidator/Release/PluginArchiveValidator
+app/assets/programs/PluginArchiveValidator/Release/src/*.d
+app/assets/programs/PluginArchiveValidator/Release/src/*.o
+app/assets/programs/PluginArchiveValidator/Release/src/opencctv/*.d
+app/assets/programs/PluginArchiveValidator/Release/src/opencctv/*.o
+app/assets/programs/PluginArchiveValidator/Release/src/opencctv/util/*.d
+app/assets/programs/PluginArchiveValidator/Release/src/opencctv/util/*.o

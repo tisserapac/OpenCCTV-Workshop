@@ -29,7 +29,7 @@ class VmsesController < ApplicationController
       rescue Exception => e
         flash[:error] = e.message
       end
-    respond_with @vms
+      respond_with @vms
     end
   end
 
@@ -122,6 +122,7 @@ class VmsesController < ApplicationController
       flash[:error] = "There are analytic instances that are using cameras connected to this VMS . Unable to delete the VMS -  #{@vms.name}; "
     else
       @vms.destroy
+      flash[:notice] = 'VMS was successfully destroyed.'
     end
 
     redirect_to vmses_url
