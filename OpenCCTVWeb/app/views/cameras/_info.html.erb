@@ -34,7 +34,11 @@
             <% end %>
           </td>
           <td>
-            <%= image_tag("#{@camera.vms.id}_#{@camera.id}.jpeg", :alt => 'Default frame from Camera comes here.', width: '320') %>
+            <% if(@camera.vms.vms_type != 'other') %>
+              <td>
+                <%= image_tag("#{@camera.vms.id}_#{@camera.id}.jpeg", :alt => 'Default frame from Camera comes here.', width: '320') %>
+              </td>
+          <% end %>
           </td>
         </tr>
     </tbody>
