@@ -46,12 +46,13 @@ class AnalyticInstanceStreamsController < ApplicationController
 
       if @analytic_instance_stream.errors.any?
         respond_with(@analytic_instance_stream)
+      else
+        redirect_to analytic_instance_path(@analytic_instance)
       end
     else
       flash[:error] = "Unable to create a new input stream for the analytic instance #{@analytic_instance.id}; Stop the analytic instance first, in order to add new input streams"
+      redirect_to analytic_instance_path(@analytic_instance)
     end
-
-    redirect_to analytic_instance_path(@analytic_instance)
   end
 
   # PATCH/PUT /analytic_instance_streams/1
