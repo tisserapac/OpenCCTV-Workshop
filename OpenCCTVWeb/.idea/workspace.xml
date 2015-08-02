@@ -33,31 +33,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="vms.rb" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/models/vms.rb">
+      <file leaf-file-name="camera.rb" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/models/camera.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-2.7235386" vertical-offset="2159" max-vertical-offset="5820">
-              <caret line="29" column="6" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="stream.rb" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/models/stream.rb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="1740">
-              <caret line="108" column="5" selection-start-line="108" selection-start-column="5" selection-end-line="108" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="_form.html.erb" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/views/vmses/_form.html.erb">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-18.125" vertical-offset="180" max-vertical-offset="1065">
-              <caret line="41" column="168" selection-start-line="41" selection-start-column="168" selection-end-line="41" selection-end-column="168" />
+            <state vertical-scroll-proportion="0.8341232" vertical-offset="1227" max-vertical-offset="1860">
+              <caret line="117" column="5" selection-start-line="117" selection-start-column="5" selection-end-line="117" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -116,6 +96,7 @@
         <option value="$PROJECT_DIR$/app/models/vms.rb" />
         <option value="$PROJECT_DIR$/app/controllers/vmses_controller.rb" />
         <option value="$PROJECT_DIR$/app/views/vmses/_form.html.erb" />
+        <option value="$PROJECT_DIR$/app/models/camera.rb" />
       </list>
     </option>
   </component>
@@ -955,13 +936,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/camera.rb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.064794816" vertical-offset="0" max-vertical-offset="1410">
-          <caret line="2" column="15" selection-start-line="2" selection-start-column="15" selection-end-line="2" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/views/cameras/show.html.erb">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-5.0" vertical-offset="540" max-vertical-offset="1005">
@@ -1154,7 +1128,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/stream.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="1740">
+        <state vertical-scroll-proportion="1.3507109" vertical-offset="765" max-vertical-offset="1740">
           <caret line="108" column="5" selection-start-line="108" selection-start-column="5" selection-end-line="108" selection-end-column="5" />
           <folding />
         </state>
@@ -1162,7 +1136,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/vmses/_form.html.erb">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-18.125" vertical-offset="180" max-vertical-offset="1065">
+        <state vertical-scroll-proportion="0.71428573" vertical-offset="180" max-vertical-offset="1065">
           <caret line="41" column="168" selection-start-line="41" selection-start-column="168" selection-end-line="41" selection-end-column="168" />
           <folding />
         </state>
@@ -1170,8 +1144,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/vms.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-2.7235386" vertical-offset="2159" max-vertical-offset="5820">
-          <caret line="29" column="6" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
+        <state vertical-scroll-proportion="0.30963665" vertical-offset="2159" max-vertical-offset="5820">
+          <caret line="157" column="5" selection-start-line="157" selection-start-column="5" selection-end-line="157" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/camera.rb">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.8341232" vertical-offset="1227" max-vertical-offset="1860">
+          <caret line="117" column="5" selection-start-line="117" selection-start-column="5" selection-end-line="117" selection-end-column="5" />
           <folding />
         </state>
       </provider>
