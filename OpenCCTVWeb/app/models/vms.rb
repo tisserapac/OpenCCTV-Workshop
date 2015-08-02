@@ -137,7 +137,6 @@ class Vms < ActiveRecord::Base
     return cameras
   end
 
-=begin
   # getMonitors returns a HashMap<monitorName, monitorWatchPath>,
   # nil if an error occurred or empty HashMap if no monitors
   def zoneminder_get_monitors(url, cookie)
@@ -156,7 +155,6 @@ class Vms < ActiveRecord::Base
     end
     return monitors
   end
-=end
 
   # zoneminder get monitors returns a HashMap<monitorName, monitorWatchPath>,
   # nil if an error occurred or empty HashMap if no monitors
