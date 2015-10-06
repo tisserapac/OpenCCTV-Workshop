@@ -17,6 +17,7 @@
 
 /app/uploads/analytics/*.zip
 /app/uploads/vms_connectors/*.zip
+/app/uploads/vms_connectors/
 
 app/assets/images/*.jpeg
 app/assets/images/*.jpg
