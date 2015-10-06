@@ -45,10 +45,8 @@ void FakeVmsConnector::produceImageObjects(opencctv::ConcurrentQueue<opencctv::I
 {
 	if(_pConfig && _pVImageData) _bEnable = true;
 	std::stringstream ssMsg;
-	//unsigned long long iCount = 20;
 
 	while(_bEnable)
-	//while(_lCount < iCount)
 	{
 		try{
 			opencctv::Image* pImage = new opencctv::Image();
@@ -63,21 +61,24 @@ void FakeVmsConnector::produceImageObjects(opencctv::ConcurrentQueue<opencctv::I
 			_lCount++;
 			boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
 
+			/*
+			 * Make sure to include this interrupt point such that the thread running the VMS connector
+			 * can be stooped by the OpenCCTV server.
+			 */
 			boost::this_thread::interruption_point();
 
 		}catch(const boost::thread_interrupted& e)
 		{
-			// Thread interruption request received, break the loop
-			//ssMsg <<  "Producer thread interrupted";
-			//std::cout << ssMsg.str() << std::endl;
+			/*
+			 * Stops the while loop when the thread running the VMS connector is interrupt by the
+			 * OpenCCTV server
+			 */
 			break;
 		}
 	}
 
 	if(_pVImageData) delete _pVImageData; _pVImageData = NULL;
-	ssMsg.clear();
-	//ssMsg <<  "Producer thread stopped";
-	//std::cout << ssMsg.str() << std::endl;
+	ssMsg.clear();;
 }
 
 bool FakeVmsConnector::isStillProducingImages()

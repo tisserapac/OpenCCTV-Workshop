@@ -5,6 +5,8 @@ class Analytic < ActiveRecord::Base
   validates :name, presence: true
   validates_presence_of :filename, message: 'No analytic plugin archive selected to upload.'
 
+
+
   def validate_plugin_archive
 
     validation_result = {}
@@ -129,7 +131,41 @@ class Analytic < ActiveRecord::Base
   end
 
   def get_analytics_stop_request
-    #<?xml version="1.0" encoding="utf-8"?><opencctvmsg><type>StopAnalyticInstances</type><analyticid>1</analyticid><analyticinstances><analyticinstanceid>1</analyticinstanceid></analyticinstances></opencctvmsg>
+    #<?xml version="1.0" encoding="utf-8"?>
+    # <opencctvmsg>
+    # <type>StopAnalyticInstances</type>
+    # <entity_type>analytic</entity_type>
+    # <entity_id>1</entity_id>
+    # <analyticid>1</analyticid>
+    # <analyticinstances><analyticinstanceid>1</analyticinstanceid></analyticinstances>
+    # </opencctvmsg>
+    message = ''
+
+    builder = Nokogiri::XML::Builder.new do |xml|
+      xml.opencctvmsg {
+        xml.type "StopAnalyticInstances"
+        xml.analyticid self.id
+        xml.analyticinstances{
+          self.analytic_instances.each do |analytic_instance|
+            xml.analyticinstanceid analytic_instance.id
+          end
+        }
+      }
+    end
+
+    message = builder.to_xml
+    return message
+  end
+
+  def get_analytics_stop_request1(entyty_type, entity_id)
+    #<?xml version="1.0" encoding="utf-8"?>
+    # <opencctvmsg>
+    # <type>StopAnalyticInstances</type>
+    # <entity_type>analytic</entity_type>
+    # <entity_id>1</entity_id>
+    # <analyticid>1</analyticid>
+    # <analyticinstances><analyticinstanceid>1</analyticinstanceid></analyticinstances>
+    # </opencctvmsg>
     message = ''
 
     builder = Nokogiri::XML::Builder.new do |xml|
