@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150714194034) do
+ActiveRecord::Schema.define(version: 20151007071654) do
 
   create_table "analytic_input_streams", force: true do |t|
     t.string   "name"
@@ -108,10 +108,11 @@ ActiveRecord::Schema.define(version: 20150714194034) do
     t.string   "name"
     t.text     "description"
     t.string   "filename"
-    t.boolean  "verified",    default: false, null: false
+    t.boolean  "verified",       default: false, null: false
     t.text     "log"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "connector_type"
   end
 
   create_table "vmses", force: true do |t|

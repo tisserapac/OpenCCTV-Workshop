@@ -9,6 +9,7 @@ class VmsConnectorsController < ApplicationController
 
   def create
     @vms_connector = VmsConnector.new(vms_connector_params)
+    #@vms_connector.type = params[:vms_connector][:type]
     uploaded_io = params[:vms_connector][:file]
     if(uploaded_io && uploaded_io.content_type.to_s == 'application/zip')
       @vms_connector.filename = SecureRandom.uuid.to_s
@@ -75,7 +76,7 @@ class VmsConnectorsController < ApplicationController
   end
 
   def vms_connector_params
-    params.require(:vms_connector).permit(:name, :description)
+    params.require(:vms_connector).permit(:name, :description, :connector_type)
   end
 
 end

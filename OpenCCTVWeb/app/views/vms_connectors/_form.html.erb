@@ -17,6 +17,11 @@
       <%= f.text_field :name %>
     </div>
     <div class="field">
+      <%= f.label :connector_type, 'Connector type' %>
+      <br>
+      <%= f.select :connector_type, options_for_select([['VMS', 'vms'], ['DVR', 'dvr'], ['Direct IP Camera', 'direct_ip_camera'],['Other', 'other']]) %>
+    </div>
+    <div class="field">
       <%= f.label :description %><br>
       <%= f.text_area :description %>
     </div>
