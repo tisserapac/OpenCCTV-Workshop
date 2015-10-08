@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151007071654) do
+ActiveRecord::Schema.define(version: 20151007084148) do
 
   create_table "analytic_input_streams", force: true do |t|
     t.string   "name"
@@ -127,6 +127,7 @@ ActiveRecord::Schema.define(version: 20151007071654) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "vms_type"
+    t.string   "camera_url" #Only used by the direct IP cameras
   end
 
   add_index "vmses", ["vms_connector_id"], name: "index_vmses_on_vms_connector_id", using: :btree
