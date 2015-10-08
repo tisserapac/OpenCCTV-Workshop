@@ -4,7 +4,8 @@ class VmsesController < ApplicationController
   respond_to :html
 
   def index
-    @vmses = Vms.all
+    #@vmses = Vms.all
+    @vmses = Vms.joins(:vms_connector).where('vms_connectors.connector_type != "direct_ip_camera"')
   end
 
   def show
