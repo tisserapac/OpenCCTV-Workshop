@@ -50,6 +50,24 @@ Rails.application.routes.draw do
 
   get '/analytic_instances/:id/stop' => 'analytic_instances#stop_analytic', as: :analytic_instance_stop
 
+  get 'direct_cameras' => 'direct_cameras#index', as: :direct_cameras
+
+  match 'direct_cameras/create' => 'direct_cameras#create', :via => [:get, :post]
+
+  get 'direct_cameras/show'
+
+  get 'direct_cameras/new'
+
+  get 'direct_cameras/edit'
+
+  #get 'direct_cameras/create'
+
+  #get 'direct_cameras/index'
+
+  get 'direct_cameras/update'
+
+  get 'direct_cameras/destroy'
+
   # Example resource route with options:
   #   resources :products do
   #     member do
