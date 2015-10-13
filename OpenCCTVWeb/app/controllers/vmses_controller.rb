@@ -20,6 +20,7 @@ class VmsesController < ApplicationController
 
   def create
     @vms = Vms.new(vms_params)
+    @vms.camera_url = 'NA'
     @vms.save
     if(!@vms.errors.any?)
       begin
