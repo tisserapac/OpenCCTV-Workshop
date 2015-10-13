@@ -10,11 +10,6 @@
 #include <string>
 #include <opencv2/opencv.hpp>
 
-/*
-#include <stdio.h>
-#include <stdlib.h>
-*/
-
 std::string generateOutput(bool bVerified, const std::string& sMessage, const int iWidth, const int iHeight)
 {
 	std::stringstream ss;
