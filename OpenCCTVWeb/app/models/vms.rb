@@ -1,10 +1,12 @@
 class Vms < ActiveRecord::Base
   belongs_to :vms_connector
   has_many :cameras, dependent: :destroy
+  validates :name, presence: true
   validates :server_ip, presence: true
   validates :server_port, presence: true
   validates :vms_connector_id, presence: true
   validates :vms_type, presence: true
+  validates :camera_url, presence: true
 
   ## Public methods start
 
@@ -51,6 +53,82 @@ class Vms < ActiveRecord::Base
     self.cameras.each do |camera|
       camera.set_verification(verification)
     end
+  end
+
+  # Sample output of the program DirectCameraInitializer
+  # DirectCameraInitializer is OpenCV based
+  # <camerainitializerreply><verified>1</verified><message>Camera verification successful</message><width>640</width><height>480</height></camerainitializerreply>
+  def init_direct_ip_camera
+    filename = "#{Rails.root}/app/assets/images/#{self.id}.jpeg"
+
+    cmd = "#{Rails.root}/app/assets/programs/DirectCameraInitializer/Release/DirectCameraInitializer "+
+          "\"#{self.camera_url}\" " + "#{filename}"
+    stdin, stdout, stderr = Open3.popen3(cmd)
+    output = stdout.readline
+
+    camera_verified = false
+    width = 0
+    height = 0
+
+    if(!output.nil? && (output.start_with?("<")))
+      xml = Nokogiri::XML(output)
+      if(xml.xpath('//camerainitializerreply/verified')[0].content == '1')
+        camera_verified = true
+        width = xml.xpath('//camerainitializerreply/width')[0].content
+        height = xml.xpath('//camerainitializerreply/height')[0].content
+      end
+    end
+
+    #self.verified = camera_verified
+
+    self.update(:verified => camera_verified)
+
+    # If camera_verified is true then add the camera and the default stream
+    if(camera_verified)
+      camera = self.cameras.first
+
+      if camera.nil?
+        camera = Camera.new
+        camera.name = self.name
+        camera.camera_id = self.name
+        camera.description = "Direct Camera - #{self.description}"
+        camera.verified = camera_verified
+        self.cameras.push(camera)
+      else
+        camera.update(:name => self.name, :camera_id => self.name, :description => self.description, :verified => camera_verified )
+      end
+
+      default_stream = camera.streams.first
+      if default_stream.nil?
+        default_stream = Stream.new(:name => "Default stream - #{self.name}", :width => width, :height => height, :keep_aspect_ratio => true, :allow_upsizing => false, :compression_rate => 100, :description => "Default stream from a direct camera", :verified => camera_verified)
+        camera.streams.push(default_stream)
+      else
+        default_stream.update(:name => "Default stream - #{self.name}")
+      end
+
+      # Default image for the camera and the stream
+      if File.exist?(filename)
+        cam_filename = "#{Rails.root}/app/assets/images/#{self.id}_#{camera.id}.jpeg"
+        stream_filename = "#{Rails.root}/app/assets/images/#{self.id}_#{camera.id}_#{default_stream.id}.jpeg"
+
+        in_file = open(filename, 'rb')
+        indata = in_file.read
+
+        out_file = open(cam_filename, 'wb')
+        out_file.write(indata)
+        out_file.close
+
+        out_file = open(stream_filename, 'wb')
+        out_file.write(indata)
+        out_file.close
+
+        in_file.close
+
+        File.delete(filename)
+      end
+    end
+
+    return camera_verified
   end
 
   ## Public methods end
