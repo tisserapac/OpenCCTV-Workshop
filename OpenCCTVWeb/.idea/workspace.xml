@@ -4,12 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/app/models/open_cctv_server.rb" line="71" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="79279080-f820-4f2e-a4e2-be17bf82665c" name="Default" comment="A connector type field is added to the VMS Connectors">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../AnalyticRunner/.cproject" afterPath="$PROJECT_DIR$/../AnalyticRunner/.cproject" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/OpenCCTVWeb.iml" afterPath="$PROJECT_DIR$/.idea/OpenCCTVWeb.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="79279080-f820-4f2e-a4e2-be17bf82665c" name="Default" comment="A connector type field is added to the VMS Connectors" />
     <ignored path="OpenCCTVWeb.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/components/" />
@@ -49,7 +44,7 @@
       <file leaf-file-name="routes.rb" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/config/routes.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.65170276">
+            <state vertical-scroll-proportion="2.6886792">
               <caret line="76" column="31" selection-start-line="76" selection-start-column="31" selection-end-line="76" selection-end-column="31" />
               <folding />
             </state>
@@ -599,7 +594,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="47" y="24" width="1319" height="744" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3288889" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1040,7 +1035,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/config/routes.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.65170276">
+        <state vertical-scroll-proportion="2.6886792">
           <caret line="76" column="31" selection-start-line="76" selection-start-column="31" selection-end-line="76" selection-end-column="31" />
           <folding />
         </state>
