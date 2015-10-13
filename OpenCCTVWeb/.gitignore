@@ -29,3 +29,8 @@ app/assets/programs/PluginArchiveValidator/Release/src/opencctv/*.d
 app/assets/programs/PluginArchiveValidator/Release/src/opencctv/*.o
 app/assets/programs/PluginArchiveValidator/Release/src/opencctv/util/*.d
 app/assets/programs/PluginArchiveValidator/Release/src/opencctv/util/*.o
+
+app/assets/programs/DirectCameraInitializer/Debug/
+app/assets/programs/DirectCameraInitializer/Release/DirectCameraInitializer
+app/assets/programs/DirectCameraInitializer/Release/src/*.d
+app/assets/programs/DirectCameraInitializer/Release/src/*.o
