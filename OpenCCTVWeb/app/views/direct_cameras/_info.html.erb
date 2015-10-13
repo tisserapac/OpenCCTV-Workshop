@@ -1,0 +1,100 @@
+<div class="container">
+  <h1>
+    Direct IP camera information
+    <a href="<%=direct_cameras_edit_path(@vms)%>" class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
+  </h1>
+  <p>
+    <strong>Name:</strong>
+    <%= @vms.name %>
+  </p>
+  <p>
+    <strong>Camera connector:</strong>
+    <%= @vms.vms_connector.name %>
+  </p>
+  <p>
+    <strong>Stream URL:</strong>
+    <%= @vms.camera_url %>
+  </p>
+  <p>
+    <strong>Description:</strong>
+    <%= @vms.description %>
+  </p>
+
+  <p>
+    <strong>Verified:</strong>
+    <% if (@vms.verified) %>
+          <span class="label label-success" title="Connection to the Camera is verified.">
+            <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+            Verified
+          </span>
+    <% else %>
+          <span class="label label-danger" title="Connection to the Camera is failed.">
+            <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
+            Unverified
+          </span>
+    <% end %>
+  </p>
+
+  <p>
+    <% unless @camera.nil? %>
+        <%filename = "#{Rails.root}/app/assets/images/#{@vms.id}_#{@camera.id}.jpeg"%>
+        <%if File.exist?(filename)%>
+            <%= image_tag("#{@vms.id}_#{@camera.id}.jpeg", :alt => 'Default frame from Camera comes here.', width: '320') %>
+        <% end %>
+    <% end %>
+
+  </p>
+</div>
+
+<br>
+
+<% unless @stream.nil? %>
+    <div class="container">
+        <h1>
+          Stream information
+          <a href="#" class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
+        </h1>
+
+        <div class="media">
+          <table class="table table-hover">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Width</th>
+              <th>Height</th>
+              <th>Verified</th>
+              <th>Keep aspect ratio</th>
+              <th>Allow upsizing</th>
+              <th>Compression rate</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr>
+              <td><%= @stream.name %></td>
+              <td><%= @stream.description %></td>
+              <td><%= @stream.width %></td>
+              <td><%= @stream.height %></td>
+              <td>
+                <% if (@vms.verified) %>
+                  <span class="label label-success" title="Connection to the Camera is verified.">
+                    <span class="glyphicon glyphicon-ok-sign" aria-hidden="true"></span>
+                    Verified
+                  </span>
+                        <% else %>
+                  <span class="label label-danger" title="Connection to the Camera is failed.">
+                    <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
+                    Unverified
+                  </span>
+                <% end %>
+              </td>
+              <td><%= @stream.keep_aspect_ratio %></td>
+              <td><%= @stream.allow_upsizing %></td>
+              <td><%= @stream.compression_rate %></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+    </div>
+<% end %>

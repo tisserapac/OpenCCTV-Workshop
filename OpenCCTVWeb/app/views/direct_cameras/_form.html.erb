@@ -1,7 +1,16 @@
-<%= form_for(@vms) do |f| %>
+<% if(params[:action]=='edit' || params[:action]=='update') %>
+    <%sUrl =  direct_cameras_update_path
+      sAction = 'Update'
+    %>
+<% else %>
+    <%sUrl =  direct_cameras_create_path
+      sAction = 'Save'%>
+<% end %>
+
+<%= form_for(@vms, url: sUrl) do |f| %>
     <% if @vms.errors.any? %>
         <div id="error_explanation" class="alert alert-danger" role="alert">
-          <h2><%= pluralize(@vms.errors.count, "Error") %> prohibited this VMS from being saved:</h2>
+          <h2><%= pluralize(@vms.errors.count, "Error") %> prohibited this camera details from being saved:</h2>
           <ul>
             <% @vms.errors.full_messages.each do |message| %>
                 <li>
@@ -18,48 +27,36 @@
       <%= f.text_field :name %>
     </div>
     <div class="field">
-      <%= f.label :server_ip, 'Server IP address / URL' %>
+      <%= f.label :camera_url, 'Camera Stream URL'%>
       <br>
-      <%= f.text_field :server_ip, {:disabled => params[:action]=="edit"} %>
+      <%= f.text_field :camera_url, {:disabled => params[:action]=="edit"}%>
     </div>
     <div class="field">
-      <%= f.label :server_port %>
+      <%= f.label :vms_connector_id, 'Camera connector'%>
       <br>
-      <%= f.number_field :server_port, {:disabled => params[:action]=="edit"} %>
+      <%= f.collection_select(:vms_connector_id, VmsConnector.where("verified = ? AND connector_type = ?", 1, 'direct_ip_camera'), :id, :name, {prompt: 'Select Connector Type'}, {:disabled => params[:action]=="edit"}) %>
     </div>
-    <div class="field">
-      <%= f.label :vms_connector_id, 'VMS connector' %>
-      <br>
-      <%= f.collection_select(:vms_connector_id, VmsConnector.where('verified = 1'), :id, :name, {prompt: 'Select Connector Type'}, {:disabled => params[:action]=="edit"}) %>
-      <% if(params[:action]=='edit') %>
-          <%= "(#{@vms.vms_type})" %>
-      <% end %>
-    </div>
-    <% if(params[:action]!='edit') %>
-        <div class="field">
-          <%= f.label :vms_type, 'VMS type' %>
-          <br>
-          <%= f.select :vms_type, options_for_select([['Other', 'other'], ['Milestone XProtect', 'milestone'], ['ZoneMinder', 'zoneminder'], ['HikVision', 'hikvision']]) %>
-        </div>
-    <% end %>
     <div class="field">
       <%= f.label :description %>
       <br>
       <%= f.text_area :description %>
     </div>
-    <div class="field">
-      <%= f.label :username %>
-      <br>
-      <%= f.text_field :username %>
-    </div>
-    <div class="field">
-      <%= f.label :password %>
-      <br>
-      <%= f.password_field :password %>
-    </div>
     <br />
     <div class="actions">
-      <%= f.submit "Save VMS", :class => "btn btn-success btn-mini" %>
-      <%= link_to 'Cancel', @vms, :class => "btn btn-danger" %>
+      <%= f.submit sAction, :class => "btn btn-success btn-mini" %>
+      <%= link_to 'Cancel', direct_cameras_path, :class => "btn btn-danger" %>
     </div>
 <% end %>
+
+<br>
+<% if(params[:action]=='edit' || params[:action]=='update') %>
+<div>
+  <strong>Changing camera stream URL or camera connector type:</strong> <br>
+  If you need to change the camera stream URL or camera connector type, please
+  <%= link_to 'Delete',direct_cameras_destroy_path(@vms), method: :delete, :class => "btn btn-xs btn-danger", data: { confirm: 'Are you sure?' } %>
+  the current camera and re-create a new one.
+</div>
+<% end %>
+
+
+<%#=params%>
