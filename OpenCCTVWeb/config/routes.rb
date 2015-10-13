@@ -54,19 +54,27 @@ Rails.application.routes.draw do
 
   match 'direct_cameras/create' => 'direct_cameras#create', :via => [:get, :post]
 
-  get 'direct_cameras/show'
+  get 'direct_cameras/:id/show' => 'direct_cameras#show', as: :direct_cameras_show
 
   get 'direct_cameras/new'
 
-  get 'direct_cameras/edit'
+  get 'direct_cameras/:id/edit' => 'direct_cameras#edit', as: :direct_cameras_edit
+
+  match 'direct_cameras/:id/update' => 'direct_cameras#update', :via => [:patch, :put], as: :direct_cameras_update
+
+  match 'direct_cameras/:id/destroy' => 'direct_cameras#destroy', :via => [:delete], as: :direct_cameras_destroy
+
+  #get 'direct_cameras/edit'
 
   #get 'direct_cameras/create'
 
   #get 'direct_cameras/index'
 
-  get 'direct_cameras/update'
+  #get 'direct_cameras/show'
 
-  get 'direct_cameras/destroy'
+  #get 'direct_cameras/update'
+
+  #get 'direct_cameras/destroy'
 
   # Example resource route with options:
   #   resources :products do
