@@ -60,11 +60,20 @@ class Vms < ActiveRecord::Base
   # <camerainitializerreply><verified>1</verified><message>Camera verification successful</message><width>640</width><height>480</height></camerainitializerreply>
   def init_direct_ip_camera
     filename = "#{Rails.root}/app/assets/images/#{self.id}.jpeg"
+    output = nil
 
     cmd = "#{Rails.root}/app/assets/programs/DirectCameraInitializer/Release/DirectCameraInitializer "+
           "\"#{self.camera_url}\" " + "#{filename}"
-    stdin, stdout, stderr = Open3.popen3(cmd)
-    output = stdout.readline
+
+    Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
+      exit_status = wait_thr.value
+      if exit_status.success?
+        output = stdout.readline
+      end
+    end
+
+    #stdin, stdout, stderr = Open3.popen3(cmd)
+    #output = stdout.readline
 
     camera_verified = false
     width = 0

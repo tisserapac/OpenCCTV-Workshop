@@ -78,16 +78,6 @@ ActiveRecord::Schema.define(version: 20151007084148) do
     t.datetime "updated_at"
   end
 
-  create_table "results", force: true do |t|
-    t.integer  "analytic_id"
-    t.string   "timestamp"
-    t.text     "result_text"
-    t.datetime "time"
-    t.integer  "count"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-  end
-
   create_table "streams", force: true do |t|
     t.string   "name"
     t.text     "description"
@@ -127,7 +117,7 @@ ActiveRecord::Schema.define(version: 20151007084148) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "vms_type"
-    t.string   "camera_url" #Only used by the direct IP cameras
+    t.string   "camera_url"
   end
 
   add_index "vmses", ["vms_connector_id"], name: "index_vmses_on_vms_connector_id", using: :btree
