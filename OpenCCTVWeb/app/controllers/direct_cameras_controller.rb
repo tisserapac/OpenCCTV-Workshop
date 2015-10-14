@@ -1,5 +1,5 @@
 class DirectCamerasController < ApplicationController
-  before_action :set_vms, only: [:show, :edit, :update, :destroy]
+  before_action :set_vms, only: [:show, :edit, :update, :destroy, :edit_stream]
   before_action :set_vms_connector, only: [:show, :edit, :update]
   respond_to :html
 
@@ -24,6 +24,11 @@ class DirectCamerasController < ApplicationController
   end
 
   def edit
+  end
+
+  def edit_stream
+    @camera = @vms.cameras.first
+    @stream = @camera.streams.first
   end
 
   def create

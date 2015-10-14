@@ -5,8 +5,8 @@ class Stream < ActiveRecord::Base
 
   validates :name, presence: true
   validates_numericality_of :compression_rate, :greater_than => 0, :less_than_or_equal_to => 100
-  validates_numericality_of :width, :greater_than => 0
-  validates_numericality_of :height, :greater_than => 0
+  validates_numericality_of :width, :greater_than_or_equal_to => 0
+  validates_numericality_of :height, :greater_than_or_equal_to => 0
 
   before_destroy :delete_frame
 

@@ -64,6 +64,8 @@ Rails.application.routes.draw do
 
   match 'direct_cameras/:id/destroy' => 'direct_cameras#destroy', :via => [:delete], as: :direct_cameras_destroy
 
+  get 'direct_cameras/:id/editstream' => 'direct_cameras#edit_stream', as: :direct_cameras_edit_stream
+
   #get 'direct_cameras/edit'
 
   #get 'direct_cameras/create'

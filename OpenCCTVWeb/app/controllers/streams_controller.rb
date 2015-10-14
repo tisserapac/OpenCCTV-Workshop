@@ -59,10 +59,11 @@ class StreamsController < ApplicationController
       flash[:error] = "There are analytic instances that are using this video stream. Unable to edit the stream #{@stream.name}; "
     end
 
-    redirect_to vms_camera_path(@stream.camera.vms, @stream.camera)
-
-    #redirect_to vms_camera_stream_path(@stream.camera.vms, @stream.camera, @stream)
-
+    if(@stream.camera.vms.vms_connector.connector_type == 'direct_ip_camera')
+      redirect_to direct_cameras_show_path(@stream.camera.vms)
+    else
+      redirect_to vms_camera_path(@stream.camera.vms, @stream.camera)
+    end
   end
 
   def destroy
