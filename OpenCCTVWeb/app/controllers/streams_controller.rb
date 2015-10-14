@@ -64,6 +64,7 @@ class StreamsController < ApplicationController
     else
       redirect_to vms_camera_path(@stream.camera.vms, @stream.camera)
     end
+    
   end
 
   def destroy
