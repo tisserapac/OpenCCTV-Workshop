@@ -4,7 +4,13 @@
     <bookmark url="file://$PROJECT_DIR$/app/models/open_cctv_server.rb" line="71" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="79279080-f820-4f2e-a4e2-be17bf82665c" name="Default" comment="A connector type field is added to the VMS Connectors" />
+=======
+    <list default="true" id="79279080-f820-4f2e-a4e2-be17bf82665c" name="Default" comment="A connector type field is added to the VMS Connectors">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/vms.rb" afterPath="$PROJECT_DIR$/app/models/vms.rb" />
+    </list>
+>>>>>>> refs/heads/direct_camera
     <ignored path="OpenCCTVWeb.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/components/" />
@@ -34,8 +40,13 @@
       <file leaf-file-name="vms.rb" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/models/vms.rb">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state vertical-scroll-proportion="0.38915095">
               <caret line="94" column="75" selection-start-line="94" selection-start-column="75" selection-end-line="94" selection-end-column="75" />
+=======
+            <state vertical-scroll-proportion="0.6014151">
+              <caret line="94" column="6" selection-start-line="94" selection-start-column="6" selection-end-line="94" selection-end-column="6" />
+>>>>>>> refs/heads/direct_camera
               <folding />
             </state>
           </provider>
@@ -185,7 +196,7 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectReloadState">
-    <option name="STATE" value="0" />
+    <option name="STATE" value="1" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -1046,8 +1057,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/vms.rb">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state vertical-scroll-proportion="0.38915095">
           <caret line="94" column="75" selection-start-line="94" selection-start-column="75" selection-end-line="94" selection-end-column="75" />
+=======
+        <state vertical-scroll-proportion="0.6014151">
+          <caret line="94" column="6" selection-start-line="94" selection-start-column="6" selection-end-line="94" selection-end-column="6" />
+>>>>>>> refs/heads/direct_camera
           <folding />
         </state>
       </provider>
