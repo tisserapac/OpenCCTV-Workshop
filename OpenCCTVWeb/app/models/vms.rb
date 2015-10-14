@@ -94,7 +94,6 @@ class Vms < ActiveRecord::Base
 
     # If camera_verified is true then add the camera and the default stream
     # TODO : As a tempory messure even if the direct IP camera connection cannot be verified the camera and the stream details are anyway saved/updated
-
     #--------if(camera_verified)
     camera = self.cameras.first
 
