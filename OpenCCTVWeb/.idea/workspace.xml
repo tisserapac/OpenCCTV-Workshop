@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="79279080-f820-4f2e-a4e2-be17bf82665c" name="Default" comment="A connector type field is added to the VMS Connectors">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/schema.rb" afterPath="$PROJECT_DIR$/db/schema.rb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/vms.rb" afterPath="$PROJECT_DIR$/app/models/vms.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="OpenCCTVWeb.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -39,7 +37,7 @@
         <entry file="file://$PROJECT_DIR$/app/models/vms.rb">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.6014151">
-              <caret line="67" column="9" selection-start-line="67" selection-start-column="4" selection-end-line="67" selection-end-column="9" />
+              <caret line="94" column="6" selection-start-line="94" selection-start-column="6" selection-end-line="94" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -189,7 +187,7 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectReloadState">
-    <option name="STATE" value="0" />
+    <option name="STATE" value="1" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -1051,7 +1049,7 @@
     <entry file="file://$PROJECT_DIR$/app/models/vms.rb">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.6014151">
-          <caret line="67" column="9" selection-start-line="67" selection-start-column="4" selection-end-line="67" selection-end-column="9" />
+          <caret line="94" column="6" selection-start-line="94" selection-start-column="6" selection-end-line="94" selection-end-column="6" />
           <folding />
         </state>
       </provider>
