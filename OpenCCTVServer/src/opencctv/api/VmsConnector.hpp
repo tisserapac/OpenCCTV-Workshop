@@ -26,6 +26,8 @@ typedef struct
 	bool bKeepAspectRatio;
 	bool bAllowUpsizing;
 	unsigned short int iCompressionRate;
+	/* To be used only by the direct camera connectors */
+	std::string sCameraUri;
 } VmsConnectInfo;
 
 class VmsConnector
