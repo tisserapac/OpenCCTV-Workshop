@@ -10,8 +10,8 @@
 namespace opencctv {
 namespace db {
 
-const std::string StreamGateway::_SELECT_ALL_STREAMS_SQL = "SELECT DISTINCT s.id, s.width, s.height, s.keep_aspect_ratio, s.allow_upsizing, s.compression_rate, ca.camera_id, vms.vms_connector_id, vms.server_ip, vms.server_port, vms.username, vms.password, vmsc.filename FROM streams AS s, cameras AS ca, vmses as vms, vms_connectors as vmsc WHERE (s.verified = TRUE) AND (s.camera_id = ca.id) AND (ca.vms_id = vms.id) AND (vms.vms_connector_id = vmsc.id) AND (s.id IN (SELECT DISTINCT ais.stream_id FROM analytic_instance_streams as ais))";
-const std::string StreamGateway::_SELECT_STREAM_SQL ="SELECT DISTINCT s.id, s.width, s.height, s.keep_aspect_ratio, s.allow_upsizing, s.compression_rate, ca.camera_id, vms.vms_connector_id, vms.server_ip, vms.server_port, vms.username, vms.password, vmsc.filename FROM streams AS s, cameras AS ca, vmses as vms, vms_connectors as vmsc WHERE (s.verified = TRUE) AND (s.camera_id = ca.id) AND (ca.vms_id = vms.id) AND (vms.vms_connector_id = vmsc.id) AND s.id = ?";
+const std::string StreamGateway::_SELECT_ALL_STREAMS_SQL = "SELECT DISTINCT s.id, s.width, s.height, s.keep_aspect_ratio, s.allow_upsizing, s.compression_rate, ca.camera_id, vms.vms_connector_id, vms.server_ip, vms.server_port, vms.username, vms.password, vms.camera_url, vmsc.filename FROM streams AS s, cameras AS ca, vmses as vms, vms_connectors as vmsc WHERE (s.verified = TRUE) AND (s.camera_id = ca.id) AND (ca.vms_id = vms.id) AND (vms.vms_connector_id = vmsc.id) AND (s.id IN (SELECT DISTINCT ais.stream_id FROM analytic_instance_streams as ais))";
+const std::string StreamGateway::_SELECT_STREAM_SQL ="SELECT DISTINCT s.id, s.width, s.height, s.keep_aspect_ratio, s.allow_upsizing, s.compression_rate, ca.camera_id, vms.vms_connector_id, vms.server_ip, vms.server_port, vms.username, vms.password, vms.camera_url, vmsc.filename FROM streams AS s, cameras AS ca, vmses as vms, vms_connectors as vmsc WHERE (s.verified = TRUE) AND (s.camera_id = ca.id) AND (ca.vms_id = vms.id) AND (vms.vms_connector_id = vmsc.id) AND s.id = ?";
 
 StreamGateway::StreamGateway()
 {
@@ -53,6 +53,10 @@ void StreamGateway::findStream(const unsigned int iStreamId, opencctv::dto::Stre
 			stream.setVmsServerPort((*pResultsPtr).getInt("server_port"));
 			stream.setVmsUsername((*pResultsPtr).getString("username"));
 			stream.setVmsPassword((*pResultsPtr).getString("password"));
+
+			/* This field is only used by the direct camera connections */
+			stream.setCameraUri((*pResultsPtr).getString("camera_url"));
+
 			stream.setVmsConnectorFilename((*pResultsPtr).getString("filename"));
 			stream.setVmsConnectorDirLocation((*pResultsPtr).getString("filename"));
 		}
@@ -90,6 +94,10 @@ void StreamGateway::findAll(std::vector<opencctv::dto::Stream>& vToStoreStreams)
 			stream.setVmsServerPort((*pResultsPtr).getInt("server_port"));
 			stream.setVmsUsername((*pResultsPtr).getString("username"));
 			stream.setVmsPassword((*pResultsPtr).getString("password"));
+
+			/* This field is only used by the direct camera connections */
+			stream.setCameraUri((*pResultsPtr).getString("camera_url"));
+
 			stream.setVmsConnectorFilename((*pResultsPtr).getString("filename"));
 			stream.setVmsConnectorDirLocation((*pResultsPtr).getString("filename"));
 

@@ -219,6 +219,7 @@ std::string AnalyticEvent::startAnalytic(const unsigned int iAnalyticInstanceId,
 			bStartThreadResult = true;
 		}
 
+		//Start the consumer thread
 		if(bStartThreadResult)
 		{
 			bStartThreadResult = EventUtil::startThread(opencctv::event::CONSUMER_THREAD, iStreamId);

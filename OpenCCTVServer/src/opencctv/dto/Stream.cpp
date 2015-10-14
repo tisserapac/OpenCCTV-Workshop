@@ -149,6 +149,14 @@ const std::string& Stream::getVmsConnectorFilename() const
 	return _sVmsConnectorFilename;
 }
 
+const std::string& Stream::getCameraUri() const {
+	return _sCameraUri;
+}
+
+void Stream::setCameraUri(const std::string& cameraUri) {
+	_sCameraUri = cameraUri;
+}
+
 Stream::~Stream() {
 }
 

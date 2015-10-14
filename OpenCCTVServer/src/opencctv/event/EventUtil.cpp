@@ -84,7 +84,7 @@ bool EventUtil::loadVmsConnector(const opencctv::dto::Stream& stream)
 	// init VMS Connector
 	opencctv::api::VmsConnectInfo connInfo = { stream.getVmsServerIp(), stream.getVmsServerPort(), stream.getVmsUsername(),
 			stream.getVmsPassword(), stream.getCameraId(), stream.getWidth(), stream.getHeight(),
-			stream.getKeepAspectRatio(), stream.getAllowUpSizing(), stream.getCompressionRate() };
+			stream.getKeepAspectRatio(), stream.getAllowUpSizing(), stream.getCompressionRate(), stream.getCameraUri()};
 
 	bool bVmsConnInitDone = false;
 

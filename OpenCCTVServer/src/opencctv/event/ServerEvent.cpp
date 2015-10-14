@@ -231,7 +231,7 @@ bool ServerEvent::startServer()
 					stream.getVmsPassword(), stream.getCameraId(),
 					stream.getWidth(), stream.getHeight(),
 					stream.getKeepAspectRatio(), stream.getAllowUpSizing(),
-					stream.getCompressionRate() };
+					stream.getCompressionRate(), stream.getCameraUri()};
 
 			bool bVmsConnInitDone = false;
 			if(pVmsConnector)

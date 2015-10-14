@@ -23,6 +23,8 @@ private:
 	std::string _sUsername;
 	std::string _sPassword;
 	unsigned int _iVmsTypeId; // to store vms plugin loaders in application model by this id
+	/* The URL field only used by the direct camera connections */
+	std::string _sCameraUri;
 	std::string _sVmsConnectorDirLocation;
 	std::string _sVmsConnectorFilename;
 public:
@@ -57,6 +59,8 @@ public:
 	const std::string& getVmsConnectorDirLocation() const;
 	void setVmsConnectorFilename(const std::string& sFilename);
 	const std::string& getVmsConnectorFilename() const;
+	const std::string& getCameraUri() const;
+	void setCameraUri(const std::string& cameraUri);
 };
 
 } /* namespace dto */
