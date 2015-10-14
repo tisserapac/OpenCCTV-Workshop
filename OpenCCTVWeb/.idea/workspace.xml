@@ -4,11 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/app/models/open_cctv_server.rb" line="71" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="79279080-f820-4f2e-a4e2-be17bf82665c" name="Default" comment="A connector type field is added to the VMS Connectors">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/schema.rb" afterPath="$PROJECT_DIR$/db/schema.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/vms.rb" afterPath="$PROJECT_DIR$/app/models/vms.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="79279080-f820-4f2e-a4e2-be17bf82665c" name="Default" comment="A connector type field is added to the VMS Connectors" />
     <ignored path="OpenCCTVWeb.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/components/" />
@@ -38,8 +34,8 @@
       <file leaf-file-name="vms.rb" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/models/vms.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6014151">
-              <caret line="67" column="9" selection-start-line="67" selection-start-column="4" selection-end-line="67" selection-end-column="9" />
+            <state vertical-scroll-proportion="0.38915095">
+              <caret line="94" column="75" selection-start-line="94" selection-start-column="75" selection-end-line="94" selection-end-column="75" />
               <folding />
             </state>
           </provider>
@@ -1050,8 +1046,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/vms.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6014151">
-          <caret line="67" column="9" selection-start-line="67" selection-start-column="4" selection-end-line="67" selection-end-column="9" />
+        <state vertical-scroll-proportion="0.38915095">
+          <caret line="94" column="75" selection-start-line="94" selection-start-column="75" selection-end-line="94" selection-end-column="75" />
           <folding />
         </state>
       </provider>
